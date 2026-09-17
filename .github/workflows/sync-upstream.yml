@@ -1,0 +1,31 @@
+name: Sync upstream (ReSukiSU + KernelSU)
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync with ReSukiSU & KernelSU upstream
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.5
+        with:
+          target_branch: main
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+          upstream_repository: |
+            ReSukiSU/ReSukiSU
+            tiann/KernelSU
+          upstream_branch: main,main
+          upstream_repo_access_token: ${{ secrets.GITHUB_TOKEN }}
+          exclude_merge: true
+          emails_report: false
