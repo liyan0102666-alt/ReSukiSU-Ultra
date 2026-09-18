@@ -1,0 +1,19 @@
+name: tmp test2 write-all
+
+on:
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove invalid workflow files
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git rm -q --ignore-unmatch .github/workflows/sync-upstream.yml .github/workflows/fix-cleanup.yml .github/workflows/tmp-test.yml .github/workflows/tmp-test2.yml .github/workflows/.github/workflows/fix-sync.yml
+          git commit -m "chore: remove invalid workflow files" || true
+          git push origin main
