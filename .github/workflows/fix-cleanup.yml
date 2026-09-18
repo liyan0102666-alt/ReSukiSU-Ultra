@@ -1,0 +1,21 @@
+name: Clean up broken sync workflow
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  workflows: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove broken workflow files
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git rm -q --ignore-unmatch .github/workflows/sync-upstream.yml .github/workflows/.github/workflows/fix-sync.yml .github/workflows/fix-cleanup.yml
+          git commit -m "chore: remove broken sync workflow for recreation"
+          git push origin main
