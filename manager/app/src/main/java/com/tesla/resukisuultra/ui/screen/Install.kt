@@ -72,6 +72,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/Install.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.LkmSelection
 import com.tesla.resukisuultra.ui.component.DialogHandle
@@ -93,6 +94,30 @@ import com.tesla.resukisuultra.ui.theme.getCardElevation
 import com.tesla.resukisuultra.ui.theme.renderBackgroundBlur
 import com.tesla.resukisuultra.ui.viewmodel.InstallUiEvent
 import com.tesla.resukisuultra.ui.viewmodel.InstallViewModel
+=======
+import com.resukisu.resukisu.R
+import com.resukisu.resukisu.domain.model.LkmSelection
+import com.resukisu.resukisu.ui.component.DialogHandle
+import com.resukisu.resukisu.ui.component.rememberConfirmDialog
+import com.resukisu.resukisu.ui.component.rememberCustomDialog
+import com.resukisu.resukisu.ui.component.settings.AppBackButton
+import com.resukisu.resukisu.ui.component.settings.SettingsBaseWidget
+import com.resukisu.resukisu.ui.component.settings.SettingsChooseDialog
+import com.resukisu.resukisu.ui.component.settings.SettingsChooseWidget
+import com.resukisu.resukisu.ui.navigation.LocalNavigator
+import com.resukisu.resukisu.ui.navigation.Route
+import com.resukisu.resukisu.ui.screen.kernelFlash.component.SlotSelectionDialog
+import com.resukisu.resukisu.ui.theme.CardConfig
+import com.resukisu.resukisu.ui.theme.ThemeConfig
+import com.resukisu.resukisu.ui.theme.blurEffect
+import com.resukisu.resukisu.ui.theme.blurSource
+import com.resukisu.resukisu.ui.theme.getCardColors
+import com.resukisu.resukisu.ui.theme.getCardElevation
+import com.resukisu.resukisu.ui.theme.renderBackgroundBlur
+import com.resukisu.resukisu.ui.util.adaptiveScaffoldWindowInsets
+import com.resukisu.resukisu.ui.viewmodel.InstallUiEvent
+import com.resukisu.resukisu.ui.viewmodel.InstallViewModel
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/Install.kt
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -263,6 +288,7 @@ fun InstallScreen(
     }
 
     Scaffold(
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         topBar = {
             TopBar(
                 onBack = { navigator.pop() },

@@ -101,6 +101,7 @@ data class SettingsUiState(
     val isSelinuxHideEnabled: Boolean = false,
     val isRootAvailable: Boolean = false,
     val defaultUmountModules: Boolean = false,
+    val useBuiltinMonoFont: Boolean = false,
 )
 
 sealed interface SettingsUiAction {
@@ -184,7 +185,7 @@ class SettingsViewModel(
         dispatch(SettingsUiAction.Initialize)
     }
 
-    fun initialize() {
+fun initialize() {
         applySnapshot(loadSettings(), resetTempDpi = true)
         loadFeatureSettings()
     }
@@ -431,7 +432,7 @@ class SettingsViewModel(
         }
     }
 
-    fun dispatch(action: SettingsUiAction) {
+fun dispatch(action: SettingsUiAction) {
         when (action) {
             SettingsUiAction.Initialize -> initialize()
             SettingsUiAction.InitializeFirstRun -> initializeFirstRunSettings()
@@ -473,6 +474,10 @@ class SettingsViewModel(
             is SettingsUiAction.SetDefaultUmountModules ->
                 handleDefaultUmountModulesChange(action.enabled)
         }
+    }
+
+    fun handleBuiltinMonospaceFontChange(checked: Boolean) {
+        updatePlatformAsync(PlatformSetting.BuiltinMonospaceFont(checked))
     }
 
     private fun updateAppearanceAsync(setting: AppearanceSetting) {
@@ -518,6 +523,7 @@ class SettingsViewModel(
                 checkBetaUpdate = snapshot.checkBetaUpdate,
                 checkModuleUpdate = snapshot.checkModuleUpdate,
                 autoJailbreakEnabled = snapshot.autoJailbreakEnabled,
+                useBuiltinMonoFont = snapshot.useBuiltinMonoFont,
             )
         }
     }

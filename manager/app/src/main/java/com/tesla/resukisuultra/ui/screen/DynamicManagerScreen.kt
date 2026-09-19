@@ -45,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/DynamicManagerScreen.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.DynamicManagerConfig
 import com.tesla.resukisuultra.ui.component.ConfirmResult
@@ -68,6 +69,33 @@ import com.tesla.resukisuultra.ui.viewmodel.DynamicManagerOperation
 import com.tesla.resukisuultra.ui.viewmodel.DynamicManagerUiAction
 import com.tesla.resukisuultra.ui.viewmodel.DynamicManagerUiEvent
 import com.tesla.resukisuultra.ui.viewmodel.DynamicManagerViewModel
+=======
+import com.resukisu.resukisu.R
+import com.resukisu.resukisu.domain.model.DynamicManagerConfig
+import com.resukisu.resukisu.ui.component.ConfirmResult
+import com.resukisu.resukisu.ui.component.DialogHandle
+import com.resukisu.resukisu.ui.component.PackageIcon
+import com.resukisu.resukisu.ui.component.SearchAppBar
+import com.resukisu.resukisu.ui.component.SwipeableSnackbarHost
+import com.resukisu.resukisu.ui.component.rememberConfirmDialog
+import com.resukisu.resukisu.ui.component.rememberCustomDialog
+import com.resukisu.resukisu.ui.component.rememberSearchAppBarScrollBehavior
+import com.resukisu.resukisu.ui.component.settings.SegmentedColumn
+import com.resukisu.resukisu.ui.component.settings.SettingsBaseWidget
+import com.resukisu.resukisu.ui.component.settings.SettingsTextFieldWidget
+import com.resukisu.resukisu.ui.component.settings.lazySegmentColumn
+import com.resukisu.resukisu.ui.navigation.LocalNavigator
+import com.resukisu.resukisu.ui.theme.blurSource
+import com.resukisu.resukisu.ui.util.ActivityResumeEffect
+import com.resukisu.resukisu.ui.util.LocalSnackbarHost
+import com.resukisu.resukisu.ui.util.adaptiveScaffoldWindowInsets
+import com.resukisu.resukisu.ui.util.showReplacingSnackbar
+import com.resukisu.resukisu.ui.viewmodel.DynamicManagerAppItem
+import com.resukisu.resukisu.ui.viewmodel.DynamicManagerOperation
+import com.resukisu.resukisu.ui.viewmodel.DynamicManagerUiAction
+import com.resukisu.resukisu.ui.viewmodel.DynamicManagerUiEvent
+import com.resukisu.resukisu.ui.viewmodel.DynamicManagerViewModel
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/DynamicManagerScreen.kt
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -78,8 +106,9 @@ fun DynamicManagerScreen() {
     val navigator = LocalNavigator.current
     val viewModel = koinViewModel<DynamicManagerViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val scrollBehavior =
+    val scrollBehavior = rememberSearchAppBarScrollBehavior(
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    )
     val pullToRefreshState = rememberPullToRefreshState()
     val snackbarHost = LocalSnackbarHost.current
     val scope = rememberCoroutineScope()
@@ -150,6 +179,7 @@ fun DynamicManagerScreen() {
     }
 
     Scaffold(
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         topBar = {
             SearchAppBar(
                 title = stringResource(R.string.dynamic_manager_title),

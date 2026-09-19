@@ -49,11 +49,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/UmountManagerScreen.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.ui.component.ConfirmResult
 import com.tesla.resukisuultra.ui.component.SwipeableSnackbarHost
@@ -73,6 +73,28 @@ import com.tesla.resukisuultra.ui.util.showReplacingSnackbar
 import com.tesla.resukisuultra.ui.viewmodel.UmountManagerScreenViewModel
 import com.tesla.resukisuultra.ui.viewmodel.UmountManagerUiAction
 import com.tesla.resukisuultra.ui.viewmodel.UmountManagerUiEvent
+=======
+import com.resukisu.resukisu.R
+import com.resukisu.resukisu.ui.component.ConfirmResult
+import com.resukisu.resukisu.ui.component.SwipeableSnackbarHost
+import com.resukisu.resukisu.ui.component.WarningCard
+import com.resukisu.resukisu.ui.component.rememberConfirmDialog
+import com.resukisu.resukisu.ui.component.settings.AppBackButton
+import com.resukisu.resukisu.ui.component.settings.SettingsBaseWidget
+import com.resukisu.resukisu.ui.component.settings.lazySegmentColumn
+import com.resukisu.resukisu.ui.navigation.LocalNavigator
+import com.resukisu.resukisu.ui.theme.CardConfig
+import com.resukisu.resukisu.ui.theme.ThemeConfig
+import com.resukisu.resukisu.ui.theme.blurEffect
+import com.resukisu.resukisu.ui.theme.blurSource
+import com.resukisu.resukisu.ui.util.ActivityResumeEffect
+import com.resukisu.resukisu.ui.util.LocalSnackbarHost
+import com.resukisu.resukisu.ui.util.adaptiveScaffoldWindowInsets
+import com.resukisu.resukisu.ui.util.showReplacingSnackbar
+import com.resukisu.resukisu.ui.viewmodel.UmountManagerScreenViewModel
+import com.resukisu.resukisu.ui.viewmodel.UmountManagerUiAction
+import com.resukisu.resukisu.ui.viewmodel.UmountManagerUiEvent
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/UmountManagerScreen.kt
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -87,7 +109,6 @@ fun UmountManagerScreen() {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val snackBarHost = LocalSnackbarHost.current
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val confirmDialog = rememberConfirmDialog()
 
@@ -105,7 +126,7 @@ fun UmountManagerScreen() {
         viewModel.events.collectLatest { event ->
             when (event) {
                 is UmountManagerUiEvent.Message ->
-                    snackBarHost.showReplacingSnackbar(context.getString(event.stringResource))
+                    snackBarHost.showReplacingSnackbar(event.message)
             }
         }
     }
@@ -115,6 +136,7 @@ fun UmountManagerScreen() {
     }
 
     Scaffold(
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         topBar = {
             LargeFlexibleTopAppBar(
                 modifier = Modifier
