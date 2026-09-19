@@ -69,9 +69,16 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.PopupPositionProvider
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/themeSettings/crop/BackgroundCropActivity.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.ui.component.KeyPointSlider
 import com.tesla.resukisuultra.ui.theme.KernelSUTheme
+=======
+import com.resukisu.resukisu.R
+import com.resukisu.resukisu.ui.component.KeyPointSlider
+import com.resukisu.resukisu.ui.theme.KernelSUTheme
+import com.resukisu.resukisu.ui.util.adaptiveScaffoldWindowInsets
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/themeSettings/crop/BackgroundCropActivity.kt
 import com.yalantis.ucrop.UCrop
 import com.yalantis.ucrop.callback.BitmapCropCallback
 import com.yalantis.ucrop.view.OverlayView
@@ -252,6 +259,7 @@ private fun BackgroundCropScreen(
     }
 
     Scaffold(
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         topBar = {
             LargeFlexibleTopAppBar(
                 title = { Text(stringResource(R.string.background_crop_title)) },

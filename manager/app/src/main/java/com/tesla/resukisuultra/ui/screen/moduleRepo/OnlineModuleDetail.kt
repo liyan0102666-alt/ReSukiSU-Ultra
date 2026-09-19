@@ -20,14 +20,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -81,6 +78,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/moduleRepo/OnlineModuleDetail.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.CatalogModule
 import com.tesla.resukisuultra.domain.model.ModuleRelease
@@ -108,6 +106,36 @@ import com.tesla.resukisuultra.ui.util.LocalSnackbarHost
 import com.tesla.resukisuultra.ui.viewmodel.ModuleDetailUiAction
 import com.tesla.resukisuultra.ui.viewmodel.ModuleDetailViewModel
 import com.tesla.resukisuultra.ui.viewmodel.formatFileSize
+=======
+import com.resukisu.resukisu.R
+import com.resukisu.resukisu.domain.model.CatalogModule
+import com.resukisu.resukisu.domain.model.ModuleRelease
+import com.resukisu.resukisu.domain.model.ModuleReleaseAsset
+import com.resukisu.resukisu.domain.usecase.EnqueueDownloadUseCase
+import com.resukisu.resukisu.domain.usecase.ObserveDownloadUseCase
+import com.resukisu.resukisu.ui.activity.PermissionRequestInterface
+import com.resukisu.resukisu.ui.component.ConfirmResult
+import com.resukisu.resukisu.ui.component.GithubMarkdown
+import com.resukisu.resukisu.ui.component.SwipeableSnackbarHost
+import com.resukisu.resukisu.ui.component.rememberConfirmDialog
+import com.resukisu.resukisu.ui.component.settings.AppBackButton
+import com.resukisu.resukisu.ui.component.settings.SegmentedColumn
+import com.resukisu.resukisu.ui.component.settings.SettingsBaseWidget
+import com.resukisu.resukisu.ui.navigation.LocalNavigator
+import com.resukisu.resukisu.ui.navigation.Navigator
+import com.resukisu.resukisu.ui.navigation.Route
+import com.resukisu.resukisu.ui.theme.CardConfig
+import com.resukisu.resukisu.ui.theme.ThemeConfig
+import com.resukisu.resukisu.ui.theme.blurEffect
+import com.resukisu.resukisu.ui.theme.blurSource
+import com.resukisu.resukisu.ui.theme.renderBackgroundBlur
+import com.resukisu.resukisu.ui.util.LocalPermissionRequestInterface
+import com.resukisu.resukisu.ui.util.LocalSnackbarHost
+import com.resukisu.resukisu.ui.util.adaptiveScaffoldWindowInsets
+import com.resukisu.resukisu.ui.viewmodel.ModuleDetailUiAction
+import com.resukisu.resukisu.ui.viewmodel.ModuleDetailViewModel
+import com.resukisu.resukisu.ui.viewmodel.formatFileSize
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/moduleRepo/OnlineModuleDetail.kt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -239,9 +267,7 @@ private fun OnlineModuleDetailContent(module: CatalogModule) {
         },
         containerColor = Color.Transparent,
         contentColor =  MaterialTheme.colorScheme.onSurface,
-        contentWindowInsets = WindowInsets.safeDrawing.only(
-            WindowInsetsSides.Top + WindowInsetsSides.Horizontal
-        ),
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         snackbarHost = { SwipeableSnackbarHost(hostState = snackBarHost) }
     ) { innerPadding ->
         Column(
@@ -553,7 +579,8 @@ fun ReleaseCard(
                             formatFileSize(assetInfo.size),
                             assetInfo.downloadCount
                         ),
-                        isOnBackground = false
+                        isOnBackground = false,
+                        containerColor = Color.Transparent,
                     ) {
                         FilledTonalButton(
                             onClick = onClick,

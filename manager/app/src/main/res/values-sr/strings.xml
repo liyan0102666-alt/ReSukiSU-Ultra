@@ -5,12 +5,11 @@
     <string name="home_not_installed">Није инсталирано</string>
     <string name="home_working">Ради</string>
     <string name="save_log">Сачувај Дневнике</string>
-    <string name="settings_check_update">Obaveštenja o ažuriranju</string>
-    <string name="settings_check_update_summary">Automatski proveri ažuriranja modula i menadžera</string>
     <string name="settings_sucompat">Preusmeri su binarni fajl</string>
     <string name="settings_sucompat_summary">Preusmeri /system/bin/su na ksud za aplikacije sa dozvolom Superkorisnika u Profilu aplikacije; efektivno samo za nove procese.</string>
     <string name="settings_kernel_umount">Kernel umount</string>
     <string name="settings_kernel_umount_summary">Ponašanje umount-a na nivou kernela kontrolisano od strane KernelSU-a</string>
+<<<<<<< HEAD
 
     <string name="iosched_title">I/O распоређивач</string>
     <string name="iosched_current">Тренутни распоређивач</string>
@@ -26,3 +25,6 @@
     <string name="settings_soft_reboot">Мека поновно покретање</string>
     <string name="settings_soft_reboot_summary">Преферирајте меко поновно покретање (задржава jailbreak, промене модула се и даље примењују)</string>
 </resources>
+=======
+</resources>
+>>>>>>> resukisu/main
