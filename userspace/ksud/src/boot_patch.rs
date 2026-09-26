@@ -17,10 +17,25 @@ use regex_lite::Regex;
 
 use crate::{assets, banner};
 
+const KSU_BLOCK_MODULES_CONFIG: &str = "ksu_block_modules";
+const KSU_BLOCK_MODULES_MAX_LEN: usize = 255;
+
+fn valid_block_modules(modules: &str) -> bool {
+    modules.len() <= KSU_BLOCK_MODULES_MAX_LEN
+        && (modules.is_empty()
+            || modules.split(',').all(|name| {
+                !name.is_empty()
+                    && name
+                        .bytes()
+                        .all(|ch| ch.is_ascii_alphanumeric() || ch == b'_' || ch == b'-')
+            }))
+}
+
 #[cfg(target_os = "android")]
 mod android {
+    use rustix::process::getuid;
     use std::{
-        fs::OpenOptions,
+        fs::{File, OpenOptions},
         io::Write,
         os::fd::AsRawFd,
         path::{Path, PathBuf},
@@ -33,7 +48,10 @@ mod android {
 
     use super::{PermissionsExt, Result};
     use crate::android::utils;
-    pub(super) use crate::defs::{BACKUP_FILENAME, KSU_BACKUP_DIR, KSU_BACKUP_FILE_PREFIX};
+    pub(super) use crate::defs::{
+        BACKUP_FILENAME, DEFAULT_PACKAGE_NAME, KSU_BACKUP_DIR, KSU_BACKUP_FILE_PREFIX,
+        KSU_TEMP_BACKUP_DIR_NAME,
+    };
 
     pub(super) fn ensure_gki_kernel() -> Result<()> {
         let version = get_kernel_version()?;
@@ -121,17 +139,43 @@ mod android {
         Ok(base16ct::lower::encode_string(&result))
     }
 
-    pub(super) fn do_backup(cpio: &mut Cpio, image: &Path) -> Result<()> {
-        let sha1 = calculate_sha1(image)?;
+    fn find_backup_location(sha1: &String) -> Result<(File, String)> {
         let filename = format!("{KSU_BACKUP_FILE_PREFIX}{sha1}");
-
-        println!("- Backup stock boot image");
         let target = format!("{KSU_BACKUP_DIR}{filename}");
-        let mut target_file = OpenOptions::new()
+        if let Ok(target_file) = OpenOptions::new()
             .create(true)
             .truncate(true)
             .write(true)
-            .open(&target)?;
+            .open(&target)
+        {
+            return Ok((target_file, target));
+        }
+
+        // We have no permission to access /data/adb
+        // Save it to /data/user_de/$USER/$PKG/boot_backup
+        let user_id = getuid().as_raw() / 100_000;
+
+        let backup_dir =
+            format!("/data/user_de/{user_id}/{DEFAULT_PACKAGE_NAME}/{KSU_TEMP_BACKUP_DIR_NAME}");
+        std::fs::remove_dir_all(&backup_dir).ok();
+        std::fs::create_dir(&backup_dir)?;
+        let backup_file = format!("{backup_dir}/{filename}");
+        if let Ok(file) = OpenOptions::new()
+            .create(true)
+            .truncate(true)
+            .write(true)
+            .open(&backup_file)
+        {
+            return Ok((file, backup_file));
+        }
+        bail!("Both /data/adb/ksu and {backup_dir} are not accessible!")
+    }
+
+    pub(super) fn do_backup(cpio: &mut Cpio, image: &Path) -> Result<()> {
+        let sha1 = calculate_sha1(image)?;
+        let (mut target_file, target) = find_backup_location(&sha1)?;
+        println!("- Backup stock boot image");
+
         let mut source = OpenOptions::new()
             .create(false)
             .truncate(false)
@@ -419,6 +463,11 @@ pub struct BootPatchArgs {
     #[arg(short, long, default_value = "false")]
     pub flash: bool,
 
+    /// Force backup source image as stock image
+    #[cfg(target_os = "android")]
+    #[arg(long, default_value = "false")]
+    pub backup: bool,
+
     /// output path, if not specified, will use current directory
     #[arg(short, long, default_value = None)]
     pub out: Option<PathBuf>,
@@ -460,6 +509,14 @@ pub struct BootPatchArgs {
     #[arg(long, default_value = "false")]
     no_custom_rc: bool,
 
+    /// Block what module loading
+    #[arg(
+        long,
+        value_name = "NAMES",
+        default_value = "vr,vklp,oplus_secure_guard,oplus_secure_guard_new,mkp"
+    )]
+    block_modules: Option<String>,
+
     #[cfg(not(target_os = "android"))]
     #[arg(long, default_value = "aarch64")]
     arch: String,
@@ -484,10 +541,13 @@ pub fn patch(args: BootPatchArgs) -> Result<()> {
             adb_debug_prop,
             cmdline,
             no_install,
+            block_modules,
             #[cfg(target_os = "android")]
             ota,
             #[cfg(target_os = "android")]
             flash,
+            #[cfg(target_os = "android")]
+            backup,
             #[cfg(target_os = "android")]
             partition,
             no_custom_rc,
@@ -495,6 +555,13 @@ pub fn patch(args: BootPatchArgs) -> Result<()> {
             arch,
             ramdisk,
         } = args;
+
+        if let Some(modules) = &block_modules {
+            ensure!(
+                valid_block_modules(modules),
+                "blocked preset module list must be at most 255 bytes and contain only letters, digits, '_' or '-'"
+            );
+        }
 
         println!("{}", banner::print_banner());
 
@@ -523,6 +590,9 @@ pub fn patch(args: BootPatchArgs) -> Result<()> {
                 "init and module must not be specified."
             );
         }
+
+        // None means --no-install: preserve the marker for the existing LKM.
+        let bundled_lkm = (!no_install).then_some(kmod.is_none());
 
         let kmi = kmi.map_or_else(
             || -> Result<_> {
@@ -677,8 +747,7 @@ pub fn patch(args: BootPatchArgs) -> Result<()> {
             cpio.add("kernelsu.ko", CpioEntry::regular(0o755, kernelsu_ko))?;
 
             #[cfg(target_os = "android")]
-            if !is_kernelsu_patched
-                && flash
+            if (backup || (!is_kernelsu_patched && flash))
                 && let Err(e) = do_backup(&mut cpio, &boot_image_file)
             {
                 println!("- Backup stock image failed: {e:?}");
@@ -708,6 +777,9 @@ pub fn patch(args: BootPatchArgs) -> Result<()> {
 
         apply_config("no custom rc", "norc=1", no_custom_rc);
         apply_config("allow shell", "allow_shell=1", allow_shell);
+        if let Some(bundled) = bundled_lkm {
+            apply_config("bundled LKM", "bundled=1", bundled);
+        }
 
         if ksu_config.is_empty() {
             cpio.rm("ksu_config", false);
@@ -718,6 +790,16 @@ pub fn patch(args: BootPatchArgs) -> Result<()> {
 
         // remove legacy config file
         cpio.rm("allow_shell", false);
+
+        if let Some(modules) = block_modules {
+            if !modules.is_empty() {
+                println!("- Blocking modules: {modules}");
+            }
+            cpio.add(
+                KSU_BLOCK_MODULES_CONFIG,
+                CpioEntry::regular(0o644, Box::new(modules.into_bytes())),
+            )?;
+        }
 
         if enable_adbd || adb_debug_prop.is_some() {
             println!("- Adding adb_debug props");
@@ -774,9 +856,6 @@ pub fn patch(args: BootPatchArgs) -> Result<()> {
             println!("- Flashing new boot image");
             let bootdevice = boot_image_file.display().to_string();
             flash_partition(&bootdevice, &new_boot_bytes)?;
-            if ota {
-                post_ota()?;
-            }
             if ota {
                 post_ota()?;
             }

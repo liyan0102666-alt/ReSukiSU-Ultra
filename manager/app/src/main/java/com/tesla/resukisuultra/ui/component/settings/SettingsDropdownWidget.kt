@@ -4,11 +4,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.DropdownMenuGroup
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.SelectableDropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -85,16 +85,21 @@ fun SettingsDropdownWidget(
                     data.forEachIndexed { index, item ->
                         val isSelected = index == choice
 
-                        // Utilize the selectable variation of DropdownMenuItem
-                        // MenuDefaults.itemShape(index, count) automatically handles the shapes
-                        DropdownMenuItem(
+                        SelectableDropdownMenuItem(
                             selected = isSelected,
                             onClick = {
                                 onChoiceChange(index)
                                 expanded = false
                             },
                             text = { Text(text = item) },
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/SettingsDropdownWidget.kt
                             shapes = com.tesla.resukisuultra.ui.theme.menuItemShapes(index, data.size)
+=======
+                            shapes = MenuDefaults.itemShape(
+                                index = index,
+                                count = data.size
+                            ),
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/component/settings/SettingsDropdownWidget.kt
                         )
                     }
                 }

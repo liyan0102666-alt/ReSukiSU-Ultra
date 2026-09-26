@@ -4,18 +4,25 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build
 import android.system.Os
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/system/HomeRuntimeRepository.kt
 import com.tesla.resukisuultra.BuildConfig
 import com.tesla.resukisuultra.data.shell.KsuCliRepository
 import com.tesla.resukisuultra.domain.model.HomeBasicInfo
 import com.tesla.resukisuultra.domain.model.HomeModuleOverview
+=======
+import com.resukisu.resukisu.BuildConfig
+import com.resukisu.resukisu.domain.model.HomeBasicInfo
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/data/system/HomeRuntimeRepository.kt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class HomeRuntimeRepository(
     private val application: Application,
-    private val ksuCliRepository: KsuCliRepository,
 ) {
-    suspend fun getBasicInfo(managerUapiVersion: Int): HomeBasicInfo =
+    suspend fun getBasicInfo(
+        managerUapiVersion: Int,
+        includeSelinuxStatus: Boolean = true,
+    ): HomeBasicInfo =
         withContext(Dispatchers.IO) {
             val uname = runCatching { Os.uname() }.getOrNull()
             HomeBasicInfo(
@@ -27,26 +34,14 @@ class HomeRuntimeRepository(
                     BuildConfig.VERSION_CODE,
                     managerUapiVersion,
                 ),
-                selinuxStatus = runCatching { getSELinuxStatus(application) }.getOrDefault("Unknown"),
+                selinuxStatus = if (includeSelinuxStatus) {
+                    runCatching { getSELinuxStatus(application) }.getOrDefault("Unknown")
+                } else {
+                    ""
+                },
                 seccompStatus = runCatching { Os.prctl(21, 0, 0, 0, 0) }.getOrDefault(-1),
             )
         }
-
-    suspend fun getModuleOverview(): HomeModuleOverview = withContext(Dispatchers.IO) {
-        HomeModuleOverview(
-            count = runCatching { ksuCliRepository.getModuleCount() }.getOrDefault(0),
-            zygiskImplementation = runCatching {
-                ksuCliRepository.getZygiskImplement()
-            }.getOrDefault("None"),
-            metaModuleImplementation = runCatching {
-                ksuCliRepository.getMetaModuleImplement()
-            }.getOrDefault("None"),
-        )
-    }
-
-    suspend fun getSuperuserCount(): Int = withContext(Dispatchers.IO) {
-        runCatching { ksuCliRepository.getSuperuserCount() }.getOrDefault(0)
-    }
 
     @SuppressLint("PrivateApi")
     private fun getDeviceModel(): String = runCatching {

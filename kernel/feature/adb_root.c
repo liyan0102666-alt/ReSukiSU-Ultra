@@ -8,6 +8,12 @@
 #include <linux/ptrace.h>
 #include <linux/static_key.h>
 #include <linux/slab.h>
+#include <linux/version.h>
+
+// https://github.com/torvalds/linux/commit/68db0cf10678630d286f4bbbbdfa102951a35faa
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
+#include <linux/sched/task_stack.h>
+#endif
 
 #include "adb_root.h"
 #include "arch.h"
@@ -189,7 +195,11 @@ out_release_env_p:
 }
 
 #ifdef CONFIG_KSU_TRACEPOINT_HOOK
+<<<<<<< HEAD
 static long do_ksu_adb_root_handle_execve(const char __user *filename_user, unsigned long *envp_p)
+=======
+static long do_ksu_adb_root_handle_execve(const char __user *filename_user, struct pt_regs *regs, unsigned long *envp_p)
+>>>>>>> resukisu/main
 {
     if (likely(is_exec_adbd_tracepoint(filename_user) != 1)) {
         return 0;
@@ -214,7 +224,11 @@ long ksu_adb_root_handle_execve_tracepoint(struct pt_regs *regs)
     // Tracepoint Syscall Redirect hook always in GKI2
     // So there no need to check for modern static key interface
     if (static_branch_unlikely(&ksu_adb_root)) {
+<<<<<<< HEAD
         return do_ksu_adb_root_handle_execve((const char __user *)PT_REGS_PARM1(regs),
+=======
+        return do_ksu_adb_root_handle_execve((const char __user *)PT_REGS_SYSCALL_PARM1(regs), regs,
+>>>>>>> resukisu/main
                                              (unsigned long *)&PT_REGS_PARM3(regs));
     }
     return 0;
@@ -222,10 +236,15 @@ long ksu_adb_root_handle_execve_tracepoint(struct pt_regs *regs)
 
 long ksu_adb_root_handle_execveat_tracepoint(struct pt_regs *regs)
 {
+<<<<<<< HEAD
     // Tracepoint Syscall Redirect hook always in GKI2
     // So there no need to check for modern static key interface
     if (static_branch_unlikely(&ksu_adb_root)) {
         return do_ksu_adb_root_handle_execve((const char __user *)PT_REGS_PARM2(regs),
+=======
+    if (static_branch_unlikely(&ksu_adb_root)) {
+        return do_ksu_adb_root_handle_execve((const char __user *)PT_REGS_PARM2(regs), regs,
+>>>>>>> resukisu/main
                                              (unsigned long *)&PT_REGS_SYSCALL_PARM4(regs));
     }
     return 0;

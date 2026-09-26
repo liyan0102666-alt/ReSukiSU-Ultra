@@ -394,7 +394,7 @@ static void load_module_rc_once(void)
         return;
     }
 
-    old_cred = ksu_cred ? override_creds(ksu_cred) : NULL;
+    old_cred = override_creds(ksu_cred);
 
     f = open_module_rc(&path);
     if (IS_ERR(f)) {
@@ -435,8 +435,7 @@ out_close_file:
     filp_close(f, NULL);
 
 out_revert_creds:
-    if (old_cred)
-        revert_creds(old_cred);
+    revert_creds(old_cred);
 }
 
 static void free_module_rc(void)
@@ -801,9 +800,12 @@ int ksu_handle_input_handle_event(unsigned int *type, unsigned int *code, int *v
         if (val) {
             // key pressed, count it
             volumedown_pressed_count += 1;
-            if (is_volumedown_enough(volumedown_pressed_count)) {
-                ksu_stop_input_hook_runtime();
-            }
+            // don't stop hook, or sleep in atomic context
+            // keep for on_post_fs_data do that
+            // check https://github.com/ReSukiSU/ReSukiSU/issues/363
+            // if (is_volumedown_enough(volumedown_pressed_count)) {
+            //     ksu_stop_input_hook_runtime();
+            // }
         }
     }
 
@@ -975,7 +977,11 @@ static void ksu_execve_hook_ksud_common(const char __user *filename_user, const 
 
 void ksu_execve_hook_ksud(const struct pt_regs *regs)
 {
+<<<<<<< HEAD
     const char __user *filename_user = (const char __user *)PT_REGS_PARM1(regs);
+=======
+    const char __user *filename_user = (const char __user *)PT_REGS_SYSCALL_PARM1(regs);
+>>>>>>> resukisu/main
     const char __user *const __user *argv_user = (const char __user *const __user *)PT_REGS_PARM2(regs);
 
     ksu_execve_hook_ksud_common(filename_user, argv_user);
@@ -992,7 +998,7 @@ void ksu_execveat_hook_ksud(const struct pt_regs *regs)
 static long (*orig_sys_read)(const struct pt_regs *regs);
 static long ksu_sys_read(const struct pt_regs *regs)
 {
-    unsigned int fd = PT_REGS_PARM1(regs);
+    unsigned int fd = PT_REGS_SYSCALL_PARM1(regs);
     char __user **buf_ptr = (char __user **)&PT_REGS_PARM2(regs);
     size_t *count_ptr = (size_t *)&PT_REGS_PARM3(regs);
 
@@ -1003,7 +1009,7 @@ static long ksu_sys_read(const struct pt_regs *regs)
 static long (*orig_sys_fstat)(const struct pt_regs *regs);
 static long ksu_sys_fstat(const struct pt_regs *regs)
 {
-    unsigned int fd = PT_REGS_PARM1(regs);
+    unsigned int fd = PT_REGS_SYSCALL_PARM1(regs);
     void __user *statbuf = (void __user *)PT_REGS_PARM2(regs);
     bool is_rc = false;
     long ret;

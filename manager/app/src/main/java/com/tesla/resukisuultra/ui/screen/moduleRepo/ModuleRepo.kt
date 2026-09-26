@@ -3,7 +3,6 @@ import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -12,15 +11,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,9 +29,8 @@ import androidx.compose.material.icons.twotone.Extension
 import androidx.compose.material.icons.twotone.MoreVert
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material.icons.twotone.WebAsset
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CheckableDropdownMenuItem
 import androidx.compose.material3.DropdownMenuGroup
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -82,6 +76,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/moduleRepo/ModuleRepo.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.CatalogAuthor
 import com.tesla.resukisuultra.domain.model.CatalogModule
@@ -114,6 +109,42 @@ import com.tesla.resukisuultra.ui.viewmodel.ModuleRepoUiAction
 import com.tesla.resukisuultra.ui.viewmodel.ModuleRepoUiState
 import com.tesla.resukisuultra.ui.viewmodel.ModuleRepoViewModel
 import com.tesla.resukisuultra.ui.viewmodel.formatFileSize
+=======
+import com.resukisu.resukisu.R
+import com.resukisu.resukisu.domain.model.CatalogAuthor
+import com.resukisu.resukisu.domain.model.CatalogModule
+import com.resukisu.resukisu.domain.model.ModuleRelease
+import com.resukisu.resukisu.domain.model.ModuleReleaseAsset
+import com.resukisu.resukisu.domain.usecase.EnqueueDownloadUseCase
+import com.resukisu.resukisu.domain.usecase.ObserveDownloadUseCase
+import com.resukisu.resukisu.ui.activity.PermissionRequestInterface
+import com.resukisu.resukisu.ui.component.ConfirmDialogHandle
+import com.resukisu.resukisu.ui.component.ConfirmResult
+import com.resukisu.resukisu.ui.component.DialogHandle
+import com.resukisu.resukisu.ui.component.NetworkRefreshContent
+import com.resukisu.resukisu.ui.component.SearchAppBar
+import com.resukisu.resukisu.ui.component.SwipeableSnackbarHost
+import com.resukisu.resukisu.ui.component.rememberConfirmDialog
+import com.resukisu.resukisu.ui.component.rememberCustomDialog
+import com.resukisu.resukisu.ui.component.rememberSearchAppBarScrollBehavior
+import com.resukisu.resukisu.ui.navigation.LocalNavigator
+import com.resukisu.resukisu.ui.navigation.Navigator
+import com.resukisu.resukisu.ui.navigation.Route
+import com.resukisu.resukisu.ui.screen.LabelText
+import com.resukisu.resukisu.ui.theme.CardConfig
+import com.resukisu.resukisu.ui.theme.ThemeConfig
+import com.resukisu.resukisu.ui.theme.blurSource
+import com.resukisu.resukisu.ui.theme.renderBackgroundBlur
+import com.resukisu.resukisu.ui.util.ActivityResumeEffect
+import com.resukisu.resukisu.ui.util.LocalPermissionRequestInterface
+import com.resukisu.resukisu.ui.util.LocalSnackbarHost
+import com.resukisu.resukisu.ui.util.adaptiveScaffoldWindowInsets
+import com.resukisu.resukisu.ui.util.downloader.download
+import com.resukisu.resukisu.ui.viewmodel.ModuleRepoUiAction
+import com.resukisu.resukisu.ui.viewmodel.ModuleRepoUiState
+import com.resukisu.resukisu.ui.viewmodel.ModuleRepoViewModel
+import com.resukisu.resukisu.ui.viewmodel.formatFileSize
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/moduleRepo/ModuleRepo.kt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -136,7 +167,9 @@ fun ModuleRepoScreen() {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHost = LocalSnackbarHost.current
     val topAppBarState = rememberTopAppBarState()
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(topAppBarState)
+    val scrollBehavior = rememberSearchAppBarScrollBehavior(
+        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(topAppBarState)
+    )
     val currentModuleForChooseDialog = remember { mutableStateOf<CatalogModule?>(null) }
     val chooseDialog = rememberCustomDialog({ dismiss ->
         ChooseDialogContent(
@@ -165,9 +198,6 @@ fun ModuleRepoScreen() {
     Scaffold(
         topBar = {
             SearchAppBar(
-                modifier = if (isLoading) Modifier.background(MaterialTheme.colorScheme.surfaceContainer.copy(
-                    alpha = 0.8f
-                )) else Modifier,
                 title = stringResource(R.string.module_repo),
                 searchText = uiState.search,
                 onSearchTextChange = { query ->
@@ -199,9 +229,7 @@ fun ModuleRepoScreen() {
         },
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        contentWindowInsets = WindowInsets.safeDrawing.only(
-            WindowInsetsSides.Top + WindowInsetsSides.Horizontal
-        ),
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         snackbarHost = { SwipeableSnackbarHost(hostState = snackBarHost) }
     ) { innerPadding ->
         if (isLoading) {
@@ -210,12 +238,14 @@ fun ModuleRepoScreen() {
                 onRetry = refreshModules,
                 modifier = Modifier
                     .fillMaxSize()
+                    .blurSource()
                     .padding(innerPadding),
             )
         } else if (uiState.modules.isEmpty() && uiState.search.isNotEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .blurSource()
                     .padding(24.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -307,10 +337,10 @@ private fun ModuleRepoDropdown(
                 com.tesla.resukisuultra.ui.theme.ContinuousCornerShape(28.dp),
             ),
         ) {
-            DropdownMenuItem(
+            CheckableDropdownMenuItem(
                 checked = uiState.sortStargazerCountFirst,
-                onCheckedChange = { checked ->
-                    viewModel.dispatch(ModuleRepoUiAction.SetStarsFirst(checked))
+                onCheckedChange = {
+                    viewModel.dispatch(ModuleRepoUiAction.SetStarsFirst(it))
                 },
                 text = { Text(stringResource(R.string.module_sort_star_first)) },
                 shapes = com.tesla.resukisuultra.ui.theme.menuItemShapes(0, 1),
@@ -349,7 +379,9 @@ fun OnlineModuleItem(
             .renderBackgroundBlur(),
     ) {
         Column(
-            modifier = Modifier.padding(22.dp, 18.dp, 22.dp, 12.dp)
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = 12.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -454,8 +486,6 @@ fun OnlineModuleItem(
 
             HorizontalDivider(thickness = Dp.Hairline)
 
-            Spacer(modifier = Modifier.height(8.dp))
-
             Row(horizontalArrangement = Arrangement.SpaceBetween) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.align(Alignment.CenterVertically)) {
                     Spacer(modifier = Modifier.weight(1f))
@@ -464,7 +494,12 @@ fun OnlineModuleItem(
                         onClick = {
                             navigator.push(Route.ModuleRepoDetail(module.moduleId))
                         },
-                        contentPadding = ButtonDefaults.TextButtonContentPadding,
+                        contentPadding = PaddingValues(
+                            start = 12.dp,
+                            top = 7.dp,
+                            end = 12.dp,
+                            bottom = 7.dp,
+                        ),
                     ) {
                         Icon(
                             modifier = Modifier.size(20.dp),
@@ -509,7 +544,12 @@ fun OnlineModuleItem(
                                     }
                                 }
                             },
-                            contentPadding = ButtonDefaults.TextButtonContentPadding,
+                            contentPadding = PaddingValues(
+                                start = 12.dp,
+                                top = 7.dp,
+                                end = 12.dp,
+                                bottom = 7.dp,
+                            ),
                         ) {
                             Icon(
                                 modifier = Modifier.size(20.dp),
