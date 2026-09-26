@@ -1,9 +1,12 @@
 package com.tesla.resukisuultra.ui.screen
 import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
 
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/Template.kt
 import org.koin.compose.koinInject
 import com.tesla.resukisuultra.ui.theme.CardConfig
 import com.tesla.resukisuultra.ui.theme.ThemeConfig
+=======
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/Template.kt
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.widget.Toast
@@ -20,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -68,6 +70,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.dropUnlessResumed
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/Template.kt
 import org.koin.compose.viewmodel.koinViewModel
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.ProfileTemplate
@@ -84,7 +87,29 @@ import com.tesla.resukisuultra.ui.util.ActivityResumeEffect
 import com.tesla.resukisuultra.ui.viewmodel.TemplateUiEvent
 import com.tesla.resukisuultra.ui.viewmodel.TemplateViewModel
 import com.tesla.resukisuultra.ui.viewmodel.TemplateUiAction
+=======
+import com.resukisu.resukisu.R
+import com.resukisu.resukisu.domain.model.ProfileTemplate
+import com.resukisu.resukisu.ui.component.NetworkRefreshContent
+import com.resukisu.resukisu.ui.component.settings.AppBackButton
+import com.resukisu.resukisu.ui.component.settings.SettingsJumpPageWidget
+import com.resukisu.resukisu.ui.component.settings.lazySegmentColumn
+import com.resukisu.resukisu.ui.navigation.LocalNavigator
+import com.resukisu.resukisu.ui.navigation.Navigator
+import com.resukisu.resukisu.ui.navigation.Route
+import com.resukisu.resukisu.ui.theme.CardConfig
+import com.resukisu.resukisu.ui.theme.ThemeConfig
+import com.resukisu.resukisu.ui.theme.blurEffect
+import com.resukisu.resukisu.ui.theme.blurSource
+import com.resukisu.resukisu.ui.util.ActivityResumeEffect
+import com.resukisu.resukisu.ui.util.adaptiveScaffoldWindowInsets
+import com.resukisu.resukisu.ui.viewmodel.TemplateUiAction
+import com.resukisu.resukisu.ui.viewmodel.TemplateUiEvent
+import com.resukisu.resukisu.ui.viewmodel.TemplateViewModel
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/Template.kt
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * @author weishu
@@ -204,7 +229,7 @@ fun AppProfileTemplateScreen() {
         },
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        contentWindowInsets = WindowInsets.safeDrawing,
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
     ) { innerPadding ->
         if (uiState.templateList.isEmpty()) {
             LazyColumn(
@@ -407,7 +432,7 @@ private fun TopBar(
             )
                     ) {
                         DropdownMenuItem(
-                            selected = false,
+                            shape = MenuDefaults.itemShape(0, 2).shape,
                             text = {
                                 Text(stringResource(id = R.string.app_profile_import_from_clipboard))
                             },
@@ -415,10 +440,13 @@ private fun TopBar(
                                 onImport()
                                 showDropdown = false
                             },
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/Template.kt
                             shapes = com.tesla.resukisuultra.ui.theme.menuItemShapes(0, 1)
+=======
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/Template.kt
                         )
                         DropdownMenuItem(
-                            selected = false,
+                            shape = MenuDefaults.itemShape(1, 2).shape,
                             text = {
                                 Text(stringResource(id = R.string.app_profile_export_to_clipboard))
                             },
@@ -426,7 +454,10 @@ private fun TopBar(
                                 onExport()
                                 showDropdown = false
                             },
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/Template.kt
                             shapes = com.tesla.resukisuultra.ui.theme.menuItemShapes(0, 2)
+=======
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/Template.kt
                         )
                     }
                 }

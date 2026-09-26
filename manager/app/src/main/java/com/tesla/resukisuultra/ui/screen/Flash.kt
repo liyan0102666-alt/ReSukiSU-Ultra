@@ -69,11 +69,11 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/Flash.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.FlashOperation
 import com.tesla.resukisuultra.domain.model.FlashOperationUpdate
@@ -103,6 +103,39 @@ import com.tesla.resukisuultra.ui.viewmodel.FlashingStatus
 import com.tesla.resukisuultra.ui.viewmodel.ModuleInstallStatus
 import com.tesla.resukisuultra.ui.viewmodel.ModuleUiAction
 import com.tesla.resukisuultra.ui.viewmodel.ModuleViewModel
+=======
+import com.resukisu.resukisu.R
+import com.resukisu.resukisu.domain.model.FlashOperation
+import com.resukisu.resukisu.domain.model.FlashOperationUpdate
+import com.resukisu.resukisu.domain.model.LkmSelection
+import com.resukisu.resukisu.domain.model.MetaModuleStatus
+import com.resukisu.resukisu.domain.usecase.CheckFlashModuleMountUseCase
+import com.resukisu.resukisu.domain.usecase.ExecuteFlashOperationUseCase
+import com.resukisu.resukisu.domain.usecase.ExtractModuleNameUseCase
+import com.resukisu.resukisu.domain.usecase.IsLateLoadModeUseCase
+import com.resukisu.resukisu.domain.usecase.IsModuleUriAccessibleUseCase
+import com.resukisu.resukisu.ui.component.KeyEventBlocker
+import com.resukisu.resukisu.ui.component.SwipeableSnackbarHost
+import com.resukisu.resukisu.ui.component.rememberCustomDialog
+import com.resukisu.resukisu.ui.component.settings.AppBackButton
+import com.resukisu.resukisu.ui.navigation.LocalNavigator
+import com.resukisu.resukisu.ui.navigation.Route
+import com.resukisu.resukisu.ui.theme.CardConfig
+import com.resukisu.resukisu.ui.theme.MonospaceFontFamily
+import com.resukisu.resukisu.ui.theme.ThemeConfig
+import com.resukisu.resukisu.ui.theme.blurEffect
+import com.resukisu.resukisu.ui.theme.blurSource
+import com.resukisu.resukisu.ui.theme.renderBackgroundBlur
+import com.resukisu.resukisu.ui.util.LocalSnackbarHost
+import com.resukisu.resukisu.ui.util.adaptiveScaffoldWindowInsets
+import com.resukisu.resukisu.ui.util.showReplacingSnackbar
+import com.resukisu.resukisu.ui.viewmodel.FlashUiAction
+import com.resukisu.resukisu.ui.viewmodel.FlashViewModel
+import com.resukisu.resukisu.ui.viewmodel.FlashingStatus
+import com.resukisu.resukisu.ui.viewmodel.ModuleInstallStatus
+import com.resukisu.resukisu.ui.viewmodel.ModuleUiAction
+import com.resukisu.resukisu.ui.viewmodel.ModuleViewModel
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/Flash.kt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -440,6 +473,7 @@ fun FlashScreen(flashIt: FlashIt) {
     }
 
     Scaffold(
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         topBar = {
             TopBar(
                 flashUiState.flashingStatus,
@@ -464,7 +498,11 @@ fun FlashScreen(flashIt: FlashIt) {
             if (showFloatAction) {
                 ExtendedFloatingActionButton(
                     onClick = {
-                        flashViewModel.dispatch(FlashUiAction.Reboot)
+                        flashViewModel.dispatch(
+                            FlashUiAction.Reboot(
+                                allowSoftReboot = flashIt is FlashIt.FlashModule || flashIt is FlashIt.FlashModules || flashIt is FlashIt.FlashModuleUpdate
+                            )
+                        )
                     },
                     icon = {
                         Icon(
@@ -522,7 +560,7 @@ fun FlashScreen(flashIt: FlashIt) {
                     modifier = Modifier.padding(16.dp),
                     text = text,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = MonospaceFontFamily(),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -802,6 +840,9 @@ sealed class FlashIt : Parcelable {
         val kmi: String? = null,
         val ota: Boolean,
         val partition: String? = null,
+        val allowShell: Boolean = false,
+        val enableAdb: Boolean = false,
+        val forceBackup: Boolean = false,
     ) : FlashIt()
 
     data class FlashModule(val uri: String) : FlashIt()
@@ -845,6 +886,9 @@ private suspend fun flashIt(
             },
             ota = flashIt.ota,
             partition = flashIt.partition,
+            allowShell = flashIt.allowShell,
+            enableAdb = flashIt.enableAdb,
+            forceBackup = flashIt.forceBackup,
         )
 
         is FlashIt.FlashModule -> FlashOperation.Module(flashIt.uri)

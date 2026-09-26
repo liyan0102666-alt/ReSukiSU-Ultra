@@ -9,13 +9,10 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -46,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/SuSFSConfig.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.ui.component.SwipeableSnackbarHost
 import com.tesla.resukisuultra.ui.component.settings.AppBackButton
@@ -67,6 +65,30 @@ import com.tesla.resukisuultra.ui.viewmodel.SuSFSUiAction
 import com.tesla.resukisuultra.ui.viewmodel.SuSFSUiEvent
 import com.tesla.resukisuultra.ui.viewmodel.SuSFSViewModel
 import com.tesla.resukisuultra.ui.viewmodel.awaitSuSFSBoolean
+=======
+import com.resukisu.resukisu.R
+import com.resukisu.resukisu.ui.component.SwipeableSnackbarHost
+import com.resukisu.resukisu.ui.component.settings.AppBackButton
+import com.resukisu.resukisu.ui.navigation.LocalNavigator
+import com.resukisu.resukisu.ui.screen.susfs.subpages.OpenRedirectTab
+import com.resukisu.resukisu.ui.screen.susfs.subpages.StandardFeaturesTab
+import com.resukisu.resukisu.ui.screen.susfs.subpages.StatusTab
+import com.resukisu.resukisu.ui.screen.susfs.subpages.SusKstatTab
+import com.resukisu.resukisu.ui.screen.susfs.subpages.SusMapTab
+import com.resukisu.resukisu.ui.screen.susfs.subpages.SusPathTab
+import com.resukisu.resukisu.ui.theme.CardConfig
+import com.resukisu.resukisu.ui.theme.ThemeConfig
+import com.resukisu.resukisu.ui.theme.blurEffect
+import com.resukisu.resukisu.ui.theme.blurSource
+import com.resukisu.resukisu.ui.util.ActivityResumeEffect
+import com.resukisu.resukisu.ui.util.LocalSnackbarHost
+import com.resukisu.resukisu.ui.util.adaptiveScaffoldWindowInsets
+import com.resukisu.resukisu.ui.util.showReplacingSnackbar
+import com.resukisu.resukisu.ui.viewmodel.SuSFSUiAction
+import com.resukisu.resukisu.ui.viewmodel.SuSFSUiEvent
+import com.resukisu.resukisu.ui.viewmodel.SuSFSViewModel
+import com.resukisu.resukisu.ui.viewmodel.awaitSuSFSBoolean
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/susfs/SuSFSConfig.kt
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -305,9 +327,7 @@ fun SuSFSConfigScreen() {
         },
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        contentWindowInsets = WindowInsets.safeDrawing.only(
-            WindowInsetsSides.Top + WindowInsetsSides.Horizontal
-        ),
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         snackbarHost = { SwipeableSnackbarHost(hostState = snackBarHost) }
     ) { innerPadding ->
         PullToRefreshBox(
