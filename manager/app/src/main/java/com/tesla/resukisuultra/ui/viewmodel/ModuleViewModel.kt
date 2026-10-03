@@ -2,6 +2,7 @@ package com.tesla.resukisuultra.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/ModuleViewModel.kt
 import com.tesla.resukisuultra.data.module.ModulePreferencesRepository
 import com.tesla.resukisuultra.domain.model.InstalledModule
 import com.tesla.resukisuultra.domain.model.MetaModuleStatus
@@ -14,6 +15,21 @@ import com.tesla.resukisuultra.domain.usecase.SetModuleEnabledUseCase
 import com.tesla.resukisuultra.domain.usecase.SetModuleRemovedUseCase
 import com.tesla.resukisuultra.domain.usecase.TransliterateTextUseCase
 import com.tesla.resukisuultra.domain.usecase.UpdateCachedModuleEnabledUseCase
+=======
+import com.resukisu.resukisu.data.module.ModulePreferencesRepository
+import com.resukisu.resukisu.domain.model.InstalledModule
+import com.resukisu.resukisu.domain.model.MetaModuleStatus
+import com.resukisu.resukisu.domain.usecase.CalculateInstalledModuleSizeUseCase
+import com.resukisu.resukisu.domain.usecase.GetBooleanPreferenceUseCase
+import com.resukisu.resukisu.domain.usecase.IsSoftRebootPreferredUseCase
+import com.resukisu.resukisu.domain.usecase.ObserveInstalledModulesUseCase
+import com.resukisu.resukisu.domain.usecase.RebootUseCase
+import com.resukisu.resukisu.domain.usecase.RefreshInstalledModulesUseCase
+import com.resukisu.resukisu.domain.usecase.SetModuleEnabledUseCase
+import com.resukisu.resukisu.domain.usecase.SetModuleRemovedUseCase
+import com.resukisu.resukisu.domain.usecase.TransliterateTextUseCase
+import com.resukisu.resukisu.domain.usecase.UpdateCachedModuleEnabledUseCase
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/viewmodel/ModuleViewModel.kt
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -39,7 +55,6 @@ data class ModuleUiState(
     val metaModuleStatus: MetaModuleStatus = MetaModuleStatus.MISSING,
     val isNeedRefresh: Boolean = false,
     val showMoreModuleInfo: Boolean = false,
-    val isHideTagRow: Boolean = false,
 )
 
 sealed interface ModuleUiAction {
@@ -47,7 +62,6 @@ sealed interface ModuleUiAction {
     data object ReloadSettings : ModuleUiAction
     data class Search(val query: String) : ModuleUiAction
     data class Sort(val enabledFirst: Boolean, val actionFirst: Boolean) : ModuleUiAction
-    data class SetHideTagRow(val enabled: Boolean) : ModuleUiAction
     data class SetShowMoreInfo(val enabled: Boolean) : ModuleUiAction
     data class LoadSize(val moduleId: String) : ModuleUiAction
     data object MarkNeedRefresh : ModuleUiAction
@@ -90,6 +104,7 @@ class ModuleViewModel(
     private val setModuleEnabled: SetModuleEnabledUseCase,
     private val setModuleRemoved: SetModuleRemovedUseCase,
     private val reboot: RebootUseCase,
+    private val isSoftRebootPreferred: IsSoftRebootPreferredUseCase,
 ) : ViewModel() {
     private val controls = MutableStateFlow(ModuleControls())
     private val mutableEvents = MutableSharedFlow<ModuleUiEvent>(extraBufferCapacity = 1)
@@ -117,7 +132,6 @@ class ModuleViewModel(
             metaModuleStatus = source.metaModuleStatus,
             isNeedRefresh = local.isNeedRefresh,
             showMoreModuleInfo = preferences.showMoreModuleInfo,
-            isHideTagRow = preferences.isHideTagRow,
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, ModuleUiState())
     val uiState: StateFlow<ModuleUiState> = state
@@ -129,10 +143,6 @@ class ModuleViewModel(
             is ModuleUiAction.Search -> controls.update { it.copy(search = action.query) }
             is ModuleUiAction.Sort -> {
                 modulePreferences.setSort(action.enabledFirst, action.actionFirst)
-            }
-
-            is ModuleUiAction.SetHideTagRow -> {
-                modulePreferences.setHideTagRow(action.enabled)
             }
 
             is ModuleUiAction.SetShowMoreInfo -> {
@@ -165,7 +175,8 @@ class ModuleViewModel(
             }
 
             ModuleUiAction.Reboot -> viewModelScope.launch {
-                reboot().onFailure { mutableEvents.tryEmit(ModuleUiEvent.Error(it.message.orEmpty())) }
+                val reason = if (isSoftRebootPreferred()) "soft_reboot" else ""
+                reboot(reason).onFailure { mutableEvents.tryEmit(ModuleUiEvent.Error(it.message.orEmpty())) }
             }
         }
     }

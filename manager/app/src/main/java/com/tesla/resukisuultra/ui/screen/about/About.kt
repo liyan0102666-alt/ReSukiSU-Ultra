@@ -1,9 +1,12 @@
 package com.tesla.resukisuultra.ui.screen.about
 import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
 
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/about/About.kt
 import org.koin.compose.koinInject
 import com.tesla.resukisuultra.ui.theme.CardConfig
 import com.tesla.resukisuultra.ui.theme.ThemeConfig
+=======
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/about/About.kt
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +57,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/about/About.kt
 import com.tesla.resukisuultra.BuildConfig
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.ui.component.WarningCard
@@ -66,6 +70,24 @@ import com.tesla.resukisuultra.ui.navigation.Route
 import com.tesla.resukisuultra.ui.theme.blurEffect
 import com.tesla.resukisuultra.ui.theme.blurSource
 import com.tesla.resukisuultra.ui.theme.renderBackgroundBlur
+=======
+import com.resukisu.resukisu.BuildConfig
+import com.resukisu.resukisu.R
+import com.resukisu.resukisu.ui.component.WarningCard
+import com.resukisu.resukisu.ui.component.settings.AppBackButton
+import com.resukisu.resukisu.ui.component.settings.SegmentedColumn
+import com.resukisu.resukisu.ui.component.settings.SettingsJumpPageWidget
+import com.resukisu.resukisu.ui.navigation.LocalNavigator
+import com.resukisu.resukisu.ui.navigation.Navigator
+import com.resukisu.resukisu.ui.navigation.Route
+import com.resukisu.resukisu.ui.theme.CardConfig
+import com.resukisu.resukisu.ui.theme.ThemeConfig
+import com.resukisu.resukisu.ui.theme.blurEffect
+import com.resukisu.resukisu.ui.theme.blurSource
+import com.resukisu.resukisu.ui.theme.renderBackgroundBlur
+import com.resukisu.resukisu.ui.util.adaptiveScaffoldWindowInsets
+import org.koin.compose.koinInject
+>>>>>>> resukisu/main:manager/app/src/main/java/com/resukisu/resukisu/ui/screen/about/About.kt
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -82,6 +104,7 @@ fun AboutScreen() {
     )
 
     Scaffold(
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         topBar = {
             LargeFlexibleTopAppBar(
                 modifier = Modifier.blurEffect(
@@ -145,10 +168,7 @@ fun AboutScreen() {
                     ),
                     message = AnnotatedString.fromHtml(
                         htmlString = stringResource(
-                            id = R.string.about_anime_character_sticker,
-                            "<b>怡子曰曰</b>",
-                            "<b>明风 OuO</b>",
-                            "<b><a href=\"https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.txt\">CC BY-NC-SA 4.0</a></b>"
+                            id = R.string.about_anime_character_sticker
                         ),
                         linkStyles = TextLinkStyles(
                             style = SpanStyle(
