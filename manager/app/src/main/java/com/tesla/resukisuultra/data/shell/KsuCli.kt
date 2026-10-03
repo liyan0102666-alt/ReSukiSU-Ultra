@@ -372,6 +372,9 @@ class KsuCliRepository(context: Context) {
         lkm: LkmSelection,
         ota: Boolean,
         partition: String?,
+        allowShell: Boolean = false,
+        enableAdb: Boolean = false,
+        forceBackup: Boolean = false,
         onFinish: (Boolean, Int) -> Unit,
         onStdout: (String) -> Unit,
         onStderr: (String) -> Unit,
@@ -434,6 +437,16 @@ class KsuCliRepository(context: Context) {
 
         partition?.let { part ->
             cmd += " --partition $part"
+        }
+
+        if (allowShell) {
+            cmd += " --allow-shell"
+        }
+        if (enableAdb) {
+            cmd += " --enable-adbd"
+        }
+        if (forceBackup) {
+            cmd += " --backup"
         }
 
         val result = flashWithIO("${getKsuDaemonPath()} $cmd", onStdout, onStderr)
@@ -664,15 +677,12 @@ class KsuCliRepository(context: Context) {
     fun getZygiskImplement(): String {
         val zygiskModuleIds = listOf(
             "zygisksu",
-            "rezygisk",
-            "shirokozygisk"
+            "rezygisk"
         )
 
         for (moduleId in zygiskModuleIds) {
-            // 忽略禁用/即将删除
             if (SuFile.open("/data/adb/modules/$moduleId/disable").isFile || SuFile.open("/data/adb/modules/$moduleId/remove").isFile) continue
 
-            // 读取prop
             val propFile = SuFile.open("/data/adb/modules/$moduleId/module.prop")
             if (!propFile.isFile) continue
 

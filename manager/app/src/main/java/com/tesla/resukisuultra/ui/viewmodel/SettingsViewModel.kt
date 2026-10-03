@@ -101,6 +101,10 @@ data class SettingsUiState(
     val isSelinuxHideEnabled: Boolean = false,
     val isRootAvailable: Boolean = false,
     val defaultUmountModules: Boolean = false,
+    val useBuiltinMonoFont: Boolean = false,
+    val useSoftReboot: Boolean = false,
+    val enableSwipeDismiss: Boolean = true,
+    val pagerInterceptionMode: Int = 1,
 )
 
 sealed interface SettingsUiAction {
@@ -139,6 +143,9 @@ sealed interface SettingsUiAction {
     data class SetAdbRoot(val enabled: Boolean) : SettingsUiAction
     data class SetSuLog(val enabled: Boolean) : SettingsUiAction
     data class SetDefaultUmountModules(val enabled: Boolean) : SettingsUiAction
+    data class SetUseSoftReboot(val enabled: Boolean) : SettingsUiAction
+    data class SetSwipeDismiss(val enabled: Boolean) : SettingsUiAction
+    data class SetPagerInterceptionMode(val index: Int) : SettingsUiAction
 }
 
 sealed interface SettingsUiEvent {
@@ -184,7 +191,7 @@ class SettingsViewModel(
         dispatch(SettingsUiAction.Initialize)
     }
 
-    fun initialize() {
+fun initialize() {
         applySnapshot(loadSettings(), resetTempDpi = true)
         loadFeatureSettings()
     }
@@ -431,7 +438,12 @@ class SettingsViewModel(
         }
     }
 
-    fun dispatch(action: SettingsUiAction) {
+    fun handleUseSoftRebootChange(enabled: Boolean) {
+        mutableState.update { it.copy(useSoftReboot = enabled) }
+        updatePlatformAsync(PlatformSetting.UseSoftReboot(enabled))
+    }
+
+fun dispatch(action: SettingsUiAction) {
         when (action) {
             SettingsUiAction.Initialize -> initialize()
             SettingsUiAction.InitializeFirstRun -> initializeFirstRunSettings()
@@ -472,7 +484,28 @@ class SettingsViewModel(
             is SettingsUiAction.SetSuLog -> handleSuLogChange(action.enabled)
             is SettingsUiAction.SetDefaultUmountModules ->
                 handleDefaultUmountModulesChange(action.enabled)
+
+            is SettingsUiAction.SetUseSoftReboot ->
+                handleUseSoftRebootChange(action.enabled)
+            is SettingsUiAction.SetSwipeDismiss -> handleSwipeDismissChange(action.enabled)
+            is SettingsUiAction.SetPagerInterceptionMode ->
+                handlePagerInterceptionModeChange(action.index)
         }
+    }
+
+    fun handleBuiltinMonospaceFontChange(checked: Boolean) {
+        updatePlatformAsync(PlatformSetting.BuiltinMonospaceFont(checked))
+    }
+
+    fun handleSwipeDismissChange(enabled: Boolean) {
+        mutableState.update { it.copy(enableSwipeDismiss = enabled) }
+        updatePlatformAsync(PlatformSetting.SwipeDismiss(enabled))
+    }
+
+    fun handlePagerInterceptionModeChange(index: Int) {
+        val coerced = index.coerceIn(0, 2)
+        mutableState.update { it.copy(pagerInterceptionMode = coerced) }
+        updatePlatformAsync(PlatformSetting.PagerInterceptionMode(coerced))
     }
 
     private fun updateAppearanceAsync(setting: AppearanceSetting) {
@@ -518,6 +551,10 @@ class SettingsViewModel(
                 checkBetaUpdate = snapshot.checkBetaUpdate,
                 checkModuleUpdate = snapshot.checkModuleUpdate,
                 autoJailbreakEnabled = snapshot.autoJailbreakEnabled,
+                useBuiltinMonoFont = snapshot.useBuiltinMonoFont,
+                useSoftReboot = snapshot.useSoftReboot,
+                enableSwipeDismiss = snapshot.enableSwipeDismiss,
+                pagerInterceptionMode = snapshot.pagerInterceptionMode,
             )
         }
     }
