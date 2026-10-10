@@ -1,25 +1,16 @@
 pub mod metamodule;
 pub mod module_config;
 
-#[cfg(unix)]
 use std::os::unix::{prelude::PermissionsExt, process::CommandExt};
 use std::{
     collections::{BTreeMap, HashMap},
     env::var as env_var,
     fs::{File, Permissions, canonicalize, copy, remove_dir_all, rename, set_permissions},
-    io::{Cursor, Write},
+    io::{Cursor, Read, Seek, Write},
     path::{Path, PathBuf},
     process::Command,
-    str::FromStr,
+    time::Instant,
 };
-
-use anyhow::{Context, Result, anyhow, bail, ensure};
-use const_format::concatcp;
-use is_executable::is_executable;
-use java_properties::PropertiesIter;
-use log::{debug, error, info, warn};
-use regex_lite::Regex;
-use zip_extensions::zip_extract::zip_extract_file_to_memory;
 
 use crate::{
     android::{
@@ -35,6 +26,12 @@ use crate::{
     assets, banner, defs,
     defs::{MODULE_DIR, MODULE_UPDATE_DIR, UPDATE_FILE_NAME},
 };
+use anyhow::{Context, Result, anyhow, bail, ensure};
+use const_format::concatcp;
+use is_executable::is_executable;
+use java_properties::PropertiesIter;
+use log::{debug, error, info, warn};
+use regex_lite::Regex;
 
 const INSTALLER_CONTENT: &str = include_str!("./installer.sh");
 const INSTALL_MODULE_SCRIPT: &str = concatcp!(
@@ -67,7 +64,7 @@ pub fn get_common_script_envs(module_id: Option<&str>) -> Vec<(&'static str, Str
     let mut envs = vec![
         ("ASH_STANDALONE", "1".to_string()),
         ("KSU", "true".to_string()),
-        ("KSU_SUKISU", "true".to_string()),
+        ("BAKASU", "true".to_string()),
         ("KSU_KERNEL_VER_CODE", ksucalls::get_version().to_string()),
         ("KSU_VER_CODE", defs::VERSION_CODE.to_string()),
         ("KSU_VER", defs::VERSION_NAME.to_string()),
@@ -186,7 +183,96 @@ pub fn load_sepolicy_rule() -> Result<()> {
     Ok(())
 }
 
-pub fn exec_script<T: AsRef<Path>>(path: T, wait: bool) -> Result<()> {
+#[derive(Clone, Copy)]
+pub enum ScriptWait {
+    NoWait,
+    Forever,
+    Until(Instant),
+}
+
+struct SigchldBlock {
+    set: libc::sigset_t,
+    previous: libc::sigset_t,
+}
+
+impl SigchldBlock {
+    fn block() -> std::io::Result<Self> {
+        // Initialize both sets before passing them to libc.
+        let mut set = unsafe { std::mem::zeroed() };
+        let mut previous = unsafe { std::mem::zeroed() };
+        unsafe {
+            libc::sigemptyset(&raw mut set);
+            libc::sigaddset(&raw mut set, libc::SIGCHLD);
+            if libc::sigprocmask(libc::SIG_BLOCK, &raw const set, &raw mut previous) != 0 {
+                return Err(std::io::Error::last_os_error());
+            }
+        }
+        Ok(Self { set, previous })
+    }
+
+    fn wait_until(&self, pid: libc::pid_t, deadline: Instant) -> std::io::Result<bool> {
+        loop {
+            // Only reap the script being waited for. Other children can also send SIGCHLD.
+            let result = unsafe { libc::waitpid(pid, std::ptr::null_mut(), libc::WNOHANG) };
+            if result == pid {
+                return Ok(true);
+            }
+            if result < 0 {
+                let error = std::io::Error::last_os_error();
+                if error.raw_os_error() == Some(libc::EINTR) {
+                    continue;
+                }
+                return Err(error);
+            }
+
+            let remaining = deadline.saturating_duration_since(Instant::now());
+            if remaining.is_zero() {
+                return Ok(false);
+            }
+            let timeout = libc::timespec {
+                tv_sec: remaining.as_secs() as libc::time_t,
+                tv_nsec: remaining.subsec_nanos() as libc::c_long,
+            };
+            // SIGCHLD stays blocked between waitpid and sigtimedwait to avoid lost wakeups.
+            if unsafe {
+                libc::sigtimedwait(
+                    &raw const self.set,
+                    std::ptr::null_mut(),
+                    &raw const timeout,
+                )
+            } < 0
+            {
+                let error = std::io::Error::last_os_error();
+                match error.raw_os_error() {
+                    Some(libc::EAGAIN) => return Ok(false),
+                    Some(libc::EINTR) => {}
+                    _ => return Err(error),
+                }
+            }
+        }
+    }
+}
+
+impl Drop for SigchldBlock {
+    fn drop(&mut self) {
+        // Restore the parent's signal mask on success, timeout, and every error path.
+        if unsafe {
+            libc::sigprocmask(
+                libc::SIG_SETMASK,
+                &raw const self.previous,
+                std::ptr::null_mut(),
+            )
+        } != 0
+        {
+            warn!(
+                "Failed to restore signal mask: {}",
+                std::io::Error::last_os_error()
+            );
+        }
+    }
+}
+
+pub fn exec_script<T: AsRef<Path>>(path: T, wait: ScriptWait) -> Result<()> {
     info!("exec {}", path.as_ref().display());
 
     let is_module_script = path.as_ref().starts_with(defs::MODULE_DIR);
@@ -226,33 +312,48 @@ pub fn exec_script<T: AsRef<Path>>(path: T, wait: bool) -> Result<()> {
         );
     }
 
-    let mut command = &mut Command::new(assets::BUSYBOX_PATH);
-    #[cfg(unix)]
-    {
-        command = unsafe {
-            command.pre_exec(|| {
-                detach_process_group(true);
-                // ignore the error?
-                switch_cgroups();
-                Ok(())
-            })
-        };
-    }
-    command = command
+    let sigchld = SigchldBlock::block().context("Failed to block SIGCHLD")?;
+    let original_sigmask = sigchld.previous;
+    let mut command = Command::new(assets::BUSYBOX_PATH);
+    unsafe {
+        command.pre_exec(move || {
+            if libc::sigprocmask(
+                libc::SIG_SETMASK,
+                &raw const original_sigmask,
+                std::ptr::null_mut(),
+            ) != 0
+            {
+                return Err(std::io::Error::last_os_error());
+            }
+            detach_process_group(true);
+            // ignore the error?
+            switch_cgroups();
+            Ok(())
+        })
+    };
+    command
         .current_dir(path.as_ref().parent().unwrap())
         .arg("sh")
         .arg(path.as_ref())
         .envs(get_common_script_envs(validated_module_id));
 
-    let result = if wait {
-        command.status().map(|_| ())
-    } else {
-        command.spawn().map(|_| ())
+    let result = match wait {
+        ScriptWait::NoWait => command.spawn().map(|_| ()),
+        ScriptWait::Forever => command.status().map(|_| ()),
+        ScriptWait::Until(deadline) => command.spawn().and_then(|child| {
+            // Once the shared deadline has passed, launch later scripts without waiting.
+            if deadline > Instant::now()
+                && !sigchld.wait_until(child.id() as libc::pid_t, deadline)?
+            {
+                warn!("Timed out waiting for script: {}", path.as_ref().display());
+            }
+            Ok(())
+        }),
     };
     result.map_err(|e| anyhow!("Failed to exec {}: {e}", path.as_ref().display()))
 }
 
-pub fn exec_stage_script(stage: &str, block: bool) -> Result<()> {
+pub fn exec_stage_script(stage: &str, wait: ScriptWait) -> Result<()> {
     let metamodule_dir = metamodule::get_metamodule_path().and_then(|path| canonicalize(path).ok());
 
     foreach_active_module(|module| {
@@ -267,13 +368,13 @@ pub fn exec_stage_script(stage: &str, block: bool) -> Result<()> {
             return Ok(());
         }
 
-        exec_script(&script_path, block)
+        exec_script(&script_path, wait)
     })?;
 
     Ok(())
 }
 
-pub fn exec_common_scripts(dir: &str, wait: bool) -> Result<()> {
+pub fn exec_common_scripts(dir: &str, wait: ScriptWait) -> Result<()> {
     let script_dir = Path::new(defs::ADB_DIR).join(dir);
     if !script_dir.exists() {
         info!("{} not exists, skip", script_dir.display());
@@ -338,7 +439,7 @@ pub fn prune_modules() -> Result<()> {
         // Then execute module's own uninstall.sh
         let uninstaller = module.join("uninstall.sh");
         if uninstaller.exists()
-            && let Err(e) = exec_script(uninstaller, true)
+            && let Err(e) = exec_script(uninstaller, ScriptWait::Forever)
         {
             warn!("Failed to exec uninstaller: {e}");
         }
@@ -525,6 +626,24 @@ pub fn handle_updated_modules() -> Result<()> {
     Ok(())
 }
 
+fn read_module_prop_from_archive<R>(
+    archive: &mut zip::ZipArchive<R>,
+) -> Result<HashMap<String, String>>
+where
+    R: Read + Seek,
+{
+    let mut buffer = Vec::new();
+    archive.by_name("module.prop")?.read_to_end(&mut buffer)?;
+
+    let mut module_prop = HashMap::new();
+    PropertiesIter::new_with_encoding(Cursor::new(buffer), encoding_rs::UTF_8).read_into(
+        |k, v| {
+            module_prop.insert(k, v);
+        },
+    )?;
+    Ok(module_prop)
+}
+
 fn install_module_to_system(zip: &str) -> Result<()> {
     ensure_boot_completed()?;
 
@@ -537,19 +656,12 @@ fn install_module_to_system(zip: &str) -> Result<()> {
     ensure_dir_exists(defs::WORKING_DIR).with_context(|| "Failed to create working dir")?;
     ensure_dir_exists(defs::BINARY_DIR).with_context(|| "Failed to create bin dir")?;
 
-    // read the module_id from zip, if failed it will return early.
-    let mut buffer: Vec<u8> = Vec::new();
-    let entry_path = PathBuf::from_str("module.prop")?;
-    let zip_path = PathBuf::from_str(zip)?;
+    // Open the archive once and reuse it for metadata reads, size calculation, and extraction.
+    let zip_path = PathBuf::from(zip);
     let zip_path = zip_path.canonicalize()?;
-    zip_extract_file_to_memory(&zip_path, &entry_path, &mut buffer)?;
-
-    let mut module_prop = HashMap::new();
-    PropertiesIter::new_with_encoding(Cursor::new(buffer), encoding_rs::UTF_8).read_into(
-        |k, v| {
-            module_prop.insert(k, v);
-        },
-    )?;
+    let file = File::open(&zip_path)?;
+    let mut archive = zip::ZipArchive::new(file)?;
+    let module_prop = read_module_prop_from_archive(&mut archive)?;
     info!("module prop: {module_prop:?}");
 
     let Some(module_id) = module_prop.get("id") else {
@@ -612,7 +724,7 @@ fn install_module_to_system(zip: &str) -> Result<()> {
         }
     }
 
-    let zip_uncompressed_size = get_zip_uncompressed_size(zip)?;
+    let zip_uncompressed_size = get_zip_uncompressed_size(&mut archive)?;
     info!(
         "zip uncompressed size: {}",
         humansize::format_size(zip_uncompressed_size, humansize::DECIMAL)
@@ -633,14 +745,11 @@ fn install_module_to_system(zip: &str) -> Result<()> {
 
     // Extract zip to target directory
     println!("- Extracting module files");
-    let file = File::open(zip)?;
-    let mut archive = zip::ZipArchive::new(file)?;
     archive.extract(&updated_dir)?;
 
     // Set permission and selinux context for $MOD/system
     let module_system_dir = updated_dir.join("system");
     if module_system_dir.exists() {
-        #[cfg(unix)]
         set_permissions(&module_system_dir, Permissions::from_mode(0o755))?;
         restore_syscon(&module_system_dir)?;
     }
@@ -727,7 +836,7 @@ pub fn run_action(id: &str) -> Result<()> {
 
     let action_script_path = format!("/data/adb/modules/{id}/action.sh");
 
-    exec_script(&action_script_path, true)
+    exec_script(&action_script_path, ScriptWait::Forever)
 }
 
 pub fn enable_module(id: &str) -> Result<()> {
@@ -752,6 +861,8 @@ pub fn enable_module(id: &str) -> Result<()> {
 }
 
 pub fn disable_module(id: &str) -> Result<()> {
+    validate_module_id(id)?;
+
     let module_path = Path::new(defs::MODULE_DIR).join(id);
     ensure!(module_path.exists(), "Module {id} not found");
 
