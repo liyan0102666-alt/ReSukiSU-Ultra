@@ -1,5 +1,9 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/SettingsBaseWidget.kt
 package com.tesla.resukisuultra.ui.component.settings
 import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
+========
+package org.bakasu.bakasu.ui.component.settings
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/settings/SettingsBaseWidget.kt
 
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -20,8 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CornerBasedShape
@@ -31,11 +34,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocal
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
@@ -49,7 +54,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -61,12 +68,21 @@ import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/SettingsBaseWidget.kt
 import com.tesla.resukisuultra.ui.component.settings.material3internal.rememberAnimatedShape
 import com.tesla.resukisuultra.ui.theme.CardConfig
 import com.tesla.resukisuultra.ui.theme.ThemeConfig
 import com.tesla.resukisuultra.ui.theme.renderBackgroundBlur
+========
+import org.bakasu.bakasu.ui.component.settings.material3internal.rememberAnimatedShape
+import org.bakasu.bakasu.ui.theme.CardConfig
+import org.bakasu.bakasu.ui.theme.ThemeConfig
+import org.bakasu.bakasu.ui.theme.renderBackgroundBlur
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/settings/SettingsBaseWidget.kt
 import org.koin.compose.koinInject
 
 /**
@@ -132,40 +148,58 @@ fun SettingsBaseWidget(
     foreContent: @Composable RowScope.() -> Unit = {},
     descriptionColumnContent: (@Composable ColumnScope.() -> Unit)? = null,
     containerColor: Color? = null,
-    containerAlpha: Float? = null,
     trailingContent: (@Composable BoxScope.(interactionSource: MutableInteractionSource) -> Unit)? = null,
 ) {
     val themeConfig: ThemeConfig = koinInject()
     val cardConfig: CardConfig = koinInject()
-    val resolvedContainerAlpha = containerAlpha ?: cardConfig.cardAlpha
     val hapticFeedback = LocalHapticFeedback.current
     val alpha = if (enabled) 1f else 0.38f
 
     val interactionSource = remember { MutableInteractionSource() }
 
-    val density = LocalDensity.current
-    val dynamicInternalPadding = (4 * density.fontScale).dp
+    /*
+     * Material 3 ListItem uses fixed 56dp/72dp minimum heights that do not shrink with fontScale,
+     * leaving excessive vertical space at smaller system font sizes. Recheck this workaround when
+     * updating Material 3 in case ListItem starts adapting its minimum height internally.
+     */
+    val fontScale = LocalDensity.current.fontScale
+    val defaultMinHeight = if (description == null) 56.dp else 72.dp
+    val adaptiveMinHeight = (defaultMinHeight * fontScale).coerceAtLeast(48.dp)
 
     val baseShape = LocalSegmentedItemShape.current
 
-    val finalContainerColor = (containerColor
-        ?: if (selected) {
-            MaterialTheme.colorScheme.primaryContainer
-        } else {
-            MaterialTheme.colorScheme.surfaceBright
-        }).run {
+    val finalContainerColor = (
+        containerColor
+            ?: if (selected) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceBright
+            }
+        ).run {
         if (isOnBackground) {
             copy(
-                alpha = resolvedContainerAlpha
+                alpha = cardConfig.cardAlpha,
             )
-        } else this
+        } else {
+            this
+        }
     }
 
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/SettingsBaseWidget.kt
     val backgroundColor = finalContainerColor
+========
+    val backgroundColor = run {
+        if (isOnBackground && themeConfig.isEnableBlurExp) {
+            Color.Transparent
+        } else {
+            finalContainerColor
+        }
+    }
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/settings/SettingsBaseWidget.kt
 
-    val baseContentColor = if (containerColor != null)
+    val baseContentColor = if (containerColor != null) {
         MaterialTheme.colorScheme.contentColorFor(containerColor)
-    else if (selected) {
+    } else if (selected) {
         MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.primaryContainer)
     } else {
         MaterialTheme.colorScheme.onSurface
@@ -204,15 +238,19 @@ fun SettingsBaseWidget(
         disabledContentColor = baseContentColor,
         disabledLeadingContentColor = resolvedIconColor,
         disabledTrailingContentColor = resolvedIconColor,
-        disabledSupportingContentColor = finalDescriptionColor
+        disabledSupportingContentColor = finalDescriptionColor,
     )
 
     val shapes = ListItemDefaults.shapes(
         shape = baseShape,
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/SettingsBaseWidget.kt
         pressedShape = ContinuousCornerShape(16.dp),
+========
+        pressedShape = if (themeConfig.isEnableBlurExp) baseShape else RoundedCornerShape(16.dp),
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/settings/SettingsBaseWidget.kt
         selectedShape = baseShape,
         focusedShape = baseShape,
-        hoveredShape = baseShape
+        hoveredShape = baseShape,
     )
 
     val clickShape = if (onClick != null || onLongClick != null) {
@@ -230,7 +268,6 @@ fun SettingsBaseWidget(
 
         val shapeAnimationSpec = MaterialTheme.motionScheme.fastSpatialSpec<Float>()
 
-
         shapes.shapeForInteraction(
             selected = selected,
             pressed = pressed.value,
@@ -239,7 +276,35 @@ fun SettingsBaseWidget(
             dragged = dragged.value,
             animationSpec = shapeAnimationSpec,
         )
-    } else RectangleShape
+    } else {
+        RectangleShape
+    }
+
+    val safeClickShape = if (onClick != null || onLongClick != null) {
+        remember(clickShape) {
+            object : Shape {
+                override fun createOutline(
+                    size: Size,
+                    layoutDirection: LayoutDirection,
+                    density: Density,
+                ): Outline = clickShape.createOutline(size, layoutDirection, density)
+            }
+        }
+    } else {
+        RectangleShape
+    }
+    val listItemShapes = if (onClick != null || onLongClick != null) {
+        ListItemDefaults.shapes(
+            shape = safeClickShape,
+            selectedShape = safeClickShape,
+            pressedShape = safeClickShape,
+            focusedShape = safeClickShape,
+            hoveredShape = safeClickShape,
+            draggedShape = safeClickShape,
+        )
+    } else {
+        shapes
+    }
 
     val clipShape = if (onClick != null || onLongClick != null) {
         clickShape
@@ -248,15 +313,17 @@ fun SettingsBaseWidget(
     }
 
     var itemModifier = (if (fillMaxWidth) modifier.fillMaxWidth() else modifier)
-    if (isOnBackground && themeConfig.isEnableBlurExp)
+        .heightIn(min = adaptiveMinHeight)
+    if (isOnBackground && themeConfig.isEnableBlurExp) {
         itemModifier = itemModifier
             .clip(clipShape)
             .renderBackgroundBlur(finalContainerColor)
+    }
 
     val finalLeadingContent: (@Composable () -> Unit)? =
-        if (leadingContent == null && icon == null && !iconPlaceholder)
+        if (leadingContent == null && icon == null && !iconPlaceholder) {
             null
-        else {
+        } else {
             {
                 leadingContent?.invoke()
 
@@ -265,14 +332,14 @@ fun SettingsBaseWidget(
                         modifier = Modifier
                             .size(24.dp)
                             .alpha(alpha),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         if (icon != null) {
                             Icon(
                                 imageVector = icon,
                                 modifier = Modifier.size(iconSize),
                                 contentDescription = null,
-                                tint = resolvedIconColor
+                                tint = resolvedIconColor,
                             )
                         } else {
                             Spacer(modifier = Modifier.size(24.dp))
@@ -289,15 +356,11 @@ fun SettingsBaseWidget(
                     text = text,
                     style = descriptionStyle,
                     modifier = Modifier
-                        .alpha(alpha)
+                        .alpha(alpha),
                 )
             }
 
             descriptionColumnContent?.invoke(this)
-
-            if (description != null || descriptionColumnContent != null) {
-                Spacer(Modifier.height(dynamicInternalPadding))
-            }
         }
     }
 
@@ -305,24 +368,22 @@ fun SettingsBaseWidget(
         {
             Box(
                 modifier = Modifier.alpha(alpha),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 trailingContent(interactionSource)
             }
         }
-    } else null
+    } else {
+        null
+    }
 
     val headline: @Composable () -> Unit = {
         Box(
             modifier = Modifier
-                .alpha(alpha)
-                .padding(
-                    top = dynamicInternalPadding,
-                    bottom = if (description == null && descriptionColumnContent == null) dynamicInternalPadding else 0.dp
-                )
+                .alpha(alpha),
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 title?.let {
                     Text(
@@ -332,6 +393,26 @@ fun SettingsBaseWidget(
                 }
 
                 foreContent()
+            }
+        }
+    }
+
+    // M3E ListItem has bug, supportingContent will cause RectList broken
+    // and cause application crash.
+
+    // We use headlineContent + Column + supportingContent for workaround,
+    // Hope Google fix this problem in their new version....
+    val expressiveContent: @Composable () -> Unit = {
+        Column {
+            headline()
+            CompositionLocalProvider(
+                LocalContentColor provides colors.supportingContentColor(
+                    enabled = enabled,
+                    selected = selected,
+                    dragged = false,
+                ),
+            ) {
+                supportingContent()
             }
         }
     }
@@ -363,16 +444,17 @@ fun SettingsBaseWidget(
                     }
                     onLongClick(touchPoint)
                 }
-            } else null,
+            } else {
+                null
+            },
             enabled = enabled,
             colors = colors,
-            shapes = shapes,
+            shapes = listItemShapes,
             verticalAlignment = Alignment.CenterVertically,
             leadingContent = finalLeadingContent,
-            supportingContent = supportingContent,
             trailingContent = trailing,
             interactionSource = interactionSource,
-            content = headline
+            content = expressiveContent,
         )
     } else {
         /*
@@ -383,7 +465,6 @@ fun SettingsBaseWidget(
          * which incorrectly exposes the item as disabled and changes its visual state.
          */
         ListItem(
-            headlineContent = headline,
             modifier = itemModifier
                 .clip(baseShape)
                 .then(
@@ -391,12 +472,16 @@ fun SettingsBaseWidget(
                         Modifier.semantics { disabled() }
                     } else {
                         Modifier
-                    }
+                    },
                 ),
+            enabled = enabled,
+            verticalAlignment = Alignment.CenterVertically,
+            shapes = shapes,
             colors = colors,
             leadingContent = finalLeadingContent,
-            supportingContent = supportingContent,
-            trailingContent = trailing
+            trailingContent = trailing,
+            contentPadding = ListItemDefaults.ContentPadding,
+            content = expressiveContent,
         )
     }
 }
@@ -405,21 +490,21 @@ fun SettingsBaseWidget(
 private val ListItemShapes.hasRoundedCornerShapes: Boolean
     get() =
         shape is RoundedCornerShape &&
-                selectedShape is RoundedCornerShape &&
-                pressedShape is RoundedCornerShape &&
-                focusedShape is RoundedCornerShape &&
-                hoveredShape is RoundedCornerShape &&
-                draggedShape is RoundedCornerShape
+            selectedShape is RoundedCornerShape &&
+            pressedShape is RoundedCornerShape &&
+            focusedShape is RoundedCornerShape &&
+            hoveredShape is RoundedCornerShape &&
+            draggedShape is RoundedCornerShape
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 private val ListItemShapes.hasCornerBasedShapes: Boolean
     get() =
         shape is CornerBasedShape &&
-                selectedShape is CornerBasedShape &&
-                pressedShape is CornerBasedShape &&
-                focusedShape is CornerBasedShape &&
-                hoveredShape is CornerBasedShape &&
-                draggedShape is CornerBasedShape
+            selectedShape is CornerBasedShape &&
+            pressedShape is CornerBasedShape &&
+            focusedShape is CornerBasedShape &&
+            hoveredShape is CornerBasedShape &&
+            draggedShape is CornerBasedShape
 
 /**
  * Equivalent to [collectIsPressedAsState], [collectIsFocusedAsState], etc. but only uses one
@@ -444,17 +529,26 @@ private fun InteractionSource.CollectInteractionsAsState(
             when (interaction) {
                 // press
                 is PressInteraction.Press -> pressInteractions?.add(interaction)
+
                 is PressInteraction.Release -> pressInteractions?.remove(interaction.press)
+
                 is PressInteraction.Cancel -> pressInteractions?.remove(interaction.press)
+
                 // focus
                 is FocusInteraction.Focus -> focusInteractions?.add(interaction)
+
                 is FocusInteraction.Unfocus -> focusInteractions?.remove(interaction.focus)
+
                 // hover
                 is HoverInteraction.Enter -> hoverInteractions?.add(interaction)
+
                 is HoverInteraction.Exit -> hoverInteractions?.remove(interaction.enter)
+
                 // drag
                 is DragInteraction.Start -> dragInteractions?.add(interaction)
+
                 is DragInteraction.Stop -> dragInteractions?.remove(interaction.start)
+
                 is DragInteraction.Cancel -> dragInteractions?.remove(interaction.start)
             }
             if (pressedState != null && pressInteractions != null) {
@@ -504,14 +598,14 @@ internal fun ListItemShapes.shapeForInteraction(
 
 @Preview
 @Composable
-fun SettingsBaseWidgetPreview() {
+private fun SettingsBaseWidgetPreview() {
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
             SettingsBaseWidget(
                 title = "I am title",
-                description = "I am description, I have iconPlaceholder"
+                description = "I am description, I have iconPlaceholder",
             ) {}
         }
 
@@ -519,7 +613,7 @@ fun SettingsBaseWidgetPreview() {
             SettingsBaseWidget(
                 iconPlaceholder = false,
                 title = "I am title",
-                description = "I am description, I don't have iconPlaceholder"
+                description = "I am description, I don't have iconPlaceholder",
             ) {}
         }
 
@@ -529,7 +623,7 @@ fun SettingsBaseWidgetPreview() {
                 title = "I am title",
                 descriptionColumnContent = {
                     Text("Hello from descriptionColumnContent")
-                }
+                },
             ) {}
         }
 
@@ -538,13 +632,13 @@ fun SettingsBaseWidgetPreview() {
                 item {
                     SettingsBaseWidget(
                         title = "I can click (widget 1)",
-                        onClick = {}
+                        onClick = {},
                     )
                 }
                 item {
                     SettingsBaseWidget(
                         title = "I can click (widget 2)",
-                        onClick = {}
+                        onClick = {},
                     )
                 }
             }

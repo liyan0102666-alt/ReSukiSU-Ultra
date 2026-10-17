@@ -1,11 +1,15 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/network/NetworkRequestRepository.kt
 package com.tesla.resukisuultra.data.network
+========
+package org.bakasu.bakasu.data.network
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/network/NetworkRequestRepository.kt
 
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.util.concurrent.TimeUnit
 
 data class NetworkResponse(
     val body: String?,

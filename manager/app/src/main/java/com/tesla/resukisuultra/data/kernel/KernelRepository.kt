@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/kernel/KernelRepository.kt
 package com.tesla.resukisuultra.data.kernel
 
 import android.app.Application
@@ -10,8 +11,22 @@ import com.tesla.resukisuultra.domain.model.KernelStatus
 import com.tesla.resukisuultra.domain.model.ManagerRecord
 import com.tesla.resukisuultra.domain.model.ManagerRuntimeInfo
 import com.tesla.resukisuultra.getKernelVersion
+========
+package org.bakasu.bakasu.data.kernel
+
+import android.app.Application
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/kernel/KernelRepository.kt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.bakasu.bakasu.Natives
+import org.bakasu.bakasu.Natives.KernelPatchImplementation
+import org.bakasu.bakasu.data.shell.KsuCliRepository
+import org.bakasu.bakasu.data.system.isSELinuxPermissive
+import org.bakasu.bakasu.domain.model.KernelFeatureSettings
+import org.bakasu.bakasu.domain.model.KernelStatus
+import org.bakasu.bakasu.domain.model.ManagerRecord
+import org.bakasu.bakasu.domain.model.ManagerRuntimeInfo
+import org.bakasu.bakasu.getKernelVersion
 
 class KernelRepository(
     private val application: Application,
@@ -24,6 +39,7 @@ class KernelRepository(
         val kernelUapi = if (isManager) Natives.kernelUAPIVersion else null
         val managerUapi = runCatching { Natives.managerUAPIVersion }.getOrDefault(1)
         val fullVersion = runCatching { Natives.getFullVersion() }.getOrDefault("Unknown")
+        val isRootAvailable = runCatching { ksuCliRepository.rootAvailable() }.getOrDefault(false)
         KernelStatus(
             isManager = isManager,
             ksuVersion = ksuVersion,
@@ -32,13 +48,9 @@ class KernelRepository(
             ksuFullVersion = "$fullVersion (${Natives.version}/$kernelUapi)",
             lkmMode = ksuVersion?.let { if (kernelVersion.isGKI()) Natives.isLkmMode else null },
             kernelVersion = kernelVersion,
-            isRootAvailable = runCatching { ksuCliRepository.rootAvailable() }.getOrDefault(false),
-            requireNewKernel = runCatching { isManager && Natives.requireNewKernel() }.getOrDefault(
-                false
-            ),
-            uapiMismatch = runCatching { isManager && Natives.checkUAPIMismatch() }.getOrDefault(
-                false
-            ),
+            isRootAvailable = isRootAvailable,
+            isFullFeatured = isRootAvailable && runCatching { Natives.isFullFeatured() }
+                .getOrDefault(false),
             isSELinuxPermissive = runCatching { isSELinuxPermissive() }.getOrDefault(false),
             isOfficialSignature = runCatching {
                 ksuCliRepository.isOfficialSignature(application.packageResourcePath)
@@ -71,7 +83,7 @@ class KernelRepository(
             suLogEnabled = runCatching { Natives.isSuLogEnabled() }.getOrDefault(false),
             selinuxHideEnabled = runCatching { Natives.isSelinuxHideEnabled() }.getOrDefault(false),
             defaultUmountModules = runCatching { Natives.isDefaultUmountModules() }.getOrDefault(
-                false
+                false,
             ),
         )
     }
@@ -94,8 +106,7 @@ class KernelRepository(
         }
     }
 
-    suspend fun setDefaultUmountModules(enabled: Boolean): Boolean =
-        withContext(Dispatchers.IO) { Natives.setDefaultUmountModules(enabled) }
+    suspend fun setDefaultUmountModules(enabled: Boolean): Boolean = withContext(Dispatchers.IO) { Natives.setDefaultUmountModules(enabled) }
 
     fun isLateLoadMode(): Boolean = runCatching { Natives.isLateLoadMode }.getOrDefault(false)
 

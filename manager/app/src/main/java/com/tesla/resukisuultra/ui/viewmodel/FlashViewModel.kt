@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/FlashViewModel.kt
 package com.tesla.resukisuultra.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
@@ -7,6 +8,12 @@ import com.tesla.resukisuultra.domain.model.FlashOperationUpdate
 import com.tesla.resukisuultra.domain.usecase.CheckFlashModuleMountUseCase
 import com.tesla.resukisuultra.domain.usecase.ExecuteFlashOperationUseCase
 import com.tesla.resukisuultra.domain.usecase.RebootUseCase
+========
+package org.bakasu.bakasu.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/FlashViewModel.kt
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +23,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.domain.model.FlashOperation
+import org.bakasu.bakasu.domain.model.FlashOperationUpdate
+import org.bakasu.bakasu.domain.usecase.CheckFlashModuleMountUseCase
+import org.bakasu.bakasu.domain.usecase.ExecuteFlashOperationUseCase
+import org.bakasu.bakasu.domain.usecase.IsSoftRebootPreferredUseCase
+import org.bakasu.bakasu.domain.usecase.RebootUseCase
 
 enum class FlashingStatus { FLASHING, SUCCESS, FAILED }
 
@@ -47,7 +60,9 @@ sealed interface FlashUiAction {
         val verifiedModule: String? = null,
     ) : FlashUiAction
 
-    data object Reboot : FlashUiAction
+    data class Reboot(
+        val allowSoftReboot: Boolean,
+    ) : FlashUiAction
 }
 
 sealed interface FlashUiEvent {
@@ -63,6 +78,7 @@ sealed interface FlashUiEvent {
 
 class FlashViewModel(
     private val reboot: RebootUseCase,
+    private val isSoftRebootPreferred: IsSoftRebootPreferredUseCase,
     private val executeFlashOperation: ExecuteFlashOperationUseCase? = null,
     private val checkFlashModuleMount: CheckFlashModuleMountUseCase? = null,
 ) : ViewModel() {
@@ -131,7 +147,7 @@ class FlashViewModel(
                                         update.showReboot,
                                         update.code,
                                         moduleNeedsMount,
-                                    )
+                                    ),
                                 )
                             }
                         }
@@ -164,12 +180,14 @@ class FlashViewModel(
                             ?: current.failedModules,
                         verifiedModules = action.verifiedModule?.let(current.verifiedModules::plus)
                             ?: current.verifiedModules,
-                    )
+                    ),
                 )
             }
 
-            FlashUiAction.Reboot -> viewModelScope.launch {
-                reboot().onFailure {
+            is FlashUiAction.Reboot -> viewModelScope.launch {
+                val reason =
+                    if (isSoftRebootPreferred() && action.allowSoftReboot) "soft_reboot" else ""
+                reboot(reason).onFailure {
                     mutableEvents.tryEmit(FlashUiEvent.Error(it.message.orEmpty()))
                 }
             }

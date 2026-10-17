@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/ModuleViewModel.kt
 package com.tesla.resukisuultra.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
@@ -14,6 +15,14 @@ import com.tesla.resukisuultra.domain.usecase.SetModuleEnabledUseCase
 import com.tesla.resukisuultra.domain.usecase.SetModuleRemovedUseCase
 import com.tesla.resukisuultra.domain.usecase.TransliterateTextUseCase
 import com.tesla.resukisuultra.domain.usecase.UpdateCachedModuleEnabledUseCase
+========
+package org.bakasu.bakasu.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import java.text.Collator
+import java.util.Locale
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/ModuleViewModel.kt
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -24,8 +33,19 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.Collator
-import java.util.Locale
+import org.bakasu.bakasu.data.module.ModulePreferencesRepository
+import org.bakasu.bakasu.domain.model.InstalledModule
+import org.bakasu.bakasu.domain.model.MetaModuleStatus
+import org.bakasu.bakasu.domain.usecase.CalculateInstalledModuleSizeUseCase
+import org.bakasu.bakasu.domain.usecase.GetBooleanPreferenceUseCase
+import org.bakasu.bakasu.domain.usecase.IsSoftRebootPreferredUseCase
+import org.bakasu.bakasu.domain.usecase.ObserveInstalledModulesUseCase
+import org.bakasu.bakasu.domain.usecase.RebootUseCase
+import org.bakasu.bakasu.domain.usecase.RefreshInstalledModulesUseCase
+import org.bakasu.bakasu.domain.usecase.SetModuleEnabledUseCase
+import org.bakasu.bakasu.domain.usecase.SetModuleRemovedUseCase
+import org.bakasu.bakasu.domain.usecase.TransliterateTextUseCase
+import org.bakasu.bakasu.domain.usecase.UpdateCachedModuleEnabledUseCase
 
 data class ModuleUiState(
     val moduleList: List<InstalledModule> = emptyList(),
@@ -39,7 +59,6 @@ data class ModuleUiState(
     val metaModuleStatus: MetaModuleStatus = MetaModuleStatus.MISSING,
     val isNeedRefresh: Boolean = false,
     val showMoreModuleInfo: Boolean = false,
-    val isHideTagRow: Boolean = false,
 )
 
 sealed interface ModuleUiAction {
@@ -47,7 +66,6 @@ sealed interface ModuleUiAction {
     data object ReloadSettings : ModuleUiAction
     data class Search(val query: String) : ModuleUiAction
     data class Sort(val enabledFirst: Boolean, val actionFirst: Boolean) : ModuleUiAction
-    data class SetHideTagRow(val enabled: Boolean) : ModuleUiAction
     data class SetShowMoreInfo(val enabled: Boolean) : ModuleUiAction
     data class LoadSize(val moduleId: String) : ModuleUiAction
     data object MarkNeedRefresh : ModuleUiAction
@@ -90,6 +108,7 @@ class ModuleViewModel(
     private val setModuleEnabled: SetModuleEnabledUseCase,
     private val setModuleRemoved: SetModuleRemovedUseCase,
     private val reboot: RebootUseCase,
+    private val isSoftRebootPreferred: IsSoftRebootPreferredUseCase,
 ) : ViewModel() {
     private val controls = MutableStateFlow(ModuleControls())
     private val mutableEvents = MutableSharedFlow<ModuleUiEvent>(extraBufferCapacity = 1)
@@ -117,7 +136,6 @@ class ModuleViewModel(
             metaModuleStatus = source.metaModuleStatus,
             isNeedRefresh = local.isNeedRefresh,
             showMoreModuleInfo = preferences.showMoreModuleInfo,
-            isHideTagRow = preferences.isHideTagRow,
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, ModuleUiState())
     val uiState: StateFlow<ModuleUiState> = state
@@ -125,14 +143,13 @@ class ModuleViewModel(
     fun dispatch(action: ModuleUiAction) {
         when (action) {
             is ModuleUiAction.Refresh -> refresh(action.manual)
+
             ModuleUiAction.ReloadSettings -> modulePreferences.reload()
+
             is ModuleUiAction.Search -> controls.update { it.copy(search = action.query) }
+
             is ModuleUiAction.Sort -> {
                 modulePreferences.setSort(action.enabledFirst, action.actionFirst)
-            }
-
-            is ModuleUiAction.SetHideTagRow -> {
-                modulePreferences.setHideTagRow(action.enabled)
             }
 
             is ModuleUiAction.SetShowMoreInfo -> {
@@ -147,25 +164,27 @@ class ModuleViewModel(
             }
 
             ModuleUiAction.MarkNeedRefresh -> controls.update { it.copy(isNeedRefresh = true) }
+
             is ModuleUiAction.UpdateCachedEnabled ->
                 updateCachedModuleEnabledUseCase(action.moduleId, action.enabled)
 
             is ModuleUiAction.SetEnabled -> viewModelScope.launch {
                 val successful = setModuleEnabled(action.moduleId, action.enabled).isSuccess
                 mutableEvents.emit(
-                    ModuleUiEvent.EnabledChanged(action.moduleId, action.enabled, successful)
+                    ModuleUiEvent.EnabledChanged(action.moduleId, action.enabled, successful),
                 )
             }
 
             is ModuleUiAction.SetRemoved -> viewModelScope.launch {
                 val successful = setModuleRemoved(action.moduleId, action.removed).isSuccess
                 mutableEvents.emit(
-                    ModuleUiEvent.RemovedChanged(action.moduleId, action.removed, successful)
+                    ModuleUiEvent.RemovedChanged(action.moduleId, action.removed, successful),
                 )
             }
 
             ModuleUiAction.Reboot -> viewModelScope.launch {
-                reboot().onFailure { mutableEvents.tryEmit(ModuleUiEvent.Error(it.message.orEmpty())) }
+                val reason = if (isSoftRebootPreferred()) "soft_reboot" else ""
+                reboot(reason).onFailure { mutableEvents.tryEmit(ModuleUiEvent.Error(it.message.orEmpty())) }
             }
         }
     }
@@ -199,6 +218,7 @@ class ModuleViewModel(
                 val executable = it.hasWebUi || it.hasActionScript
                 when {
                     it.metamodule && it.enabled -> 0
+
                     sortEnabledFirst && sortActionFirst -> when {
                         it.enabled && executable -> 1
                         it.enabled -> 2
@@ -207,7 +227,9 @@ class ModuleViewModel(
                     }
 
                     sortEnabledFirst -> if (it.enabled) 1 else 2
+
                     sortActionFirst -> if (executable) 1 else 2
+
                     else -> 1
                 }
             },
@@ -217,8 +239,8 @@ class ModuleViewModel(
 
         return modules.filter { module ->
             module.id.contains(search, ignoreCase = true) ||
-                    module.name.contains(search, ignoreCase = true) ||
-                    transliterateText(module.name).contains(search, ignoreCase = true)
+                module.name.contains(search, ignoreCase = true) ||
+                transliterateText(module.name).contains(search, ignoreCase = true)
         }.sortedWith(comparator)
     }
 

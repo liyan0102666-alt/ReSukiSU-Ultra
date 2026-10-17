@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/main/SuperUserPage.kt
 package com.tesla.resukisuultra.ui.screen.main
+========
+package org.bakasu.bakasu.ui.screen.main
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/main/SuperUserPage.kt
 
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -10,14 +14,10 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -27,13 +27,8 @@ import androidx.compose.material.icons.automirrored.twotone.Article
 import androidx.compose.material.icons.twotone.Archive
 import androidx.compose.material.icons.twotone.ChevronRight
 import androidx.compose.material.icons.twotone.MoreVert
-import androidx.compose.material.icons.twotone.RestoreFromTrash
-import androidx.compose.material.icons.twotone.Save
 import androidx.compose.material.icons.twotone.SearchOff
-import androidx.compose.material.icons.twotone.Visibility
-import androidx.compose.material.icons.twotone.VisibilityOff
 import androidx.compose.material3.DropdownMenuGroup
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -43,6 +38,7 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDropdownMenuItem
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -62,17 +58,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/main/SuperUserPage.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.AllowlistOperationResult
 import com.tesla.resukisuultra.domain.model.InstalledAppGroup
@@ -97,14 +90,45 @@ import com.tesla.resukisuultra.ui.viewmodel.SuperUserViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/main/SuperUserPage.kt
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.AllowlistOperationResult
+import org.bakasu.bakasu.domain.model.InstalledAppGroup
+import org.bakasu.bakasu.ui.component.ConfirmResult
+import org.bakasu.bakasu.ui.component.PackageIcon
+import org.bakasu.bakasu.ui.component.SearchAppBar
+import org.bakasu.bakasu.ui.component.SwipeableSnackbarHost
+import org.bakasu.bakasu.ui.component.rememberConfirmDialog
+import org.bakasu.bakasu.ui.component.rememberSearchAppBarScrollBehavior
+import org.bakasu.bakasu.ui.component.settings.SettingsBaseWidget
+import org.bakasu.bakasu.ui.component.settings.lazySegmentColumn
+import org.bakasu.bakasu.ui.navigation.LocalNavigator
+import org.bakasu.bakasu.ui.navigation.Route
+import org.bakasu.bakasu.ui.screen.LabelText
+import org.bakasu.bakasu.ui.theme.blurSource
+import org.bakasu.bakasu.ui.util.LocalPagerPage
+import org.bakasu.bakasu.ui.util.LocalPagerState
+import org.bakasu.bakasu.ui.util.LocalSnackbarHost
+import org.bakasu.bakasu.ui.util.adaptiveScaffoldWindowInsets
+import org.bakasu.bakasu.ui.util.showReplacingSnackbar
+import org.bakasu.bakasu.ui.viewmodel.SortType
+import org.bakasu.bakasu.ui.viewmodel.SuperUserUiAction
+import org.bakasu.bakasu.ui.viewmodel.SuperUserUiEvent
+import org.bakasu.bakasu.ui.viewmodel.SuperUserUiState
+import org.bakasu.bakasu.ui.viewmodel.SuperUserViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 private data class SuperUserMenuItem(
-    val icon: ImageVector,
+    val checked: Boolean = false,
     val titleRes: Int,
-    val onClick: () -> Unit
+    val onClick: () -> Unit,
+    val closeOnClick: Boolean = true,
 )
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -113,9 +137,13 @@ fun SuperUserPage(bottomPadding: Dp) {
     val context = LocalContext.current
     val viewModel = koinViewModel<SuperUserViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val pagerPage = LocalPagerPage.current
+    val isPageVisible = pagerPage == null || LocalPagerState.current.currentPage == pagerPage
     val scope = rememberCoroutineScope()
     val topAppBarState = rememberTopAppBarState()
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(topAppBarState)
+    val scrollBehavior = rememberSearchAppBarScrollBehavior(
+        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(topAppBarState),
+    )
     val listState = rememberLazyListState()
     val snackBarHostState = LocalSnackbarHost.current
 
@@ -158,14 +186,14 @@ fun SuperUserPage(bottomPadding: Dp) {
     }
 
     val backupLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("application/octet-stream")
+        contract = ActivityResultContracts.CreateDocument("application/octet-stream"),
     ) { uri ->
         if (uri != null) {
             viewModel.dispatch(SuperUserUiAction.BackupAllowlist(uri.toString()))
         }
     }
     val restoreLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
+        contract = ActivityResultContracts.OpenDocument(),
     ) { uri ->
         if (uri != null) {
             scope.launch {
@@ -188,10 +216,11 @@ fun SuperUserPage(bottomPadding: Dp) {
         viewModel.dispatch(SuperUserUiAction.Search(""))
     }
 
+    LaunchedEffect(viewModel, isPageVisible) {
+        if (isPageVisible) viewModel.dispatch(SuperUserUiAction.LoadInitialData)
+    }
+
     Scaffold(
-        modifier = Modifier
-            .testTag(SUPER_USER_SCREEN_TEST_TAG)
-            .semantics { testTagsAsResourceId = true },
         topBar = {
             SearchAppBar(
                 title = stringResource(R.string.superuser),
@@ -224,7 +253,7 @@ fun SuperUserPage(bottomPadding: Dp) {
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.TwoTone.Article,
-                            contentDescription = stringResource(R.string.sulog)
+                            contentDescription = stringResource(R.string.sulog),
                         )
                     }
                 },
@@ -237,10 +266,10 @@ fun SuperUserPage(bottomPadding: Dp) {
         snackbarHost = {
             SwipeableSnackbarHost(
                 modifier = Modifier.padding(bottom = bottomPadding),
-                hostState = snackBarHostState
+                hostState = snackBarHostState,
             )
         },
-        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+        contentWindowInsets = adaptiveScaffoldWindowInsets(includeBottom = false),
     ) { innerPadding ->
         SuperUserContent(
             innerPadding = innerPadding,
@@ -257,29 +286,27 @@ private fun Context.allowlistOperationMessage(
     result: AllowlistOperationResult,
     successMessage: Int,
     failureMessage: Int,
-): String {
-    return when (result) {
-        AllowlistOperationResult.Success ->
-            getString(successMessage)
+): String = when (result) {
+    AllowlistOperationResult.Success ->
+        getString(successMessage)
 
-        AllowlistOperationResult.InvalidFile ->
-            getString(failureMessage, getString(R.string.unknown_file))
+    AllowlistOperationResult.InvalidFile ->
+        getString(failureMessage, getString(R.string.unknown_file))
 
-        AllowlistOperationResult.UnsupportedVersion ->
-            getString(failureMessage, getString(R.string.home_unsupported))
+    AllowlistOperationResult.UnsupportedVersion ->
+        getString(failureMessage, getString(R.string.home_unsupported))
 
-        is AllowlistOperationResult.ProfileUpdateFailed ->
-            getString(
-                failureMessage,
-                getString(R.string.failed_to_update_app_profile, result.uid.toString()),
-            )
+    is AllowlistOperationResult.ProfileUpdateFailed ->
+        getString(
+            failureMessage,
+            getString(R.string.failed_to_update_app_profile, result.uid.toString()),
+        )
 
-        is AllowlistOperationResult.Failed ->
-            getString(
-                failureMessage,
-                result.cause?.localizedMessage ?: getString(R.string.unknown),
-            )
-    }
+    is AllowlistOperationResult.Failed ->
+        getString(
+            failureMessage,
+            result.cause?.localizedMessage ?: getString(R.string.unknown),
+        )
 }
 
 private fun createAllowlistBackupFileName(): String {
@@ -305,7 +332,7 @@ private fun SuperUserContent(
             modifier = Modifier
                 .fillMaxSize()
                 .blurSource(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             if (uiState.isRefreshing && uiState.search.isEmpty()) {
                 LoadingIndicator()
@@ -321,7 +348,7 @@ private fun SuperUserContent(
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .size(96.dp)
-                            .padding(bottom = 16.dp)
+                            .padding(bottom = 16.dp),
                     )
                     Text(
                         text = if (isSearchEmpty) {
@@ -359,7 +386,6 @@ private fun SuperUserContent(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .testTag(SUPER_USER_LIST_TEST_TAG)
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
         ) {
             item {
@@ -367,13 +393,14 @@ private fun SuperUserContent(
             }
             lazySegmentColumn(
                 items = uiState.appGroupList,
-                key = { _, appGroup -> "${appGroup.uid}-${appGroup.mainApp.packageName}" },
-                contentType = { _, _ -> "AppGroupItem" }
+                key = { _, appGroup -> "${appGroup.uid}-${appGroup.profileKey}" },
+                contentType = { _, appGroup -> "${appGroup.uid}-${appGroup.profileKey}" },
             ) { _, appGroup ->
                 AppGroupItem(
-                    appGroup = appGroup
+                    appGroup = appGroup,
+                    isManager = appGroup.uid in uiState.managerUids,
                 ) {
-                    navigator.push(Route.AppProfile(appGroup.uid, appGroup.mainApp.packageName))
+                    navigator.push(Route.AppProfile(appGroup.uid, appGroup.profileKey))
                 }
             }
 
@@ -383,9 +410,6 @@ private fun SuperUserContent(
         }
     }
 }
-
-private const val SUPER_USER_LIST_TEST_TAG = "super_user_app_list"
-private const val SUPER_USER_SCREEN_TEST_TAG = "super_user_screen"
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -399,27 +423,35 @@ private fun SuperUserDropdown(
 ) {
     val menuItems = remember(
         uiState.showSystemApps,
+        uiState.reverseOrder,
         onBackupAllowlist,
         onRestoreAllowlist,
     ) {
         listOf(
             SuperUserMenuItem(
-                icon = if (uiState.showSystemApps) Icons.TwoTone.VisibilityOff else Icons.TwoTone.Visibility,
-                titleRes = if (uiState.showSystemApps) R.string.hide_system_apps else R.string.show_system_apps,
+                checked = uiState.reverseOrder,
+                titleRes = R.string.reverse_order,
+                closeOnClick = false,
                 onClick = {
-                    viewModel.dispatch(SuperUserUiAction.SetShowSystemApps(!uiState.showSystemApps))
-                }
+                    viewModel.dispatch(SuperUserUiAction.SetReverseOrder(!uiState.reverseOrder))
+                },
             ),
             SuperUserMenuItem(
-                icon = Icons.TwoTone.Save,
+                checked = uiState.showSystemApps,
+                titleRes = R.string.show_system_apps,
+                closeOnClick = false,
+                onClick = {
+                    viewModel.dispatch(SuperUserUiAction.SetShowSystemApps(!uiState.showSystemApps))
+                },
+            ),
+            SuperUserMenuItem(
                 titleRes = R.string.backup_allowlist,
                 onClick = onBackupAllowlist,
             ),
             SuperUserMenuItem(
-                icon = Icons.TwoTone.RestoreFromTrash,
                 titleRes = R.string.restore_allowlist,
                 onClick = onRestoreAllowlist,
-            )
+            ),
         )
     }
 
@@ -434,13 +466,20 @@ private fun SuperUserDropdown(
             ),
         ) {
             SortType.entries.forEachIndexed { index, sortType ->
-                DropdownMenuItem(
+                SelectableDropdownMenuItem(
                     selected = uiState.currentSortType == sortType,
-                    text = { Text(stringResource(sortType.displayNameRes)) },
                     onClick = {
                         viewModel.dispatch(SuperUserUiAction.SetSort(sortType))
                     },
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/main/SuperUserPage.kt
                     shapes = com.tesla.resukisuultra.ui.theme.menuItemShapes(index, SortType.entries.size),
+========
+                    text = { Text(stringResource(sortType.displayNameRes)) },
+                    shapes = MenuDefaults.itemShape(
+                        index = index,
+                        count = SortType.entries.size,
+                    ),
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/main/SuperUserPage.kt
                 )
             }
         }
@@ -454,20 +493,21 @@ private fun SuperUserDropdown(
             ),
         ) {
             menuItems.forEachIndexed { index, menuItem ->
-                DropdownMenuItem(
-                    selected = false,
-                    text = { Text(stringResource(menuItem.titleRes)) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = menuItem.icon,
-                            contentDescription = null,
-                        )
-                    },
+                SelectableDropdownMenuItem(
+                    selected = menuItem.checked,
                     onClick = {
-                        onDismissRequest()
+                        if (menuItem.closeOnClick) onDismissRequest()
                         menuItem.onClick()
                     },
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/main/SuperUserPage.kt
                     shapes = com.tesla.resukisuultra.ui.theme.menuItemShapes(index, SortType.entries.size),
+========
+                    text = { Text(stringResource(menuItem.titleRes)) },
+                    shapes = MenuDefaults.itemShape(
+                        index = index,
+                        count = menuItems.size,
+                    ),
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/main/SuperUserPage.kt
                 )
             }
         }
@@ -478,6 +518,7 @@ private fun SuperUserDropdown(
 @Composable
 private fun AppGroupItem(
     appGroup: InstalledAppGroup,
+    isManager: Boolean,
     onClick: () -> Unit,
 ) {
     val mainApp = appGroup.mainApp
@@ -489,14 +530,14 @@ private fun AppGroupItem(
         description = if (appGroup.apps.size > 1) {
             stringResource(R.string.group_contains_apps, appGroup.apps.size)
         } else {
-            mainApp.packageName
+            mainApp.displayIdentifier
         },
         descriptionColumnContent = {
             Spacer(modifier = Modifier.height(5.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 if (appGroup.allowSu) {
                     LabelText(label = "ROOT")
@@ -516,7 +557,13 @@ private fun AppGroupItem(
                 } else if (!appGroup.allowSu) {
                     LabelText(
                         label = "DEFAULT",
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    )
+                }
+                if (isManager) {
+                    LabelText(
+                        label = "MANAGER",
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
                     )
                 }
                 if (appGroup.apps.size > 1) {
@@ -530,14 +577,14 @@ private fun AppGroupItem(
                 if (appGroup.isRecentlyInstalled) {
                     LabelText(
                         label = stringResource(R.string.recently_installed),
-                        containerColor = MaterialTheme.colorScheme.surfaceBright
+                        containerColor = MaterialTheme.colorScheme.surfaceBright,
                     )
                 }
             }
         },
         leadingContent = {
             PackageIcon(
-                packageName = mainApp.packageName,
+                packageName = if (appGroup.isWebViewZygote) "android" else mainApp.packageName,
                 contentDescription = mainApp.label,
                 modifier = Modifier
                     .padding(4.dp)
@@ -550,7 +597,7 @@ private fun AppGroupItem(
             imageVector = Icons.TwoTone.ChevronRight,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(24.dp),
         )
     }
 }

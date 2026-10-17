@@ -1,6 +1,12 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/usecase/ModuleCatalogUseCases.kt
 package com.tesla.resukisuultra.domain.usecase
 
 import com.tesla.resukisuultra.data.module.ModuleCatalogRepository
+========
+package org.bakasu.bakasu.domain.usecase
+
+import org.bakasu.bakasu.data.module.ModuleCatalogRepository
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/usecase/ModuleCatalogUseCases.kt
 
 class ObserveCatalogModulesUseCase(private val repository: ModuleCatalogRepository) {
     operator fun invoke() = repository.modules

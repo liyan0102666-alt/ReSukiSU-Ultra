@@ -1,18 +1,28 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/flash/HorizonKernelDataSource.kt
 package com.tesla.resukisuultra.data.flash
+========
+package org.bakasu.bakasu.data.flash
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/flash/HorizonKernelDataSource.kt
 
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/flash/HorizonKernelDataSource.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.data.shell.KsuCliRepository
 import com.tesla.resukisuultra.domain.model.FlashProgress
+========
+import java.io.File
+import java.io.IOException
+import java.util.concurrent.ConcurrentLinkedQueue
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/flash/HorizonKernelDataSource.kt
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.io.File
-import java.io.IOException
-import java.util.concurrent.ConcurrentLinkedQueue
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.data.shell.KsuCliRepository
+import org.bakasu.bakasu.domain.model.FlashProgress
 
 /**
  * @author ShirkNeko
@@ -57,7 +67,7 @@ class HorizonKernelState {
                 progress = 0f,
                 currentStep = "",
                 logs = emptyList(),
-                error = ""
+                error = "",
             )
         }
     }
@@ -67,7 +77,7 @@ class HorizonKernelState {
             it.copy(
                 isFlashing = false,
                 isCompleted = true,
-                progress = 1f
+                progress = 1f,
             )
         }
     }
@@ -82,7 +92,8 @@ class HorizonKernelWorker(
     private val context: Context,
     private val state: HorizonKernelState,
     private val ksuCliRepository: KsuCliRepository,
-    private val slot: String? = null
+    private val slot: String? = null,
+    private val skipKsud: Boolean = false,
 ) : Thread() {
     var uri: Uri? = null
 
@@ -107,21 +118,23 @@ class HorizonKernelWorker(
                 zipFile = zipFile,
                 slot = slot,
                 onStdout = ::handleOutput,
-                onStderr = ::handleConsoleOutput
+                onStderr = ::handleConsoleOutput,
             )
             if (!succeeded) {
                 state.setError(context.getString(R.string.flash_failed_message))
                 return
             }
 
-            runCatching { ksuCliRepository.install() }.onFailure { error ->
-                Log.w(TAG, "Failed to refresh ksud after a successful kernel flash", error)
+            if (!skipKsud) {
+                runCatching { ksuCliRepository.install() }.onFailure { error ->
+                    Log.w(TAG, "Failed to refresh ksud after a successful kernel flash", error)
+                }
             }
             state.updateStep(context.getString(R.string.horizon_flash_complete_status))
             state.completeFlashing()
         } catch (error: Exception) {
             state.setError(
-                error.message ?: context.getString(R.string.horizon_unknown_error)
+                error.message ?: context.getString(R.string.horizon_unknown_error),
             )
         } finally {
             if (zipFile.exists()) {

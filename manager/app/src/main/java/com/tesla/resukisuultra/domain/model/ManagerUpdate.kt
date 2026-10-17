@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/ManagerUpdate.kt
 package com.tesla.resukisuultra.domain.model
+========
+package org.bakasu.bakasu.domain.model
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/ManagerUpdate.kt
 
 enum class ManagerUpdateChannel {
     STABLE,
@@ -26,4 +30,3 @@ data class ManagerUpdateInfo(
     val source: ManagerApkSource,
     val changelog: String = "",
 )
-

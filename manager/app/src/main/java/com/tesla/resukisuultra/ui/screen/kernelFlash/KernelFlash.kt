@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/kernelFlash/KernelFlash.kt
 package com.tesla.resukisuultra.ui.screen.kernelFlash
+========
+package org.bakasu.bakasu.ui.screen.kernelFlash
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/kernelFlash/kernelFlash/KernelFlash.kt
 
 import android.os.Environment
 import androidx.activity.ComponentActivity
@@ -10,14 +14,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -53,10 +53,10 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/kernelFlash/KernelFlash.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.FlashProgress
 import com.tesla.resukisuultra.ui.component.KeyEventBlocker
@@ -73,11 +73,31 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/kernelFlash/kernelFlash/KernelFlash.kt
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.FlashProgress
+import org.bakasu.bakasu.ui.component.KeyEventBlocker
+import org.bakasu.bakasu.ui.component.SwipeableSnackbarHost
+import org.bakasu.bakasu.ui.navigation.LocalNavigator
+import org.bakasu.bakasu.ui.theme.CardConfig
+import org.bakasu.bakasu.ui.theme.monospaceFontFamily
+import org.bakasu.bakasu.ui.util.LocalSnackbarHost
+import org.bakasu.bakasu.ui.util.adaptiveScaffoldWindowInsets
+import org.bakasu.bakasu.ui.util.showReplacingSnackbar
+import org.bakasu.bakasu.ui.viewmodel.KernelFlashUiAction
+import org.bakasu.bakasu.ui.viewmodel.KernelFlashUiEvent
+import org.bakasu.bakasu.ui.viewmodel.KernelFlashViewModel
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * @author ShirkNeko
@@ -91,7 +111,8 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun KernelFlashScreen(
     kernelUri: String,
-    selectedSlot: String? = null
+    selectedSlot: String? = null,
+    skipKsud: Boolean = false,
 ) {
     val context = LocalContext.current
 
@@ -121,8 +142,8 @@ fun KernelFlashScreen(
     }
 
     // 开始刷写
-    LaunchedEffect(kernelUri, selectedSlot) {
-        viewModel.dispatch(KernelFlashUiAction.Start(kernelUri, selectedSlot))
+    LaunchedEffect(kernelUri, selectedSlot, skipKsud) {
+        viewModel.dispatch(KernelFlashUiAction.Start(kernelUri, selectedSlot, skipKsud))
     }
 
     LaunchedEffect(flashState.isCompleted, uiState.autoExit) {
@@ -133,7 +154,7 @@ fun KernelFlashScreen(
         }
     }
 
-            // 监听日志更新
+    // 监听日志更新
     val navigator = LocalNavigator.current
 
     val onBack: () -> Unit = {
@@ -158,13 +179,13 @@ fun KernelFlashScreen(
                         val date = format.format(Date())
                         val file = File(
                             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                            "KernelSU_kernel_flash_log_${date}.log"
+                            "KernelSU_kernel_flash_log_$date.log",
                         )
                         file.writeText(uiState.fullLog)
                         snackBarHost.showReplacingSnackbar(logSavedString.format(file.absolutePath))
                     }
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
             )
         },
         floatingActionButton = {
@@ -176,7 +197,7 @@ fun KernelFlashScreen(
                     icon = {
                         Icon(
                             Icons.TwoTone.Refresh,
-                            contentDescription = stringResource(id = R.string.reboot)
+                            contentDescription = stringResource(id = R.string.reboot),
                         )
                     },
                     text = {
@@ -184,13 +205,13 @@ fun KernelFlashScreen(
                     },
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    expanded = true
+                    expanded = true,
                 )
             }
         },
         snackbarHost = { SwipeableSnackbarHost(hostState = snackBarHost) },
-        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-        containerColor = MaterialTheme.colorScheme.background
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
+        containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         KeyEventBlocker {
             it.key == Key.VolumeDown || it.key == Key.VolumeUp
@@ -207,7 +228,7 @@ fun KernelFlashScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .verticalScroll(scrollState)
+                    .verticalScroll(scrollState),
             ) {
                 LaunchedEffect(logText) {
                     scrollState.animateScrollTo(scrollState.maxValue)
@@ -216,8 +237,8 @@ fun KernelFlashScreen(
                     modifier = Modifier.padding(16.dp),
                     text = logText,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontFamily = FontFamily.Monospace,
-                    color = MaterialTheme.colorScheme.onSurface
+                    fontFamily = monospaceFontFamily(),
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }
@@ -227,7 +248,7 @@ fun KernelFlashScreen(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun FlashProgressIndicator(
-    flashState: FlashProgress
+    flashState: FlashProgress,
 ) {
     val progressColor = when {
         flashState.error.isNotEmpty() -> MaterialTheme.colorScheme.error
@@ -237,7 +258,7 @@ private fun FlashProgressIndicator(
 
     val progress = animateFloatAsState(
         targetValue = flashState.progress,
-        label = "FlashProgress"
+        label = "FlashProgress",
     )
 
     Card(
@@ -245,18 +266,18 @@ private fun FlashProgressIndicator(
             .fillMaxWidth()
             .padding(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright
-        )
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     text = when {
@@ -266,7 +287,7 @@ private fun FlashProgressIndicator(
                     },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = progressColor
+                    color = progressColor,
                 )
 
                 when {
@@ -274,14 +295,15 @@ private fun FlashProgressIndicator(
                         Icon(
                             imageVector = Icons.TwoTone.Error,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error
+                            tint = MaterialTheme.colorScheme.error,
                         )
                     }
+
                     flashState.isCompleted -> {
                         Icon(
                             imageVector = Icons.TwoTone.CheckCircle,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.tertiary
+                            tint = MaterialTheme.colorScheme.tertiary,
                         )
                     }
                 }
@@ -293,7 +315,7 @@ private fun FlashProgressIndicator(
                 Text(
                     text = flashState.currentStep,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -305,20 +327,20 @@ private fun FlashProgressIndicator(
                     .fillMaxWidth()
                     .height(8.dp),
                 color = progressColor,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
             )
 
             if (flashState.error.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         imageVector = Icons.TwoTone.Error,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
                     )
                 }
 
@@ -332,9 +354,9 @@ private fun FlashProgressIndicator(
                         .fillMaxWidth()
                         .background(
                             MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f),
-                            shape = MaterialTheme.shapes.small
+                            shape = MaterialTheme.shapes.small,
                         )
-                        .padding(8.dp)
+                        .padding(8.dp),
                 )
             }
         }
@@ -347,7 +369,7 @@ private fun TopBar(
     flashState: FlashProgress,
     onBack: () -> Unit,
     onSave: () -> Unit = {},
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     val cardConfig: CardConfig = koinInject()
     val statusColor = when {
@@ -372,10 +394,10 @@ private fun TopBar(
                         flashState.error.isNotEmpty() -> R.string.flash_failed
                         flashState.isCompleted -> R.string.flash_success
                         else -> R.string.kernel_flashing
-                    }
+                    },
                 ),
                 style = MaterialTheme.typography.titleLarge,
-                color = statusColor
+                color = statusColor,
             )
         },
         navigationIcon = {
@@ -383,24 +405,24 @@ private fun TopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.TwoTone.ArrowBack,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = cardColor.copy(alpha = cardAlpha),
-            scrolledContainerColor = cardColor.copy(alpha = cardAlpha)
+            scrolledContainerColor = cardColor.copy(alpha = cardAlpha),
         ),
         actions = {
             IconButton(onClick = onSave) {
                 Icon(
                     imageVector = Icons.TwoTone.Save,
                     contentDescription = stringResource(id = R.string.save_log),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         },
-        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-        scrollBehavior = scrollBehavior
+        windowInsets = adaptiveScaffoldWindowInsets(includeBottom = false),
+        scrollBehavior = scrollBehavior,
     )
 }

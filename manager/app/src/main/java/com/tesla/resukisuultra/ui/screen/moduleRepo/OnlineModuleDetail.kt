@@ -1,5 +1,9 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/moduleRepo/OnlineModuleDetail.kt
 package com.tesla.resukisuultra.ui.screen.moduleRepo
 import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
+========
+package org.bakasu.bakasu.ui.screen.moduleRepo
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/moduleRepo/OnlineModuleDetail.kt
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -20,18 +24,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -81,6 +81,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/moduleRepo/OnlineModuleDetail.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.CatalogModule
 import com.tesla.resukisuultra.domain.model.ModuleRelease
@@ -108,8 +109,39 @@ import com.tesla.resukisuultra.ui.util.LocalSnackbarHost
 import com.tesla.resukisuultra.ui.viewmodel.ModuleDetailUiAction
 import com.tesla.resukisuultra.ui.viewmodel.ModuleDetailViewModel
 import com.tesla.resukisuultra.ui.viewmodel.formatFileSize
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/moduleRepo/OnlineModuleDetail.kt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.CatalogModule
+import org.bakasu.bakasu.domain.model.ModuleRelease
+import org.bakasu.bakasu.domain.model.ModuleReleaseAsset
+import org.bakasu.bakasu.domain.usecase.EnqueueDownloadUseCase
+import org.bakasu.bakasu.domain.usecase.ObserveDownloadUseCase
+import org.bakasu.bakasu.ui.activity.PermissionRequestInterface
+import org.bakasu.bakasu.ui.component.ConfirmResult
+import org.bakasu.bakasu.ui.component.GithubMarkdown
+import org.bakasu.bakasu.ui.component.HorizontalPagerWithInteraction
+import org.bakasu.bakasu.ui.component.SwipeableSnackbarHost
+import org.bakasu.bakasu.ui.component.rememberConfirmDialog
+import org.bakasu.bakasu.ui.component.settings.AppBackButton
+import org.bakasu.bakasu.ui.component.settings.SegmentedColumn
+import org.bakasu.bakasu.ui.component.settings.SettingsBaseWidget
+import org.bakasu.bakasu.ui.navigation.LocalNavigator
+import org.bakasu.bakasu.ui.navigation.Navigator
+import org.bakasu.bakasu.ui.navigation.Route
+import org.bakasu.bakasu.ui.theme.CardConfig
+import org.bakasu.bakasu.ui.theme.ThemeConfig
+import org.bakasu.bakasu.ui.theme.blurEffect
+import org.bakasu.bakasu.ui.theme.blurSource
+import org.bakasu.bakasu.ui.theme.renderBackgroundBlur
+import org.bakasu.bakasu.ui.util.LocalPermissionRequestInterface
+import org.bakasu.bakasu.ui.util.LocalSnackbarHost
+import org.bakasu.bakasu.ui.util.adaptiveScaffoldWindowInsets
+import org.bakasu.bakasu.ui.viewmodel.ModuleDetailUiAction
+import org.bakasu.bakasu.ui.viewmodel.ModuleDetailViewModel
+import org.bakasu.bakasu.ui.viewmodel.formatFileSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
@@ -166,7 +198,7 @@ private fun OnlineModuleDetailContent(module: CatalogModule) {
     Scaffold(
         topBar = {
             Column(
-                modifier = Modifier.blurEffect()
+                modifier = Modifier.blurEffect(),
             ) {
                 LargeFlexibleTopAppBar(
                     title = { Text(module.moduleName) },
@@ -175,14 +207,14 @@ private fun OnlineModuleDetailContent(module: CatalogModule) {
                         AppBackButton(
                             onClick = {
                                 navigator.pop()
-                            }
+                            },
                         )
                     },
                     actions = {
                         IconButton(
                             onClick = {
                                 uriHandler.openUri("https://modules.kernelsu.org/module/${module.moduleId}")
-                            }
+                            },
                         ) {
                             Icon(
                                 imageVector = Icons.TwoTone.OpenInBrowser,
@@ -192,15 +224,17 @@ private fun OnlineModuleDetailContent(module: CatalogModule) {
                     },
                     colors = TopAppBarDefaults.topAppBarColors().copy(
                         containerColor =
-                            if (themeConfig.isEnableBlur)
+                            if (themeConfig.isEnableBlur) {
                                 Color.Transparent
-                            else
-                                MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
-                        scrolledContainerColor =
-                            if (themeConfig.isEnableBlur)
-                                Color.Transparent
-                            else
+                            } else {
                                 MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                            },
+                        scrolledContainerColor =
+                            if (themeConfig.isEnableBlur) {
+                                Color.Transparent
+                            } else {
+                                MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                            },
                     ),
                     windowInsets = TopAppBarDefaults.windowInsets.add(WindowInsets(left = 12.dp)),
                 )
@@ -208,11 +242,12 @@ private fun OnlineModuleDetailContent(module: CatalogModule) {
                 PrimaryTabRow(
                     selectedTabIndex = pagerState.currentPage,
                     containerColor =
-                        if (themeConfig.isEnableBlur)
+                        if (themeConfig.isEnableBlur) {
                             Color.Transparent
-                        else
-                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
-                    modifier = Modifier.fillMaxWidth()
+                        } else {
+                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                        },
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     tabTitles.forEachIndexed { index, title ->
                         Tab(
@@ -223,13 +258,13 @@ private fun OnlineModuleDetailContent(module: CatalogModule) {
                                 }
                             },
                             unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            text = { Text(title) }
+                            text = { Text(title) },
                         )
                     }
                 }
 
                 BackHandler(
-                    pagerState.currentPage != 0
+                    pagerState.currentPage != 0,
                 ) {
                     coroutineScope.launch {
                         pagerState.animateScrollToPage(0)
@@ -238,30 +273,28 @@ private fun OnlineModuleDetailContent(module: CatalogModule) {
             }
         },
         containerColor = Color.Transparent,
-        contentColor =  MaterialTheme.colorScheme.onSurface,
-        contentWindowInsets = WindowInsets.safeDrawing.only(
-            WindowInsetsSides.Top + WindowInsetsSides.Horizontal
-        ),
-        snackbarHost = { SwipeableSnackbarHost(hostState = snackBarHost) }
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
+        snackbarHost = { SwipeableSnackbarHost(hostState = snackBarHost) },
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .blurSource()
+                .blurSource(),
         ) {
-
-            HorizontalPager(
+            HorizontalPagerWithInteraction(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) { page ->
                 when (page) {
                     0 -> ReadmeTab(module, scrollBehavior.nestedScrollConnection, innerPadding)
+
                     1 -> ReleasesTab(
                         module,
                         scrollBehavior.nestedScrollConnection,
                         coroutineScope,
-                        innerPadding
+                        innerPadding,
                     )
 
                     2 -> InfoTab(module, scrollBehavior.nestedScrollConnection, innerPadding)
@@ -276,21 +309,22 @@ private fun OnlineModuleDetailContent(module: CatalogModule) {
 fun InfoTab(
     module: CatalogModule,
     nestedScrollConnection: NestedScrollConnection,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
 ) {
     val uriHandler = LocalUriHandler.current
 
-    LazyColumn(modifier = Modifier
-        .fillMaxSize()
-        .padding(vertical = 16.dp)
-        .nestedScroll(nestedScrollConnection)
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 16.dp)
+            .nestedScroll(nestedScrollConnection),
     ) {
         item {
             Spacer(Modifier.height(innerPadding.calculateTopPadding()))
         }
         item {
             SegmentedColumn(
-                title = stringResource(R.string.author)
+                title = stringResource(R.string.author),
             ) {
                 module.authorList.forEach { author ->
                     item {
@@ -299,12 +333,12 @@ fun InfoTab(
                             onClick = {
                                 uriHandler.openUri(author.link)
                             },
-                            title = author.name
+                            title = author.name,
                         ) {
                             Icon(
                                 modifier = Modifier.size(24.dp),
                                 imageVector = Icons.TwoTone.Link,
-                                contentDescription = stringResource(R.string.author_link)
+                                contentDescription = stringResource(R.string.author_link),
                             )
                         }
                     }
@@ -315,7 +349,7 @@ fun InfoTab(
         if (module.sourceUrl.isNotEmpty() && module.sourceUrl != "null") {
             item {
                 SegmentedColumn(
-                    title = stringResource(R.string.source_code)
+                    title = stringResource(R.string.source_code),
                 ) {
                     item {
                         SettingsBaseWidget(
@@ -323,7 +357,7 @@ fun InfoTab(
                             title = module.sourceUrl,
                             onClick = {
                                 uriHandler.openUri(module.sourceUrl)
-                            }
+                            },
                         )
                     }
                 }
@@ -347,14 +381,14 @@ fun ReleasesTab(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(nestedScrollConnection),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
             Spacer(Modifier.height(innerPadding.calculateTopPadding()))
         }
         items(
             items = module.releases,
-            key = { it.tagName }
+            key = { it.tagName },
         ) {
             ReleaseCard(module, it, coroutineScope)
         }
@@ -369,7 +403,7 @@ fun ReleasesTab(
 fun ReadmeTab(
     module: CatalogModule,
     nestedScrollConnection: NestedScrollConnection,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
 ) {
     val themeConfig: ThemeConfig = koinInject()
     val cardConfig: CardConfig = koinInject()
@@ -380,7 +414,7 @@ fun ReadmeTab(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(nestedScrollConnection),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
                 Spacer(Modifier.height(innerPadding.calculateTopPadding()))
@@ -392,32 +426,33 @@ fun ReadmeTab(
                         .clip(ContinuousCornerShape(16.dp))
                         .renderBackgroundBlur(),
                     color =
-                        if (themeConfig.isEnableBlurExp)
+                        if (themeConfig.isEnableBlurExp) {
                             Color.Transparent
-                        else
-                            MaterialTheme.colorScheme.surfaceBright.copy(cardConfig.cardAlpha),
+                        } else {
+                            MaterialTheme.colorScheme.surfaceBright.copy(cardConfig.cardAlpha)
+                        },
                 ) {
                     GithubMarkdown(
                         content = module.readme,
                         backgroundColor = Color.Transparent,
                         loading = loading,
-                        callerProvideLoadingIndicator = true
+                        callerProvideLoadingIndicator = true,
                     )
 
                     AnimatedVisibility(
                         visible = loading.value,
                         enter = expandVertically(
                             animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                            expandFrom = Alignment.Top // Unroll downwards like a blind
+                            expandFrom = Alignment.Top, // Unroll downwards like a blind
                         ) + fadeIn(
-                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
                         ),
                         exit = shrinkVertically(
                             animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                            shrinkTowards = Alignment.Top // Roll up upwards
+                            shrinkTowards = Alignment.Top, // Roll up upwards
                         ) + fadeOut(
-                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                        )
+                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                        ),
                     ) {
                         Spacer(modifier = Modifier.fillParentMaxSize())
                     }
@@ -428,15 +463,15 @@ fun ReadmeTab(
                     modifier = Modifier.height(
                         max(
                             innerPadding.calculateBottomPadding() - 16.dp,
-                            0.dp
-                        )
-                    )
+                            0.dp,
+                        ),
+                    ),
                 )
             }
         }
         if (loading.value) {
             LoadingIndicator(
-                modifier = Modifier.align(Alignment.Center)
+                modifier = Modifier.align(Alignment.Center),
             )
         }
     }
@@ -447,7 +482,7 @@ fun ReadmeTab(
 fun ReleaseCard(
     module: CatalogModule,
     release: ModuleRelease,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
 ) {
     val themeConfig: ThemeConfig = koinInject()
     val cardConfig: CardConfig = koinInject()
@@ -468,51 +503,52 @@ fun ReleaseCard(
             .renderBackgroundBlur(MaterialTheme.colorScheme.surfaceBright),
         shape = ContinuousCornerShape(16.dp),
         color =
-            if (themeConfig.isEnableBlurExp)
+            if (themeConfig.isEnableBlurExp) {
                 Color.Transparent
-            else
-                MaterialTheme.colorScheme.surfaceBright.copy(cardConfig.cardAlpha),
+            } else {
+                MaterialTheme.colorScheme.surfaceBright.copy(cardConfig.cardAlpha)
+            },
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
                     modifier = Modifier.weight(1f),
                     text = release.name,
                     style = MaterialTheme.typography.bodyMediumEmphasized,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
                 Text(
                     text = release.publishedAt,
                     style = MaterialTheme.typography.bodySmallEmphasized,
                     color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.align(Alignment.CenterVertically)
+                    modifier = Modifier.align(Alignment.CenterVertically),
                 )
             }
             HorizontalDivider(
                 modifier = Modifier.padding(
                     top = 5.dp,
-                    bottom = 5.dp
-                )
+                    bottom = 5.dp,
+                ),
             )
             CollapsibleContent(
                 title = stringResource(R.string.show_detail_or_hide_detail),
-                enter = EnterTransition.None
+                enter = EnterTransition.None,
             ) {
                 GithubMarkdown(
                     content = release.descriptionHTML,
                     backgroundColor = Color.Transparent,
-                    callerProvideLoadingIndicator = true
+                    callerProvideLoadingIndicator = true,
                 )
             }
             HorizontalDivider(
                 modifier = Modifier.padding(
                     top = 5.dp,
-                    bottom = 5.dp
-                )
+                    bottom = 5.dp,
+                ),
             )
             if (release.assets.isEmpty()) return@Surface
 
@@ -523,7 +559,7 @@ fun ReleaseCard(
                             val result = confirmDialog.awaitConfirm(
                                 title = confirmInstallTitle,
                                 html = true,
-                                content = release.descriptionHTML
+                                content = release.descriptionHTML,
                             )
 
                             if (result == ConfirmResult.Canceled) return@launch
@@ -551,9 +587,10 @@ fun ReleaseCard(
                         iconPlaceholder = false,
                         description = stringResource(R.string.assert_support_content).format(
                             formatFileSize(assetInfo.size),
-                            assetInfo.downloadCount
+                            assetInfo.downloadCount,
                         ),
-                        isOnBackground = false
+                        isOnBackground = false,
+                        containerColor = Color.Transparent,
                     ) {
                         FilledTonalButton(
                             onClick = onClick,
@@ -562,7 +599,7 @@ fun ReleaseCard(
                             Icon(
                                 modifier = Modifier.size(20.dp),
                                 imageVector = Icons.TwoTone.Download,
-                                contentDescription = null
+                                contentDescription = null,
                             )
                         }
                     }
@@ -591,37 +628,36 @@ fun CollapsibleContent(
                 .clip(ContinuousCornerShape(16.dp))
                 .clickable { expanded = !expanded }
                 .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmallEmphasized,
                 color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
 
             Icon(
                 imageVector = Icons.TwoTone.KeyboardArrowDown,
                 contentDescription = null,
                 modifier = Modifier.rotate(rotation),
-                tint = MaterialTheme.colorScheme.onBackground
+                tint = MaterialTheme.colorScheme.onBackground,
             )
         }
 
         AnimatedVisibility(
             visible = expanded,
             enter = enter,
-            exit = exit
+            exit = exit,
         ) {
             content()
         }
     }
 }
 
-
 @Composable
 @Preview
-fun ReleaseCardPreview() {
+private fun ReleaseCardPreview() {
     val release = ModuleRelease(
         name = "name",
         tagName = "tagName",
@@ -633,18 +669,18 @@ fun ReleaseCardPreview() {
                     name = "name",
                     downloadUrl = "downloadUrl",
                     size = 0,
-                    downloadCount = 0
-                )
+                    downloadCount = 0,
+                ),
             )
             add(
                 ModuleReleaseAsset(
                     name = "name2",
                     downloadUrl = "downloadUrl2",
                     size = 0,
-                    downloadCount = 0
-                )
+                    downloadCount = 0,
+                ),
             )
-        }
+        },
     )
 
     val fakeModule = initFakeRepoModuleForPreview()
@@ -655,14 +691,14 @@ fun ReleaseCardPreview() {
             override fun requestPermission(
                 permission: String,
                 callback: (Boolean) -> Unit,
-                requestDescription: String
+                requestDescription: String,
             ) {
             }
 
             override fun requestPermissions(
                 permissions: Array<String>,
                 callback: (Map<String, @JvmSuppressWildcards Boolean>) -> Unit,
-                requestDescription: Map<String, String>
+                requestDescription: Map<String, String>,
             ) {
             }
         },

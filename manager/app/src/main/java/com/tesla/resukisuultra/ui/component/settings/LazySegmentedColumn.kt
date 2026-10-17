@@ -1,5 +1,9 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/LazySegmentedColumn.kt
 package com.tesla.resukisuultra.ui.component.settings
 import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
+========
+package org.bakasu.bakasu.ui.component.settings
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/settings/LazySegmentedColumn.kt
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -33,8 +37,8 @@ inline fun <T> LazyListScope.lazySegmentColumn(
                 modifier = Modifier.padding(
                     top = 8.dp,
                     start = if (noHorizontalPadding) 0.dp else 32.dp, // 16.dp + 16.dp
-                    bottom = 8.dp
-                )
+                    bottom = 8.dp,
+                ),
             )
         }
     }
@@ -42,7 +46,7 @@ inline fun <T> LazyListScope.lazySegmentColumn(
     items(
         count = items.size,
         key = if (key != null) { index: Int -> key(index, items[index]) } else null,
-        contentType = { index: Int -> contentType(index, items[index]) }
+        contentType = { index: Int -> contentType(index, items[index]) },
     ) { index ->
         val item = items[index]
 
@@ -56,7 +60,7 @@ inline fun <T> LazyListScope.lazySegmentColumn(
             topStart = topRadius,
             topEnd = topRadius,
             bottomStart = bottomRadius,
-            bottomEnd = bottomRadius
+            bottomEnd = bottomRadius,
         )
 
         val topPadding = if (isFirst) 0.dp else ListItemDefaults.SegmentedGap
@@ -66,7 +70,7 @@ inline fun <T> LazyListScope.lazySegmentColumn(
         Box(
             modifier = Modifier
                 .padding(top = topPadding)
-                .padding(horizontal = horizontalPadding)
+                .padding(horizontal = horizontalPadding),
         ) {
             CompositionLocalProvider(LocalSegmentedItemShape provides shape) {
                 itemContent(index, item)
