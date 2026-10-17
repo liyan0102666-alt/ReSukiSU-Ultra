@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/SuSFSModels.kt
 package com.tesla.resukisuultra.domain.model
+========
+package org.bakasu.bakasu.domain.model
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/SuSFSModels.kt
 
 enum class SusKstatType {
     Normal,
@@ -75,5 +79,4 @@ data class SuSFSConfig(
     val sus_kstat: Set<SusKstatItem>,
     val open_redirect: Set<OpenRedirectItem>,
     val sus_map: Set<String>,
-) {
-}
+)

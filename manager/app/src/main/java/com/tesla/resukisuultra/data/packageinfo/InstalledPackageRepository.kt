@@ -1,8 +1,15 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/packageinfo/InstalledPackageRepository.kt
 package com.tesla.resukisuultra.data.packageinfo
 
 import android.app.Application
 import androidx.core.content.pm.PackageInfoCompat
 import com.tesla.resukisuultra.domain.model.InstalledPackageInfo
+========
+package org.bakasu.bakasu.data.packageinfo
+
+import android.app.Application
+import androidx.core.content.pm.PackageInfoCompat
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/packageinfo/InstalledPackageRepository.kt
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.bakasu.bakasu.domain.model.InstalledPackageInfo
 
 class InstalledPackageRepository(
     application: Application,

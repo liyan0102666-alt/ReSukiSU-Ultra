@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/util/downloader/Downloader.kt
 package com.tesla.resukisuultra.ui.util.downloader
+========
+package org.bakasu.bakasu.ui.util.downloader
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/util/Downloader.kt
 
 import android.Manifest
 import android.content.Context
@@ -6,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.core.net.toUri
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/util/downloader/Downloader.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.DownloadStatus
 import com.tesla.resukisuultra.domain.model.ManagerUpdateInfo
@@ -13,10 +18,19 @@ import com.tesla.resukisuultra.domain.usecase.EnqueueDownloadUseCase
 import com.tesla.resukisuultra.domain.usecase.EnqueueManagerUpdateUseCase
 import com.tesla.resukisuultra.domain.usecase.ObserveDownloadUseCase
 import com.tesla.resukisuultra.ui.activity.PermissionRequestInterface
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/util/Downloader.kt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.DownloadStatus
+import org.bakasu.bakasu.domain.model.ManagerUpdateInfo
+import org.bakasu.bakasu.domain.usecase.EnqueueDownloadUseCase
+import org.bakasu.bakasu.domain.usecase.EnqueueManagerUpdateUseCase
+import org.bakasu.bakasu.domain.usecase.ObserveDownloadUseCase
+import org.bakasu.bakasu.ui.activity.PermissionRequestInterface
 
 /**
  * @author weishu
@@ -31,7 +45,7 @@ fun download(
     observeDownload: ObserveDownloadUseCase,
     onDownloaded: (Uri) -> Unit = {},
     onDownloading: () -> Unit = {},
-    onProgress: (Int) -> Unit = {}
+    onProgress: (Int) -> Unit = {},
 ) {
     fun startDownloadFile(
         url: String,
@@ -64,7 +78,7 @@ fun download(
             fileName = fileName,
             onDownloaded = onDownloaded,
             onDownloading = onDownloading,
-            onProgress = onProgress
+            onProgress = onProgress,
         )
     }
 }
@@ -94,14 +108,14 @@ private fun requestDownloadPermissions(
                     Toast.makeText(
                         context,
                         context.getString(R.string.notification_permission_denied),
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                     return@requestPermission
                 }
 
                 onGranted()
             },
-            requestDescription = context.getString(R.string.notification_permission_description)
+            requestDescription = context.getString(R.string.notification_permission_description),
         )
     } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S_V2) {
         // sdk 32, no need any permission
@@ -111,7 +125,7 @@ private fun requestDownloadPermissions(
         permissionRequestInterface.requestPermissions(
             permissions = arrayOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
             ),
             callback = { result ->
                 val success = result.all { it.value }
@@ -119,7 +133,7 @@ private fun requestDownloadPermissions(
                     Toast.makeText(
                         context,
                         context.getString(R.string.storage_permission_denied),
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                     return@requestPermissions
                 }
@@ -127,7 +141,7 @@ private fun requestDownloadPermissions(
             },
             requestDescription = mapOf(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE to context.getString(R.string.storage_permission_description),
-            )
+            ),
         )
     }
 }

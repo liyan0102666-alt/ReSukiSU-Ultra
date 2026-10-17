@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/overscroll/StretchOverscrollCompensationState.kt
 package com.tesla.resukisuultra.ui.overscroll
+========
+package org.bakasu.bakasu.ui.overscroll
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/overscroll/StretchOverscrollCompensationState.kt
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.layout.LayoutCoordinates

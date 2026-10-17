@@ -1,0 +1,29 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/usecase/ModuleCatalogUseCases.kt
+package com.tesla.resukisuultra.domain.usecase
+
+import com.tesla.resukisuultra.data.module.ModuleCatalogRepository
+========
+package org.bakasu.bakasu.domain.usecase
+
+import org.bakasu.bakasu.data.module.ModuleCatalogRepository
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/usecase/ModuleCatalogUseCases.kt
+
+class ObserveCatalogModulesUseCase(private val repository: ModuleCatalogRepository) {
+    operator fun invoke() = repository.modules
+}
+
+class ObserveModuleCatalogRefreshingUseCase(private val repository: ModuleCatalogRepository) {
+    operator fun invoke() = repository.refreshing
+}
+
+class ObserveModuleCatalogOfflineUseCase(private val repository: ModuleCatalogRepository) {
+    operator fun invoke() = repository.offline
+}
+
+class RefreshModuleCatalogUseCase(private val repository: ModuleCatalogRepository) {
+    suspend operator fun invoke() = repository.refresh()
+}
+
+class GetCatalogModuleUseCase(private val repository: ModuleCatalogRepository) {
+    suspend operator fun invoke(moduleId: String) = repository.get(moduleId)
+}

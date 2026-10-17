@@ -1,9 +1,14 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/Template.kt
 package com.tesla.resukisuultra.ui.screen
 import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
 
 import org.koin.compose.koinInject
 import com.tesla.resukisuultra.ui.theme.CardConfig
 import com.tesla.resukisuultra.ui.theme.ThemeConfig
+========
+package org.bakasu.bakasu.ui.screen
+
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/Template.kt
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.widget.Toast
@@ -20,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -68,6 +72,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.dropUnlessResumed
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/Template.kt
 import org.koin.compose.viewmodel.koinViewModel
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.ProfileTemplate
@@ -84,13 +89,34 @@ import com.tesla.resukisuultra.ui.util.ActivityResumeEffect
 import com.tesla.resukisuultra.ui.viewmodel.TemplateUiEvent
 import com.tesla.resukisuultra.ui.viewmodel.TemplateViewModel
 import com.tesla.resukisuultra.ui.viewmodel.TemplateUiAction
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/Template.kt
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.ProfileTemplate
+import org.bakasu.bakasu.ui.component.NetworkRefreshContent
+import org.bakasu.bakasu.ui.component.settings.AppBackButton
+import org.bakasu.bakasu.ui.component.settings.SettingsJumpPageWidget
+import org.bakasu.bakasu.ui.component.settings.lazySegmentColumn
+import org.bakasu.bakasu.ui.navigation.LocalNavigator
+import org.bakasu.bakasu.ui.navigation.Navigator
+import org.bakasu.bakasu.ui.navigation.Route
+import org.bakasu.bakasu.ui.theme.CardConfig
+import org.bakasu.bakasu.ui.theme.ThemeConfig
+import org.bakasu.bakasu.ui.theme.blurEffect
+import org.bakasu.bakasu.ui.theme.blurSource
+import org.bakasu.bakasu.ui.util.ActivityResumeEffect
+import org.bakasu.bakasu.ui.util.adaptiveScaffoldWindowInsets
+import org.bakasu.bakasu.ui.viewmodel.TemplateUiAction
+import org.bakasu.bakasu.ui.viewmodel.TemplateUiEvent
+import org.bakasu.bakasu.ui.viewmodel.TemplateViewModel
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * @author weishu
  * @date 2023/10/20.
  */
-
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -194,24 +220,24 @@ fun AppProfileTemplateScreen() {
                             readOnly = false,
                             isCreation = true,
                         ),
-                        "template_edit"
+                        "template_edit",
                     )
                 },
                 icon = { Icon(Icons.TwoTone.Add, null) },
                 text = { Text(stringResource(id = R.string.app_profile_template_create)) },
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             )
         },
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        contentWindowInsets = WindowInsets.safeDrawing,
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
     ) { innerPadding ->
         if (uiState.templateList.isEmpty()) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
-                    .blurSource()
+                    .blurSource(),
             ) {
                 item {
                     Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
@@ -234,7 +260,7 @@ fun AppProfileTemplateScreen() {
                 state = pullRefreshState,
                 modifier = Modifier
                     .nestedScroll(
-                        scrollBehavior.nestedScrollConnection
+                        scrollBehavior.nestedScrollConnection,
                     )
                     .blurSource(),
                 isRefreshing = isUserRefreshing,
@@ -264,7 +290,7 @@ fun AppProfileTemplateScreen() {
                         .nestedScroll(scrollBehavior.nestedScrollConnection),
                     contentPadding = remember {
                         PaddingValues(bottom = 16.dp + 56.dp + 16.dp /* Scaffold Fab Spacing + Fab container height */)
-                    }
+                    },
                 ) {
                     item {
                         Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
@@ -272,7 +298,8 @@ fun AppProfileTemplateScreen() {
 
                     lazySegmentColumn(
                         items = uiState.templateList,
-                        key = { _, app -> app.id }) { _, app ->
+                        key = { _, app -> app.id },
+                    ) { _, app ->
                         TemplateItem(app)
                     }
 
@@ -288,7 +315,7 @@ fun AppProfileTemplateScreen() {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TemplateItem(
-    template: ProfileTemplate
+    template: ProfileTemplate,
 ) {
     val navigator = LocalNavigator.current
     SettingsJumpPageWidget(
@@ -297,7 +324,7 @@ private fun TemplateItem(
         onClick = {
             navigator.navigateForResult(
                 Route.TemplateEditor(template.id, !template.local),
-                "template_edit"
+                "template_edit",
             )
         },
         description = "${template.id}${if (template.author.isEmpty()) "" else "@${template.author}"}",
@@ -309,7 +336,7 @@ private fun TemplateItem(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 5.dp)
+                    .padding(top = 5.dp),
             ) {
                 LabelText("UID: ${template.uid}")
                 LabelText(
@@ -332,15 +359,15 @@ private fun TemplateItem(
                     )
                 }
             }
-        }
+        },
     )
 }
 
 @Preview
 @Composable
-fun TemplateItemPreview() {
+private fun TemplateItemPreview() {
     CompositionLocalProvider(
-        LocalNavigator provides Navigator(Route.AppProfileTemplate)
+        LocalNavigator provides Navigator(Route.AppProfileTemplate),
     ) {
         TemplateItem(ProfileTemplate())
     }
@@ -358,33 +385,34 @@ private fun TopBar(
     val themeConfig: ThemeConfig = koinInject()
     val cardConfig: CardConfig = koinInject()
     LargeFlexibleTopAppBar(
-        modifier = Modifier.blurEffect(
-        ),
+        modifier = Modifier.blurEffect(),
         title = {
             Text(stringResource(R.string.settings_profile_template))
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor =
-                if (themeConfig.isEnableBlur)
+                if (themeConfig.isEnableBlur) {
                     Color.Transparent
-                else
-                    MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                },
             scrolledContainerColor =
-                if (themeConfig.isEnableBlur)
+                if (themeConfig.isEnableBlur) {
                     Color.Transparent
-                else
-                    MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                },
         ),
         navigationIcon = {
             AppBackButton(
-                onClick = onBack
+                onClick = onBack,
             )
         },
         actions = {
             IconButton(onClick = onSync) {
                 Icon(
                     Icons.TwoTone.Sync,
-                    contentDescription = stringResource(id = R.string.app_profile_template_sync)
+                    contentDescription = stringResource(id = R.string.app_profile_template_sync),
                 )
             }
 
@@ -394,20 +422,24 @@ private fun TopBar(
             }) {
                 Icon(
                     imageVector = Icons.TwoTone.ImportExport,
-                    contentDescription = stringResource(id = R.string.app_profile_import_export)
+                    contentDescription = stringResource(id = R.string.app_profile_import_export),
                 )
 
                 DropdownMenuPopup(expanded = showDropdown, onDismissRequest = {
                     showDropdown = false
                 }) {
                     DropdownMenuGroup(
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/Template.kt
                         shapes = androidx.compose.material3.MenuGroupShapes(
                 com.tesla.resukisuultra.ui.theme.ContinuousCornerShape(28.dp),
                 com.tesla.resukisuultra.ui.theme.ContinuousCornerShape(28.dp),
             )
+========
+                        shapes = MenuDefaults.groupShapes(),
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/Template.kt
                     ) {
                         DropdownMenuItem(
-                            selected = false,
+                            shape = MenuDefaults.itemShape(0, 2).shape,
                             text = {
                                 Text(stringResource(id = R.string.app_profile_import_from_clipboard))
                             },
@@ -415,10 +447,13 @@ private fun TopBar(
                                 onImport()
                                 showDropdown = false
                             },
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/Template.kt
                             shapes = com.tesla.resukisuultra.ui.theme.menuItemShapes(0, 1)
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/Template.kt
                         )
                         DropdownMenuItem(
-                            selected = false,
+                            shape = MenuDefaults.itemShape(1, 2).shape,
                             text = {
                                 Text(stringResource(id = R.string.app_profile_export_to_clipboard))
                             },
@@ -426,14 +461,17 @@ private fun TopBar(
                                 onExport()
                                 showDropdown = false
                             },
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/Template.kt
                             shapes = com.tesla.resukisuultra.ui.theme.menuItemShapes(0, 2)
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/Template.kt
                         )
                     }
                 }
             }
         },
         windowInsets = TopAppBarDefaults.windowInsets.add(WindowInsets(left = 12.dp)),
-        scrollBehavior = scrollBehavior
+        scrollBehavior = scrollBehavior,
     )
 }
 
@@ -441,11 +479,16 @@ private fun TopBar(
 fun LabelText(
     label: String,
     containerColor: Color = MaterialTheme.colorScheme.primary,
-    contentColor: Color = contentColorFor(containerColor)
+    contentColor: Color = contentColorFor(containerColor),
 ) {
     Surface(
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/Template.kt
         shape = ContinuousCornerShape(4.dp),
         color = containerColor
+========
+        shape = RoundedCornerShape(4.dp),
+        color = containerColor,
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/Template.kt
     ) {
         Text(
             text = label,
@@ -453,7 +496,7 @@ fun LabelText(
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp),
             color = contentColor,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

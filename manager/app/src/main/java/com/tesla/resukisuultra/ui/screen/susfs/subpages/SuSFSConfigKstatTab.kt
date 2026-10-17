@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/subpages/SuSFSConfigKstatTab.kt
 package com.tesla.resukisuultra.ui.screen.susfs.subpages
+========
+package org.bakasu.bakasu.ui.screen.susfs.subpages
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/subpages/SuSFSConfigKstatTab.kt
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/subpages/SuSFSConfigKstatTab.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.SusKstatItem
 import com.tesla.resukisuultra.domain.model.SusKstatStatically
@@ -44,7 +49,30 @@ import com.tesla.resukisuultra.ui.viewmodel.SuSFSViewModel
 import com.tesla.resukisuultra.ui.viewmodel.SusKstatOperation
 import com.tesla.resukisuultra.ui.viewmodel.awaitSuSFSBoolean
 import com.tesla.resukisuultra.ui.viewmodel.awaitSuSFSConfig
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/subpages/SuSFSConfigKstatTab.kt
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.SusKstatItem
+import org.bakasu.bakasu.domain.model.SusKstatStatically
+import org.bakasu.bakasu.domain.model.SusKstatType
+import org.bakasu.bakasu.ui.component.settings.SettingsBaseWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsJumpPageWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsTextFieldWidget
+import org.bakasu.bakasu.ui.screen.susfs.RegisterSuSFSRefresh
+import org.bakasu.bakasu.ui.screen.susfs.SuSFSRefreshRegistrar
+import org.bakasu.bakasu.ui.screen.susfs.component.EntryDetailDialog
+import org.bakasu.bakasu.ui.screen.susfs.component.ManualAddDialog
+import org.bakasu.bakasu.ui.screen.susfs.component.SuSFSDescriptionCard
+import org.bakasu.bakasu.ui.screen.susfs.component.susfsEntryList
+import org.bakasu.bakasu.ui.screen.susfs.component.toImportedEntryLines
+import org.bakasu.bakasu.ui.util.LocalSnackbarHost
+import org.bakasu.bakasu.ui.util.showReplacingSnackbar
+import org.bakasu.bakasu.ui.viewmodel.SuSFSUiAction
+import org.bakasu.bakasu.ui.viewmodel.SuSFSViewModel
+import org.bakasu.bakasu.ui.viewmodel.SusKstatOperation
+import org.bakasu.bakasu.ui.viewmodel.awaitSuSFSBoolean
+import org.bakasu.bakasu.ui.viewmodel.awaitSuSFSConfig
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,7 +133,7 @@ fun SusKstatTab(
                 statCtime,
                 statCtimeNsec,
                 statBlocks,
-                statBlksize
+                statBlksize,
             ).forEach { it.clearText() }
         }
     }
@@ -121,12 +149,10 @@ fun SusKstatTab(
     val defaultValueLabel = stringResource(R.string.susfs_value_default)
     val susfsEntryImportSuccess = stringResource(R.string.susfs_entry_import_success)
 
-    fun SusKstatType.localizedLabel(): String {
-        return when (this) {
-            SusKstatType.Normal -> subtypeNormal
-            SusKstatType.FullClone -> subtypeFullClone
-            SusKstatType.Statically -> subtypeStatically
-        }
+    fun SusKstatType.localizedLabel(): String = when (this) {
+        SusKstatType.Normal -> subtypeNormal
+        SusKstatType.FullClone -> subtypeFullClone
+        SusKstatType.Statically -> subtypeStatically
     }
 
     LazyColumn(
@@ -265,12 +291,12 @@ fun SusKstatTab(
                     } else {
                         TextFieldLineLimits.SingleLine
                     },
-                    renderBackgroundBlur = false
+                    renderBackgroundBlur = false,
                 )
             }
             item(
                 key = "susfs_kstat_static_fields",
-                visible = selectedSubtype == subtypeStatically
+                visible = selectedSubtype == subtypeStatically,
             ) {
                 SettingsBaseWidget(
                     iconPlaceholder = false,
@@ -290,7 +316,7 @@ fun SusKstatTab(
                 "ctime" to statCtime,
                 "ctime_nsec" to statCtimeNsec,
                 "blocks" to statBlocks,
-                "blksize" to statBlksize
+                "blksize" to statBlksize,
             ).forEachIndexed { index, (label, state) ->
                 item(key = "susfs_kstat_static_$index") {
                     SettingsTextFieldWidget(
@@ -299,17 +325,17 @@ fun SusKstatTab(
                         useLabelAsPlaceholder = true,
                         enabled = !isLoading,
                         lineLimits = TextFieldLineLimits.SingleLine,
-                        renderBackgroundBlur = false
+                        renderBackgroundBlur = false,
                     )
                 }
             }
-        }
+        },
     )
 
     detailItem?.let { item ->
         val fields = mutableListOf(
             pathLabel to item.path,
-            spoofTypeLabel to item.spoof_type.localizedLabel()
+            spoofTypeLabel to item.spoof_type.localizedLabel(),
         )
         item.statically?.let { st ->
             fields.add("ino" to (st.ino?.toString() ?: defaultValueLabel))

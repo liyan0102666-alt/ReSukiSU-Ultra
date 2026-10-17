@@ -1,9 +1,15 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/network/WebResourceRepository.kt
 package com.tesla.resukisuultra.data.network
 
 import com.tesla.resukisuultra.domain.model.WebResource
+========
+package org.bakasu.bakasu.data.network
+
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/network/WebResourceRepository.kt
 import okhttp3.Headers.Companion.toHeaders
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.bakasu.bakasu.domain.model.WebResource
 
 class WebResourceRepository(
     private val httpClient: OkHttpClient,
@@ -18,7 +24,7 @@ class WebResourceRepository(
                 .url(url)
                 .method(method, null)
                 .headers(requestHeaders.toHeaders())
-                .build()
+                .build(),
         ).execute()
         val contentTypes = response.header("content-type", "text/plain; charset=utf-8")
             ?.split(";\\s*".toRegex())

@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/InstallViewModel.kt
 package com.tesla.resukisuultra.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
@@ -5,6 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.tesla.resukisuultra.domain.model.InstallEnvironment
 import com.tesla.resukisuultra.domain.usecase.GetInstallEnvironmentUseCase
 import com.tesla.resukisuultra.domain.usecase.RebootUseCase
+========
+package org.bakasu.bakasu.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/InstallViewModel.kt
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -13,6 +20,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.domain.model.InstallEnvironment
+import org.bakasu.bakasu.domain.usecase.GetInstallEnvironmentUseCase
+import org.bakasu.bakasu.domain.usecase.RebootUseCase
 
 data class InstallUiState(
     val environment: InstallEnvironment = InstallEnvironment(),
@@ -35,7 +45,7 @@ class InstallViewModel(
     private val mutableState = MutableStateFlow(
         getInstallEnvironment.cached()?.let { cached ->
             InstallUiState(environment = cached, loading = false)
-        } ?: InstallUiState()
+        } ?: InstallUiState(),
     )
     private val mutableEvents = MutableSharedFlow<InstallUiEvent>(extraBufferCapacity = 1)
 
@@ -49,6 +59,7 @@ class InstallViewModel(
     fun dispatch(action: InstallUiAction) {
         when (action) {
             InstallUiAction.Refresh -> load(forceRefresh = true)
+
             InstallUiAction.Reboot -> viewModelScope.launch {
                 reboot().onFailure {
                     mutableEvents.tryEmit(InstallUiEvent.Error(it.message.orEmpty()))

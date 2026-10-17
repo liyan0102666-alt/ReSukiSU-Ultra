@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/module/ModuleCatalogRepository.kt
 package com.tesla.resukisuultra.data.module
 
 import com.tesla.resukisuultra.data.network.NetworkRequestRepository
@@ -8,6 +9,10 @@ import com.tesla.resukisuultra.domain.model.ModuleCatalogFailure
 import com.tesla.resukisuultra.domain.model.ModuleCatalogResult
 import com.tesla.resukisuultra.domain.model.ModuleRelease
 import com.tesla.resukisuultra.domain.model.ModuleReleaseAsset
+========
+package org.bakasu.bakasu.data.module
+
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/module/ModuleCatalogRepository.kt
 import com.topjohnwu.superuser.io.SuFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -19,6 +24,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.bakasu.bakasu.data.network.NetworkRequestRepository
+import org.bakasu.bakasu.data.network.NetworkStatusRepository
+import org.bakasu.bakasu.domain.model.CatalogAuthor
+import org.bakasu.bakasu.domain.model.CatalogModule
+import org.bakasu.bakasu.domain.model.ModuleCatalogFailure
+import org.bakasu.bakasu.domain.model.ModuleCatalogResult
+import org.bakasu.bakasu.domain.model.ModuleRelease
+import org.bakasu.bakasu.domain.model.ModuleReleaseAsset
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -57,7 +70,7 @@ class ModuleCatalogRepository(
                         },
                         onFailure = {
                             ModuleCatalogResult.Failure(
-                                ModuleCatalogFailure.Network(it.message.orEmpty())
+                                ModuleCatalogFailure.Network(it.message.orEmpty()),
                             )
                         },
                     )
@@ -73,6 +86,7 @@ class ModuleCatalogRepository(
         }
         return when (val refreshed = refresh()) {
             is ModuleCatalogResult.Failure -> refreshed
+
             is ModuleCatalogResult.Success -> refreshed.value.firstOrNull { it.moduleId == moduleId }
                 ?.let { ModuleCatalogResult.Success(it) }
                 ?: ModuleCatalogResult.Failure(ModuleCatalogFailure.NotFound)
@@ -132,24 +146,22 @@ class ModuleCatalogRepository(
         )
     }
 
-    private suspend fun fetchModuleDetail(moduleId: String): Detail? {
-        return networkRequestRepository
-            .fetch("https://modules.kernelsu.org/module/$moduleId.json")
-            .getOrNull()
-            ?.let { body ->
-                val json = JSONObject(body)
-                val releases = json.optJSONArray("releases")?.let { array ->
-                    (0 until array.length()).mapNotNull { index ->
-                        array.optJSONObject(index)?.toRelease()
-                    }
-                }.orEmpty()
-                Detail(
-                    readme = json.optString("readmeHTML"),
-                    sourceUrl = stripTicks(json.optString("sourceUrl")),
-                    releases = releases,
-                )
-            }
-    }
+    private suspend fun fetchModuleDetail(moduleId: String): Detail? = networkRequestRepository
+        .fetch("https://modules.kernelsu.org/module/$moduleId.json")
+        .getOrNull()
+        ?.let { body ->
+            val json = JSONObject(body)
+            val releases = json.optJSONArray("releases")?.let { array ->
+                (0 until array.length()).mapNotNull { index ->
+                    array.optJSONObject(index)?.toRelease()
+                }
+            }.orEmpty()
+            Detail(
+                readme = json.optString("readmeHTML"),
+                sourceUrl = stripTicks(json.optString("sourceUrl")),
+                releases = releases,
+            )
+        }
 
     private fun JSONObject.toRelease(): ModuleRelease {
         val releaseName = optString("name", optString("tagName", optString("version")))
@@ -158,12 +170,16 @@ class ModuleCatalogRepository(
                 array.optJSONObject(index)?.let { asset ->
                     val name = asset.optString("name")
                     val url = stripTicks(asset.optString("downloadUrl"))
-                    if (name.isBlank() || url.isBlank()) null else ModuleReleaseAsset(
-                        name = name,
-                        downloadUrl = url,
-                        size = asset.optLong("size"),
-                        downloadCount = asset.opt("downloadCount").toIntCompat(),
-                    )
+                    if (name.isBlank() || url.isBlank()) {
+                        null
+                    } else {
+                        ModuleReleaseAsset(
+                            name = name,
+                            downloadUrl = url,
+                            size = asset.optLong("size"),
+                            downloadCount = asset.opt("downloadCount").toIntCompat(),
+                        )
+                    }
                 }
             }
         }.orEmpty()

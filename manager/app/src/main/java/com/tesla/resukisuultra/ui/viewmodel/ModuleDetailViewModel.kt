@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/ModuleDetailViewModel.kt
 package com.tesla.resukisuultra.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
@@ -6,6 +7,12 @@ import com.tesla.resukisuultra.domain.model.CatalogModule
 import com.tesla.resukisuultra.domain.model.ModuleCatalogFailure
 import com.tesla.resukisuultra.domain.model.ModuleCatalogResult
 import com.tesla.resukisuultra.domain.usecase.GetCatalogModuleUseCase
+========
+package org.bakasu.bakasu.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/ModuleDetailViewModel.kt
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -14,6 +21,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.domain.model.CatalogModule
+import org.bakasu.bakasu.domain.model.ModuleCatalogFailure
+import org.bakasu.bakasu.domain.model.ModuleCatalogResult
+import org.bakasu.bakasu.domain.usecase.GetCatalogModuleUseCase
 
 data class ModuleDetailUiState(
     val module: CatalogModule? = null,

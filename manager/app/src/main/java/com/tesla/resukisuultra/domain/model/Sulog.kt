@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/Sulog.kt
 package com.tesla.resukisuultra.domain.model
+========
+package org.bakasu.bakasu.domain.model
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/Sulog.kt
 
 import java.time.Instant
 import java.time.ZoneId
@@ -62,12 +66,11 @@ data class SulogState(
 
 fun defaultSulogEventFilters(): Set<SulogEventFilter> = SulogEventFilter.entries.toSet()
 
-fun String.toSulogDisplayName(): String =
-    if (startsWith("sulog-") && endsWith(".log")) {
-        removePrefix("sulog-").removeSuffix(".log")
-    } else {
-        this
-    }
+fun String.toSulogDisplayName(): String = if (startsWith("sulog-") && endsWith(".log")) {
+    removePrefix("sulog-").removeSuffix(".log")
+} else {
+    this
+}
 
 fun filterSulogEntries(
     entries: List<SulogEntry>,
@@ -160,6 +163,7 @@ private fun parseQuotedValue(line: String, startIndex: Int): Pair<String, Int> {
     while (index < line.length) {
         when (val char = line[index]) {
             '"' -> return value.toString() to (index + 1)
+
             '\\' -> {
                 val next = line.getOrNull(index + 1)
                 when (next) {

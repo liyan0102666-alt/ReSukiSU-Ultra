@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/profile/Groups.kt
 package com.tesla.resukisuultra.profile
+========
+package org.bakasu.bakasu.profile
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/profile/Groups.kt
 
 /**
  * https://cs.android.com/android/platform/superproject/main/+/main:system/core/libcutils/include/private/android_filesystem_config.h

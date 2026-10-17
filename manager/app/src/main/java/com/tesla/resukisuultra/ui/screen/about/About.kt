@@ -1,9 +1,14 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/about/About.kt
 package com.tesla.resukisuultra.ui.screen.about
 import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
 
 import org.koin.compose.koinInject
 import com.tesla.resukisuultra.ui.theme.CardConfig
 import com.tesla.resukisuultra.ui.theme.ThemeConfig
+========
+package org.bakasu.bakasu.ui.screen.about
+
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/about/About.kt
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +59,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/about/About.kt
 import com.tesla.resukisuultra.BuildConfig
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.ui.component.WarningCard
@@ -67,6 +73,24 @@ import com.tesla.resukisuultra.ui.theme.blurEffect
 import com.tesla.resukisuultra.ui.theme.blurSource
 import com.tesla.resukisuultra.ui.theme.renderBackgroundBlur
 
+========
+import org.bakasu.bakasu.BuildConfig
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.ui.component.WarningCard
+import org.bakasu.bakasu.ui.component.settings.AppBackButton
+import org.bakasu.bakasu.ui.component.settings.SegmentedColumn
+import org.bakasu.bakasu.ui.component.settings.SettingsJumpPageWidget
+import org.bakasu.bakasu.ui.navigation.LocalNavigator
+import org.bakasu.bakasu.ui.navigation.Navigator
+import org.bakasu.bakasu.ui.navigation.Route
+import org.bakasu.bakasu.ui.theme.CardConfig
+import org.bakasu.bakasu.ui.theme.ThemeConfig
+import org.bakasu.bakasu.ui.theme.blurEffect
+import org.bakasu.bakasu.ui.theme.blurSource
+import org.bakasu.bakasu.ui.theme.renderBackgroundBlur
+import org.bakasu.bakasu.ui.util.adaptiveScaffoldWindowInsets
+import org.koin.compose.koinInject
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/about/About.kt
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -77,15 +101,15 @@ fun AboutScreen() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState(
             initialHeightOffset = -154f,
-            initialHeightOffsetLimit = -154f // from debugger
-        )
+            initialHeightOffsetLimit = -154f, // from debugger
+        ),
     )
 
     Scaffold(
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         topBar = {
             LargeFlexibleTopAppBar(
-                modifier = Modifier.blurEffect(
-                ),
+                modifier = Modifier.blurEffect(),
                 windowInsets = TopAppBarDefaults.windowInsets.add(WindowInsets(left = 12.dp)),
                 title = { Text(text = stringResource(id = R.string.about)) },
                 scrollBehavior = scrollBehavior,
@@ -93,20 +117,22 @@ fun AboutScreen() {
                     AppBackButton(
                         onClick = {
                             navigator.pop()
-                        }
+                        },
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor =
-                        if (themeConfig.isEnableBlur)
+                        if (themeConfig.isEnableBlur) {
                             Color.Transparent
-                        else
-                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
+                        } else {
+                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                        },
                     scrolledContainerColor =
-                        if (themeConfig.isEnableBlur)
+                        if (themeConfig.isEnableBlur) {
                             Color.Transparent
-                        else
-                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
+                        } else {
+                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                        },
                 ),
             )
         },
@@ -129,7 +155,7 @@ fun AboutScreen() {
                 Box(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
-                        .padding(top = 8.dp, bottom = 12.dp)
+                        .padding(top = 8.dp, bottom = 12.dp),
                 ) {
                     StatusCard()
                 }
@@ -140,48 +166,50 @@ fun AboutScreen() {
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .padding(top = 8.dp, bottom = 12.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(
-                        alpha = cardConfig.cardAlpha
+                    color = MaterialTheme.colorScheme.secondaryContainer.copy(
+                        alpha = cardConfig.cardAlpha,
                     ),
                     message = AnnotatedString.fromHtml(
                         htmlString = stringResource(
-                            id = R.string.about_anime_character_sticker,
-                            "<b>怡子曰曰</b>",
-                            "<b>明风 OuO</b>",
-                            "<b><a href=\"https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.txt\">CC BY-NC-SA 4.0</a></b>"
+                            id = R.string.about_app_icon,
+                            "<b><a href=\"https://github.com/OukaroMF\">OukaroMF</a></b>",
                         ),
                         linkStyles = TextLinkStyles(
                             style = SpanStyle(
                                 color = MaterialTheme.colorScheme.primary,
-                                textDecoration = TextDecoration.Underline
+                                textDecoration = TextDecoration.Underline,
                             ),
                             pressedStyle = SpanStyle(
                                 color = MaterialTheme.colorScheme.primary,
                                 background = MaterialTheme.colorScheme.secondaryContainer,
-                                textDecoration = TextDecoration.Underline
-                            )
-                        )
+                                textDecoration = TextDecoration.Underline,
+                            ),
+                        ),
                     ),
                     icon = {
                         Icon(
                             imageVector = Icons.TwoTone.Info,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(18.dp),
                         )
-                    }
+                    },
                 )
             }
 
             item {
                 SegmentedColumn(
-                    title = stringResource(R.string.about)
+                    title = stringResource(R.string.about),
                 ) {
                     item {
                         SettingsJumpPageWidget(
                             icon = Icons.TwoTone.Code,
                             title = stringResource(R.string.get_source_code),
                             description = stringResource(R.string.get_source_code_detail),
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/about/About.kt
                             onClick = { uriHandler.openUri("https://github.com/pengzenzen-creator/ReSukiSU-Ultra") }
+========
+                            onClick = { uriHandler.openUri("https://github.com/Baka-SU/BakaSU") },
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/about/About.kt
                         )
                     }
                     item {
@@ -189,7 +217,7 @@ fun AboutScreen() {
                             icon = Icons.TwoTone.Group,
                             title = stringResource(R.string.join_telegram_group),
                             description = stringResource(R.string.join_telegram_group_detail),
-                            onClick = { uriHandler.openUri("https://t.me/ReSukiSU") }
+                            onClick = { uriHandler.openUri("https://t.me/BakaSU") },
                         )
                     }
                     item {
@@ -199,7 +227,7 @@ fun AboutScreen() {
                             description = stringResource(R.string.open_source_license_settings_description),
                             onClick = {
                                 navigator.push(Route.OpenSourceLicense)
-                            }
+                            },
                         )
                     }
                 }
@@ -214,12 +242,12 @@ fun AboutScreen() {
 
 @Preview
 @Composable
-fun AboutScreenPreview() {
+private fun AboutScreenPreview() {
     CompositionLocalProvider(
-        LocalNavigator provides Navigator(Route.About)
+        LocalNavigator provides Navigator(Route.About),
     ) {
         Surface(
-            color = MaterialTheme.colorScheme.surfaceContainer
+            color = MaterialTheme.colorScheme.surfaceContainer,
         ) {
             AboutScreen()
         }
@@ -235,17 +263,24 @@ private fun StatusCard() {
             .clip(ContinuousCornerShape(16.dp))
             .renderBackgroundBlur(),
         color =
-            if (themeConfig.isEnableBlurExp)
+            if (themeConfig.isEnableBlurExp) {
                 Color.Transparent
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/about/About.kt
             else
                 MaterialTheme.colorScheme.primaryContainer.copy(cardConfig.cardAlpha),
         shape = ContinuousCornerShape(16.dp)
+========
+            } else {
+                MaterialTheme.colorScheme.primaryContainer.copy(cardConfig.cardAlpha)
+            },
+        shape = RoundedCornerShape(16.dp),
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/about/About.kt
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.secondary) {
                 Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
@@ -256,10 +291,10 @@ private fun StatusCard() {
                         painter = rememberDrawablePainter(
                             drawable = ContextCompat.getDrawable(
                                 LocalContext.current,
-                                R.mipmap.ic_launcher
-                            )
+                                R.mipmap.ic_launcher,
+                            ),
                         ),
-                        contentDescription = stringResource(id = R.string.app_name)
+                        contentDescription = stringResource(id = R.string.app_name),
                     )
                 }
             }
@@ -276,7 +311,7 @@ private fun StatusCard() {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
                         text = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
