@@ -1,17 +1,26 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/logging/BugreportDataSource.kt
 package com.tesla.resukisuultra.data.logging
+========
+package org.bakasu.bakasu.data.logging
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/logging/BugreportDataSource.kt
 
 import android.content.Context
 import android.os.Build
 import android.system.Os
 import androidx.core.content.pm.PackageInfoCompat
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/logging/BugreportDataSource.kt
 import com.tesla.resukisuultra.Natives
 import com.tesla.resukisuultra.data.shell.KsuCliRepository
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/logging/BugreportDataSource.kt
 import com.topjohnwu.superuser.ShellUtils
 import java.io.File
 import java.io.FileWriter
 import java.io.PrintWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import org.bakasu.bakasu.Natives
+import org.bakasu.bakasu.data.shell.KsuCliRepository
 
 fun getManagerVersion(context: Context): Pair<String, Long> {
     val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)!!
@@ -20,7 +29,6 @@ fun getManagerVersion(context: Context): Pair<String, Long> {
 }
 
 fun getBugreportFile(context: Context, ksuCliRepository: KsuCliRepository): File {
-
     val bugreportDir = File(context.cacheDir, "bugreport")
     bugreportDir.mkdirs()
 
@@ -102,7 +110,7 @@ fun getBugreportFile(context: Context, ksuCliRepository: KsuCliRepository): File
         val ksuKernel = Natives.version
         pw.println("KernelSU: $ksuKernel")
         val ksuKernelFull = Natives.getFullVersion()
-        pw.println("ReSukiSU: $ksuKernelFull")
+        pw.println("BakaSU: $ksuKernelFull")
         val safeMode = Natives.isSafeMode
         pw.println("SafeMode: $safeMode")
         val lkmMode = Natives.isLkmMode
@@ -116,7 +124,7 @@ fun getBugreportFile(context: Context, ksuCliRepository: KsuCliRepository): File
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm")
     val current = LocalDateTime.now().format(formatter)
 
-    val targetFile = File(context.cacheDir, "KernelSU_bugreport_${current}.tar.gz")
+    val targetFile = File(context.cacheDir, "KernelSU_bugreport_$current.tar.gz")
 
     shell.newJob().add("tar czf ${targetFile.absolutePath} -C ${bugreportDir.absolutePath} .").exec()
     shell.newJob().add("rm -rf ${bugreportDir.absolutePath}").exec()
@@ -124,4 +132,3 @@ fun getBugreportFile(context: Context, ksuCliRepository: KsuCliRepository): File
 
     return targetFile
 }
-

@@ -1,8 +1,13 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/kernel/UmountRepository.kt
 package com.tesla.resukisuultra.data.kernel
 
 import com.tesla.resukisuultra.data.shell.KsuCliRepository
 import com.tesla.resukisuultra.domain.model.UmountPath
 import com.tesla.resukisuultra.domain.model.UmountState
+========
+package org.bakasu.bakasu.data.kernel
+
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/kernel/UmountRepository.kt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -13,6 +18,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.bakasu.bakasu.data.shell.KsuCliRepository
+import org.bakasu.bakasu.domain.model.UmountPath
+import org.bakasu.bakasu.domain.model.UmountState
 import org.json.JSONArray
 
 class UmountRepository(
@@ -57,12 +65,12 @@ class UmountRepository(
             runCatching {
                 check(
                     ksuCliRepository.addUmountConfigUmountPath(path, flags) &&
-                            ksuCliRepository.addKernelUmountPath(path, flags)
+                        ksuCliRepository.addKernelUmountPath(path, flags),
                 )
                 mutableState.update { current ->
                     current.copy(
                         paths = current.paths.filterNot { it.path == path } +
-                                UmountPath(path = path, flags = flags, persistent = true)
+                            UmountPath(path = path, flags = flags, persistent = true),
                     )
                 }
             }
@@ -73,9 +81,11 @@ class UmountRepository(
         withContext(Dispatchers.IO) {
             runCatching {
                 check(
-                    (!entry.persistent ||
-                            ksuCliRepository.removeUmountConfigUmountPath(entry.path)) &&
-                            ksuCliRepository.removeKernelUmountPath(entry.path)
+                    (
+                        !entry.persistent ||
+                            ksuCliRepository.removeUmountConfigUmountPath(entry.path)
+                        ) &&
+                        ksuCliRepository.removeKernelUmountPath(entry.path),
                 )
                 mutableState.update { current ->
                     current.copy(paths = current.paths.filterNot { it.path == entry.path })

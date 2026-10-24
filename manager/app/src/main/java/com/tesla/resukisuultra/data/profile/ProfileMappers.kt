@@ -1,7 +1,14 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/profile/ProfileMappers.kt
 package com.tesla.resukisuultra.data.profile
 
 import com.tesla.resukisuultra.Natives
 import com.tesla.resukisuultra.domain.model.AppProfile
+========
+package org.bakasu.bakasu.data.profile
+
+import org.bakasu.bakasu.Natives
+import org.bakasu.bakasu.domain.model.AppProfile
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/profile/ProfileMappers.kt
 
 internal fun Natives.Profile.toDomain(): AppProfile = AppProfile(
     name = name,
@@ -38,4 +45,3 @@ internal fun AppProfile.toNative(): Natives.Profile = Natives.Profile(
     rules = rules,
     flags = flags,
 )
-

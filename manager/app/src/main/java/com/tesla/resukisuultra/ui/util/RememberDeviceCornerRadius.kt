@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/util/RememberDeviceCornerRadius.kt
 package com.tesla.resukisuultra.ui.util
+========
+package org.bakasu.bakasu.ui.util
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/util/RememberDeviceCornerRadius.kt
 
 import android.os.Build
 import android.view.RoundedCorner

@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/SettingsPlatform.kt
 package com.tesla.resukisuultra.domain.model
+========
+package org.bakasu.bakasu.domain.model
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/SettingsPlatform.kt
 
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamiccolor.ColorSpec
@@ -22,6 +26,10 @@ data class SettingsPlatformSnapshot(
     val checkBetaUpdate: Boolean = true,
     val checkModuleUpdate: Boolean = true,
     val autoJailbreakEnabled: Boolean = false,
+    val useBuiltinMonoFont: Boolean = false,
+    val useSoftReboot: Boolean = false,
+    val enableSwipeDismiss: Boolean = true,
+    val pagerInterceptionMode: Int = 1,
 )
 
 data class PlatformFeatureStatus(
@@ -55,14 +63,11 @@ private val spec2025IncompatiblePaletteStyles = setOf(
     PaletteStyle.Content,
 )
 
-fun PaletteStyle.isCompatibleWith(spec: ColorSpec.SpecVersion): Boolean =
-    spec != ColorSpec.SpecVersion.SPEC_2025 || this !in spec2025IncompatiblePaletteStyles
+fun PaletteStyle.isCompatibleWith(spec: ColorSpec.SpecVersion): Boolean = spec != ColorSpec.SpecVersion.SPEC_2025 || this !in spec2025IncompatiblePaletteStyles
 
-fun PaletteStyle.coerceCompatibleWith(spec: ColorSpec.SpecVersion): PaletteStyle =
-    takeIf { it.isCompatibleWith(spec) } ?: PaletteStyle.TonalSpot
+fun PaletteStyle.coerceCompatibleWith(spec: ColorSpec.SpecVersion): PaletteStyle = takeIf { it.isCompatibleWith(spec) } ?: PaletteStyle.TonalSpot
 
-fun ColorSpec.SpecVersion.availablePaletteStyles(): List<PaletteStyle> =
-    PaletteStyle.entries.filter { it.isCompatibleWith(this) }
+fun ColorSpec.SpecVersion.availablePaletteStyles(): List<PaletteStyle> = PaletteStyle.entries.filter { it.isCompatibleWith(this) }
 
 sealed interface PlatformSetting {
     data object InitializeFirstRun : PlatformSetting
@@ -77,4 +82,8 @@ sealed interface PlatformSetting {
     data class AutoJailbreak(val enabled: Boolean) : PlatformSetting
     data class AdbRoot(val enabled: Boolean) : PlatformSetting
     data class SuCompatMode(val value: Int) : PlatformSetting
+    data class BuiltinMonospaceFont(val enabled: Boolean) : PlatformSetting
+    data class UseSoftReboot(val enabled: Boolean) : PlatformSetting
+    data class SwipeDismiss(val enabled: Boolean) : PlatformSetting
+    data class PagerInterceptionMode(val value: Int) : PlatformSetting
 }

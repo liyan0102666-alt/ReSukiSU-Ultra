@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/profile/Capabilities.kt
 package com.tesla.resukisuultra.profile
+========
+package org.bakasu.bakasu.profile
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/profile/Capabilities.kt
 
 /**
  * @author weishu
