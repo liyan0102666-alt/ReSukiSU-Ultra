@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/webui/Insets.kt
 package com.tesla.resukisuultra.ui.webui
+========
+package org.bakasu.bakasu.ui.webui
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/webui/Insets.kt
 
 /**
  * Insets data class from GitHub@MMRLApp/WebUI-X-Portable

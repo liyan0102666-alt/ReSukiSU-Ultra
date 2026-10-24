@@ -1,4 +1,14 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/InstalledAppGroup.kt
 package com.tesla.resukisuultra.domain.model
+========
+package org.bakasu.bakasu.domain.model
+
+import androidx.annotation.StringRes
+import org.bakasu.bakasu.R
+
+const val WEBVIEW_ZYGOTE_UID = 1053
+const val WEBVIEW_ZYGOTE_PROFILE_KEY = "webview_zygote"
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/InstalledAppGroup.kt
 
 data class InstalledApp(
     val packageName: String,
@@ -6,7 +16,16 @@ data class InstalledApp(
     val uid: Int,
     val isSystem: Boolean = false,
     val firstInstallTime: Long = 0L,
-)
+    val lastUpdateTime: Long = 0L,
+    val profileKey: String = packageName,
+    val special: Boolean = false,
+) {
+    val displayIdentifier: String
+        get() = if (special) profileKey else packageName
+
+    val isWebViewZygote: Boolean
+        get() = special && uid == WEBVIEW_ZYGOTE_UID
+}
 
 data class InstalledAppGroup(
     val uid: Int,
@@ -19,15 +38,27 @@ data class InstalledAppGroup(
     val mainApp: InstalledApp
         get() = apps.first { it.packageName == primaryPackageName }
 
+    val profileKey: String
+        get() = mainApp.profileKey
+
+    val isWebViewZygote: Boolean
+        get() = mainApp.isWebViewZygote
+
     val packageNames: List<String>
         get() = apps.map(InstalledApp::packageName)
 
     val allowSu: Boolean
-        get() = profile?.allowSu == true
+        get() = !isWebViewZygote && profile?.allowSu == true
 
     val hasCustomProfile: Boolean
         get() = profile?.let {
-            if (it.allowSu) !it.rootUseDefault else !it.nonRootUseDefault
+            if (isWebViewZygote) {
+                !it.nonRootUseDefault
+            } else if (it.allowSu) {
+                !it.rootUseDefault
+            } else {
+                !it.nonRootUseDefault
+            }
         } ?: false
 
     val isRecentlyInstalled: Boolean
@@ -41,7 +72,15 @@ data class SuperUserState(
     val groups: List<InstalledAppGroup> = emptyList(),
     val refreshing: Boolean = false,
     val loadingProgress: Float = 0f,
+    val hasLoaded: Boolean = false,
+    val loadFailure: SuperUserLoadFailure? = null,
 )
+
+enum class SuperUserLoadFailure(@param:StringRes val resId: Int) {
+    ROOT_ACCESS_REQUIRED(R.string.superuser_root_access_required),
+    SERVICE_START_FAILED(R.string.superuser_service_start_failed),
+    PACKAGE_LOAD_FAILED(R.string.superuser_packages_load_failed),
+}
 
 sealed interface AllowlistOperationResult {
     data object Success : AllowlistOperationResult

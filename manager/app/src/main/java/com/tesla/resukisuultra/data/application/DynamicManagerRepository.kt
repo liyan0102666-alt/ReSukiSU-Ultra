@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/application/DynamicManagerRepository.kt
 package com.tesla.resukisuultra.data.application
 
 import com.tesla.resukisuultra.data.kernel.KernelRepository
@@ -6,6 +7,11 @@ import com.tesla.resukisuultra.data.shell.KsuCliRepository
 import com.tesla.resukisuultra.domain.model.DynamicManagerApp
 import com.tesla.resukisuultra.domain.model.DynamicManagerConfig
 import com.tesla.resukisuultra.domain.model.DynamicManagerState
+========
+package org.bakasu.bakasu.data.application
+
+import java.io.File
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/application/DynamicManagerRepository.kt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +20,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import java.io.File
+import org.bakasu.bakasu.data.kernel.KernelRepository
+import org.bakasu.bakasu.data.packageinfo.InstalledPackageRepository
+import org.bakasu.bakasu.data.shell.KsuCliRepository
+import org.bakasu.bakasu.domain.model.DynamicManagerApp
+import org.bakasu.bakasu.domain.model.DynamicManagerConfig
+import org.bakasu.bakasu.domain.model.DynamicManagerState
 
 class DynamicManagerRepository(
     private val kernelRepository: KernelRepository,
@@ -49,7 +60,7 @@ class DynamicManagerRepository(
                             isSelected = signatureIndex == DYNAMIC_MANAGER_SIGNATURE_INDEX,
                             managerSignatureIndex = signatureIndex,
                             isChangeable = signatureIndex == null ||
-                                    signatureIndex == DYNAMIC_MANAGER_SIGNATURE_INDEX,
+                                signatureIndex == DYNAMIC_MANAGER_SIGNATURE_INDEX,
                         )
                     }
                     .sortedWith(appComparator)
@@ -96,7 +107,7 @@ class DynamicManagerRepository(
                                 isSelected = signatureIndex == DYNAMIC_MANAGER_SIGNATURE_INDEX,
                                 managerSignatureIndex = signatureIndex,
                                 isChangeable = signatureIndex == null ||
-                                        signatureIndex == DYNAMIC_MANAGER_SIGNATURE_INDEX,
+                                    signatureIndex == DYNAMIC_MANAGER_SIGNATURE_INDEX,
                             )
                         }.sortedWith(appComparator),
                         isSubmitting = false,
@@ -108,8 +119,7 @@ class DynamicManagerRepository(
         }
     }
 
-    private suspend fun managerSignatureIndexes(): Map<Int, Int> =
-        kernelRepository.getManagerRuntimeInfo().managers.associate { it.uid to it.signatureIndex }
+    private suspend fun managerSignatureIndexes(): Map<Int, Int> = kernelRepository.getManagerRuntimeInfo().managers.associate { it.uid to it.signatureIndex }
 
     private companion object {
         const val DYNAMIC_MANAGER_SIGNATURE_INDEX = 255

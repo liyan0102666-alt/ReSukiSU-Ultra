@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/settings/SettingsPlatformRepository.kt
 package com.tesla.resukisuultra.data.settings
+========
+package org.bakasu.bakasu.data.settings
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/settings/SettingsPlatformRepository.kt
 
 import android.app.Application
 import android.content.ComponentName
@@ -6,6 +10,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/settings/SettingsPlatformRepository.kt
 import com.tesla.resukisuultra.data.AppSettingsRepository
 import com.tesla.resukisuultra.data.shell.KsuCliRepository
 import com.tesla.resukisuultra.data.theme.ThemeRepository
@@ -17,10 +22,25 @@ import com.tesla.resukisuultra.magica.BootCompletedReceiver
 import com.tesla.resukisuultra.ui.theme.BackgroundManager
 import com.tesla.resukisuultra.ui.theme.CardConfig
 import com.tesla.resukisuultra.ui.theme.ThemeConfig
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/settings/SettingsPlatformRepository.kt
 import com.topjohnwu.superuser.ShellUtils
+import java.security.SecureRandom
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.bakasu.bakasu.Natives
+import org.bakasu.bakasu.data.AppSettingsRepository
+import org.bakasu.bakasu.data.shell.KsuCliRepository
+import org.bakasu.bakasu.data.theme.ThemeRepository
+import org.bakasu.bakasu.domain.model.AppearanceSetting
+import org.bakasu.bakasu.domain.model.PlatformFeatureStatus
+import org.bakasu.bakasu.domain.model.PlatformSetting
+import org.bakasu.bakasu.domain.model.SettingsPlatformSnapshot
+import org.bakasu.bakasu.magica.BootCompletedReceiver
+import org.bakasu.bakasu.ui.theme.BackgroundManager
+import org.bakasu.bakasu.ui.theme.CardConfig
+import org.bakasu.bakasu.ui.theme.ThemeConfig
 
 class SettingsPlatformRepository(
     private val application: Application,
@@ -32,6 +52,10 @@ class SettingsPlatformRepository(
     private val localeHelper: LocaleHelper,
     private val ksuCliRepository: KsuCliRepository,
 ) {
+    private companion object {
+        private val secureRandom = SecureRandom()
+    }
+
     fun load(): SettingsPlatformSnapshot {
         themeConfig.forceDarkMode = themeRepository.loadThemeMode()
         themeConfig.seedColor = themeRepository.loadSeedColor()
@@ -40,6 +64,7 @@ class SettingsPlatformRepository(
         themeConfig.dynamicPaletteStyle = themeRepository.loadDynamicPaletteStyle(
             themeConfig.dynamicColorSpec,
         )
+        themeConfig.useBuiltinMonoFont = settings.getBoolean("use_builtin_monospace_font", false)
         backgroundManager.loadCustomBackground()
         val systemDpi = application.resources.displayMetrics.densityDpi
         val currentDpi = settings.getInt("app_dpi", systemDpi)
@@ -78,6 +103,10 @@ class SettingsPlatformRepository(
             checkBetaUpdate = settings.getBoolean("check_beta_update", true),
             checkModuleUpdate = loadModuleUpdatePreference(),
             autoJailbreakEnabled = settings.getBoolean("auto_jailbreak", false),
+            useBuiltinMonoFont = themeConfig.useBuiltinMonoFont,
+            useSoftReboot = settings.getBoolean("use_soft_reboot", false),
+            enableSwipeDismiss = settings.getBoolean("enable_swipe_dismiss", true),
+            pagerInterceptionMode = settings.getInt("pager_interception_mode", 1).coerceIn(0, 2),
         )
     }
 
@@ -86,6 +115,7 @@ class SettingsPlatformRepository(
     ): Result<SettingsPlatformSnapshot> = try {
         when (setting) {
             is AppearanceSetting.ThemeMode -> setThemeMode(setting.index)
+
             is AppearanceSetting.SeedColor -> {
                 themeRepository.saveSeedColor(setting.color)
                 themeConfig.seedColor = setting.color
@@ -115,8 +145,8 @@ class SettingsPlatformRepository(
                 check(
                     backgroundManager.saveAndApplyCustomBackground(
                         application,
-                        setting.uri.toUri()
-                    )
+                        setting.uri.toUri(),
+                    ),
                 )
                 backgroundManager.saveBackgroundDim(0.3f)
                 backgroundManager.saveEnableBlur(true)
@@ -129,6 +159,7 @@ class SettingsPlatformRepository(
             }
 
             AppearanceSetting.RemoveCustomBackground -> removeCustomBackground()
+
             is AppearanceSetting.CardAlpha -> {
                 cardConfig.cardAlpha = setting.value
                 cardConfig.isCustomAlphaSet = true
@@ -153,6 +184,7 @@ class SettingsPlatformRepository(
     ): Result<SettingsPlatformSnapshot> = try {
         when (setting) {
             PlatformSetting.InitializeFirstRun -> initializeFirstRun()
+
             is PlatformSetting.PredictiveBackAnimation ->
                 settings.putString("predictive_back_animation", setting.value)
 
@@ -160,6 +192,7 @@ class SettingsPlatformRepository(
                 settings.putString("predictive_back_exit_direction", setting.value)
 
             is PlatformSetting.Dpi -> settings.putInt("app_dpi", setting.value)
+
             is PlatformSetting.AlternateIcon -> {
                 settings.putBoolean("use_alt_icon", setting.enabled)
                 toggleLauncherIcon(setting.enabled)
@@ -177,9 +210,26 @@ class SettingsPlatformRepository(
                 settings.putBoolean("check_module_update", setting.enabled)
 
             is PlatformSetting.Locale -> settings.putString("app_locale", setting.tag)
+
             is PlatformSetting.AutoJailbreak -> setAutoJailbreak(setting.enabled)
+
             is PlatformSetting.AdbRoot -> setAdbRoot(setting.enabled)
+
             is PlatformSetting.SuCompatMode -> settings.putInt("su_compat_mode", setting.value)
+
+            is PlatformSetting.BuiltinMonospaceFont -> {
+                settings.putBoolean("use_builtin_monospace_font", setting.enabled)
+                themeConfig.useBuiltinMonoFont = setting.enabled
+            }
+
+            is PlatformSetting.UseSoftReboot ->
+                settings.putBoolean("use_soft_reboot", setting.enabled)
+
+            is PlatformSetting.SwipeDismiss ->
+                settings.putBoolean("enable_swipe_dismiss", setting.enabled)
+
+            is PlatformSetting.PagerInterceptionMode ->
+                settings.putInt("pager_interception_mode", setting.value.coerceIn(0, 2))
         }
         Result.success(load())
     } catch (error: CancellationException) {
@@ -187,6 +237,9 @@ class SettingsPlatformRepository(
     } catch (error: Exception) {
         Result.failure(error)
     }
+
+    fun isSoftRebootPreferred(): Boolean = Natives.isFullFeatured() &&
+        (Natives.isLateLoadMode || settings.getBoolean("use_soft_reboot", false))
 
     suspend fun getFeatureStatus(): PlatformFeatureStatus = withContext(Dispatchers.IO) {
         PlatformFeatureStatus(
@@ -247,19 +300,14 @@ class SettingsPlatformRepository(
         cardConfig.isCustomAlphaSet = false
         cardConfig.isCustomBackgroundEnabled = false
         cardConfig.save()
-        themeConfig.preventBackgroundRefresh = false
         backgroundManager.saveBackgroundDim(0f)
-        backgroundManager.saveEnableBlur(false)
         backgroundManager.saveEnableBlurExp(false)
         backgroundManager.saveUseBackgroundSeedColor(false)
         backgroundManager.saveEnableHighContrastMode(false)
-        settings.putBoolean("prevent_background_refresh", false)
     }
 
     private fun initializeFirstRun() {
         if (settings.getBoolean("is_first_run", true)) {
-            themeConfig.preventBackgroundRefresh = false
-            settings.putBoolean("prevent_background_refresh", false)
             settings.putBoolean("is_first_run", false)
         }
     }
@@ -267,8 +315,11 @@ class SettingsPlatformRepository(
     private fun setAutoJailbreak(enabled: Boolean) {
         application.packageManager.setComponentEnabledSetting(
             ComponentName(application, BootCompletedReceiver::class.java),
-            if (enabled) PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-            else PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+            if (enabled) {
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+            } else {
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+            },
             PackageManager.DONT_KILL_APP,
         )
         settings.putBoolean("auto_jailbreak", enabled)
@@ -283,8 +334,8 @@ class SettingsPlatformRepository(
 
     private fun toggleLauncherIcon(useAlt: Boolean) {
         val packageName = application.packageName
-        val main = ComponentName(packageName, "$packageName.ui.MainActivity")
-        val alias = ComponentName(packageName, "$packageName.ui.MainActivityAlias")
+        val main = ComponentName(packageName, "org.bakasu.bakasu.ui.MainActivity")
+        val alias = ComponentName(packageName, "org.bakasu.bakasu.ui.MainActivityAlias")
         application.packageManager.setComponentEnabledSetting(
             if (useAlt) alias else main,
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
@@ -308,7 +359,16 @@ class SettingsPlatformRepository(
         return enabled
     }
 
-    private fun isSystemDark(): Boolean =
-        application.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-                Configuration.UI_MODE_NIGHT_YES
+    private fun isSystemDark(): Boolean = application.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+        Configuration.UI_MODE_NIGHT_YES
+
+    val intentToken: String
+        get() {
+            val existing = settings.getString("intent_token", null)
+            if (!existing.isNullOrBlank()) return existing
+            val token = ByteArray(32).also(secureRandom::nextBytes)
+                .joinToString(separator = "") { "%02x".format(it) }
+            settings.putString("intent_token", token)
+            return token
+        }
 }

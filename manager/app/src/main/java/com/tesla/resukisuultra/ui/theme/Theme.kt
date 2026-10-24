@@ -1,7 +1,9 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/theme/Theme.kt
 package com.tesla.resukisuultra.ui.theme
+========
+package org.bakasu.bakasu.ui.theme
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/theme/Theme.kt
 
-import android.R
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -31,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MotionScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.SideEffect
@@ -40,14 +41,14 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -61,6 +62,9 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
@@ -69,25 +73,30 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.zIndex
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.kieronquinn.monetcompat.core.MonetCompat
-import com.kieronquinn.monetcompat.interfaces.MonetColorsChangedListener
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamicColorScheme
 import com.materialkolor.dynamiccolor.ColorSpec
 import com.materialkolor.quantize.QuantizerCelebi
 import com.materialkolor.score.Score
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/theme/Theme.kt
 import com.tesla.resukisuultra.data.AppSettingsRepository
 import com.tesla.resukisuultra.data.theme.ThemeRepository
 import com.tesla.resukisuultra.ui.overscroll.StretchOverscrollCompensationState
@@ -105,12 +114,35 @@ import top.yukonga.miuix.kmp.blur.BlendColorEntry
 import top.yukonga.miuix.kmp.blur.BlurColors
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 import top.yukonga.miuix.kmp.blur.textureBlur
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/theme/Theme.kt
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
-import dev.kdrag0n.monet.theme.ColorScheme as MonetCompatColorScheme
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.bakasu.bakasu.data.AppSettingsRepository
+import org.bakasu.bakasu.data.theme.MonetCompatColorSource
+import org.bakasu.bakasu.data.theme.ThemeRepository
+import org.bakasu.bakasu.ui.overscroll.StretchOverscrollCompensationState
+import org.bakasu.bakasu.ui.util.LocalBackgroundBlurAnchor
+import org.bakasu.bakasu.ui.util.LocalBackgroundBlurProvided
+import org.bakasu.bakasu.ui.util.LocalBlurState
+import org.bakasu.bakasu.ui.util.LocalPagerPage
+import org.bakasu.bakasu.ui.util.LocalPagerState
+import org.bakasu.bakasu.ui.util.LocalStretchOverscrollCompensationState
+import org.koin.compose.koinInject
+import top.yukonga.miuix.kmp.blur.BackdropEffectScope
+import top.yukonga.miuix.kmp.blur.BlendColorEntry
+import top.yukonga.miuix.kmp.blur.BlurColors
+import top.yukonga.miuix.kmp.blur.drawBackdrop
+import top.yukonga.miuix.kmp.blur.layerBackdrop
+import top.yukonga.miuix.kmp.blur.runtimeShaderEffect
+import top.yukonga.miuix.kmp.blur.textureBlurEffect
 
 @Stable
 class ThemeConfig(
@@ -122,6 +154,7 @@ class ThemeConfig(
     var forceDarkMode by mutableStateOf<Boolean?>(null)
     var seedColor by mutableIntStateOf(defaultSeedColor())
     var useDynamicColor by mutableStateOf(false)
+    var useBuiltinMonoFont by mutableStateOf(false)
     var monetCompatSeedColor by mutableIntStateOf(defaultSeedColor())
     var dynamicColorSpec by mutableStateOf(ColorSpec.SpecVersion.SPEC_2021)
     var dynamicPaletteStyle by mutableStateOf(PaletteStyle.TonalSpot)
@@ -129,25 +162,24 @@ class ThemeConfig(
     // 背景状态
     var backgroundImageLoaded by mutableStateOf(false)
     var isThemeChanging by mutableStateOf(false)
-    var preventBackgroundRefresh by mutableStateOf(false)
     var isHighContrastMode by mutableStateOf(false)
-    var isEnableBlur by mutableStateOf(false)
-    var isEnableBlurExp by mutableStateOf(false)
+    private val _isEnableBlur = mutableStateOf(false)
+    var isEnableBlur: Boolean
+        get() = _isEnableBlur.value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        set(value) {
+            _isEnableBlur.value = value
+        }
+    private val _isEnableBlurExp = mutableStateOf(false)
+    var isEnableBlurExp: Boolean
+        get() = _isEnableBlurExp.value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        set(value) {
+            _isEnableBlurExp.value = value
+        }
     var isUseBackgroundSeedColor by mutableStateOf(false)
-
-    // 主题变化检测
-    private var lastDarkModeState: Boolean? = null
-
-    fun detectThemeChange(currentDarkMode: Boolean): Boolean {
-        val hasChanged = lastDarkModeState != null && lastDarkModeState != currentDarkMode
-        lastDarkModeState = currentDarkMode
-        return hasChanged
-    }
+    var bottomBarStyle by mutableStateOf(BottomBarStyle.MATERIAL3_EXPRESSIVE)
 
     fun resetBackgroundState() {
-        if (!preventBackgroundRefresh) {
-            backgroundImageLoaded = false
-        }
+        backgroundImageLoaded = false
         isThemeChanging = true
     }
 
@@ -161,8 +193,20 @@ class ThemeConfig(
         dynamicPaletteStyle = PaletteStyle.TonalSpot
         backgroundImageLoaded = false
         isThemeChanging = false
-        preventBackgroundRefresh = false
-        lastDarkModeState = null
+    }
+}
+
+private val BuiltinspaceFontFamily = FontFamily(
+    Font(org.bakasu.bakasu.R.font.jetbrains_mono),
+)
+
+@Composable
+fun monospaceFontFamily(): FontFamily {
+    val themeConfig = koinInject<ThemeConfig>()
+    return if (themeConfig.useBuiltinMonoFont) {
+        BuiltinspaceFontFamily
+    } else {
+        FontFamily.Monospace
     }
 }
 
@@ -173,7 +217,19 @@ class BackgroundRenderState {
     var blurImageBitmap: ImageBitmap? by mutableStateOf(null)
     var blurViewportSize by mutableStateOf(IntSize(0, 0))
     var blurFrameTick by mutableIntStateOf(0)
+    var scrollActive by mutableStateOf(false)
+    private val scrollingPagers = mutableStateMapOf<Any, Unit>()
+    val pagerScrollActive: Boolean
+        get() = scrollingPagers.isNotEmpty()
     var seedColor by mutableIntStateOf(0)
+
+    internal fun updatePagerScroll(owner: Any, active: Boolean) {
+        if (active) {
+            scrollingPagers[owner] = Unit
+        } else {
+            scrollingPagers.remove(owner)
+        }
+    }
 }
 
 val LocalBackgroundRenderState = compositionLocalOf<BackgroundRenderState> {
@@ -202,6 +258,11 @@ class BackgroundManager(
         settings.putBoolean("enable_blur_exp", enable)
     }
 
+    fun saveBottomBarStyle(style: BottomBarStyle) {
+        config.bottomBarStyle = style
+        settings.putInt("bottom_bar_style", style.ordinal)
+    }
+
     fun saveUseBackgroundSeedColor(enable: Boolean) {
         config.isUseBackgroundSeedColor = enable
         settings.putBoolean("use_background_seed_color", enable)
@@ -214,7 +275,7 @@ class BackgroundManager(
 
     suspend fun saveAndApplyCustomBackground(
         context: Context,
-        uri: Uri
+        uri: Uri,
     ): Boolean {
         val appContext = context.applicationContext
         return try {
@@ -228,7 +289,7 @@ class BackgroundManager(
             withContext(Dispatchers.IO) {
                 clearBackgroundBlurCache(appContext)
             }
-            resetBackgroundState()
+            config.backgroundImageLoaded = false
 
             true
         } catch (e: CancellationException) {
@@ -244,7 +305,7 @@ class BackgroundManager(
         config.customBackgroundUri = null
         cardConfig.updateBackground(false)
         clearBackgroundBlurCache(context)
-        resetBackgroundState()
+        config.backgroundImageLoaded = false
     }
 
     fun loadCustomBackground() {
@@ -252,9 +313,6 @@ class BackgroundManager(
         val uriString = prefs.getString("custom_background", null)
 
         val newUri = uriString?.toUri()
-        val preventRefresh = prefs.getBoolean("prevent_background_refresh", false)
-
-        config.preventBackgroundRefresh = preventRefresh
 
         if (config.customBackgroundUri?.toString() != newUri?.toString()) {
             Log.d(tag, "加载自定义背景: $uriString")
@@ -264,21 +322,18 @@ class BackgroundManager(
         }
 
         config.backgroundDim = prefs.getFloat("background_dim", 0f).coerceIn(0f, 1f)
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/theme/Theme.kt
         config.isEnableBlur = prefs.getBoolean("enable_blur", false)
         config.isEnableBlurExp = false // 玻璃效果已移除 (2026-08-20)
+========
+        config.isEnableBlurExp = prefs.getBoolean("enable_blur_exp", false)
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/theme/Theme.kt
         config.isUseBackgroundSeedColor = prefs.getBoolean("use_background_seed_color", false)
         config.isHighContrastMode = prefs.getBoolean("high_contrast_mode", false)
     }
 
     private fun saveBackgroundUri(uri: Uri?) {
         settings.putString("custom_background", uri?.toString())
-        settings.putBoolean("prevent_background_refresh", false)
-    }
-
-    private fun resetBackgroundState() {
-        config.backgroundImageLoaded = false
-        config.preventBackgroundRefresh = false
-        settings.putBoolean("prevent_background_refresh", false)
     }
 
     fun clearBackgroundBlurCache(context: Context) {
@@ -320,7 +375,7 @@ fun KernelSUTheme(
     dpi: Int = 0,
     darkTheme: Boolean? = null,
     dynamicColor: Boolean? = null,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val themeConfig = koinInject<ThemeConfig>()
     val themeRepository = koinInject<ThemeRepository>()
@@ -341,6 +396,7 @@ fun KernelSUTheme(
         themeRepository = themeRepository,
         backgroundManager = backgroundManager,
         cardConfig = cardConfig,
+        settings = settings,
     )
 
     // 创建颜色方案
@@ -372,9 +428,33 @@ fun KernelSUTheme(
         MaterialExpressiveTheme(
             colorScheme = colorScheme,
             motionScheme = MotionScheme.expressive(),
-            typography = generateTypography(themeConfig)
+            typography = generateTypography(themeConfig),
         ) {
-            Box(modifier = Modifier.fillMaxSize()) {
+            val backgroundMotionConnection = remember(backgroundRenderState) {
+                object : NestedScrollConnection {
+                    override fun onPostScroll(
+                        consumed: Offset,
+                        available: Offset,
+                        source: NestedScrollSource,
+                    ): Offset {
+                        backgroundRenderState.scrollActive = true
+                        return Offset.Zero
+                    }
+
+                    override suspend fun onPostFling(
+                        consumed: Velocity,
+                        available: Velocity,
+                    ): Velocity {
+                        backgroundRenderState.scrollActive = false
+                        return Velocity.Zero
+                    }
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(backgroundMotionConnection),
+            ) {
                 BackgroundLayer(themeConfig, settings, backgroundRenderState)
                 content()
             }
@@ -390,20 +470,11 @@ private fun ThemeInitializer(
     themeRepository: ThemeRepository,
     backgroundManager: BackgroundManager,
     cardConfig: CardConfig,
+    settings: AppSettingsRepository,
 ) {
-    val themeChanged = themeConfig.detectThemeChange(systemIsDark)
-    val scope = rememberCoroutineScope()
-
     // 处理系统主题变化
-    LaunchedEffect(systemIsDark, themeChanged) {
-        if (themeConfig.forceDarkMode == null && themeChanged) {
-            Log.d("ThemeSystem", "系统主题变化: $systemIsDark")
-            themeConfig.resetBackgroundState()
-
-            if (!themeConfig.preventBackgroundRefresh) {
-                backgroundManager.loadCustomBackground()
-            }
-
+    LaunchedEffect(systemIsDark) {
+        if (themeConfig.forceDarkMode == null) {
             cardConfig.apply {
                 load()
                 setThemeDefaults(systemIsDark)
@@ -414,67 +485,45 @@ private fun ThemeInitializer(
 
     // 初始加载配置
     LaunchedEffect(Unit) {
-        scope.launch {
-            themeConfig.forceDarkMode = themeRepository.loadThemeMode()
-            themeConfig.seedColor = themeRepository.loadSeedColor()
-            themeConfig.useDynamicColor = themeRepository.loadDynamicColorState()
-            themeConfig.dynamicColorSpec = themeRepository.loadDynamicColorSpec()
-            themeConfig.dynamicPaletteStyle = themeRepository.loadDynamicPaletteStyle(
-                themeConfig.dynamicColorSpec,
-            )
-            cardConfig.load()
-
-            if (!themeConfig.backgroundImageLoaded && !themeConfig.preventBackgroundRefresh) {
-                backgroundManager.loadCustomBackground()
-            }
-        }
+        // Composition can start before application startup has finished preloading
+        // DataStore. Read it here first so the persisted background URI is never
+        // mistaken for an unset value during process recreation.
+        settings.preload()
+        themeConfig.forceDarkMode = themeRepository.loadThemeMode()
+        themeConfig.seedColor = themeRepository.loadSeedColor()
+        themeConfig.useDynamicColor = themeRepository.loadDynamicColorState()
+        themeConfig.dynamicColorSpec = themeRepository.loadDynamicColorSpec()
+        themeConfig.dynamicPaletteStyle = themeRepository.loadDynamicPaletteStyle(
+            themeConfig.dynamicColorSpec,
+        )
+        themeConfig.isEnableBlur = settings.getBoolean("enable_blur", false)
+        themeConfig.bottomBarStyle = BottomBarStyle.fromOrdinal(settings.getInt("bottom_bar_style", 0))
+        cardConfig.load()
+        backgroundManager.loadCustomBackground()
     }
 
-    MonetCompatInitializer(context, themeConfig)
+    MonetCompatInitializer(themeConfig, themeRepository)
 }
 
 @Composable
-private fun MonetCompatInitializer(context: Context, themeConfig: ThemeConfig) {
+private fun MonetCompatInitializer(themeConfig: ThemeConfig, themeRepository: ThemeRepository) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) return
+    val source = koinInject<MonetCompatColorSource>()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    val scope = rememberCoroutineScope()
-
-    DisposableEffect(context) {
-        val monet = MonetCompat.setup(context)
-        monet.defaultPrimaryColor = themeConfig.seedColor
-        monet.defaultSecondaryColor = themeConfig.seedColor
-        monet.defaultAccentColor = themeConfig.seedColor
-
-        val listener = object : MonetColorsChangedListener {
-            override fun onMonetColorsChanged(
-                monet: MonetCompat,
-                monetColors: MonetCompatColorScheme,
-                isInitialChange: Boolean
-            ) {
-                scope.launch {
-                    themeConfig.monetCompatSeedColor =
-                        monet.getSelectedWallpaperColor() ?: themeConfig.seedColor
-                }
-            }
-        }
-
-        monet.addMonetColorsChangedListener(listener, notifySelf = true)
-        onDispose {
-            monet.removeMonetColorsChangedListener(listener)
+    LaunchedEffect(source, themeConfig) {
+        source.colors.collect { color ->
+            themeConfig.monetCompatSeedColor = color
+            themeConfig.seedColor = themeRepository.loadSeedColor()
         }
     }
-
-    LaunchedEffect(themeConfig.useDynamicColor, themeConfig.seedColor) {
-        if (!themeConfig.useDynamicColor) return@LaunchedEffect
-
-        val monet = MonetCompat.setup(context)
-        monet.defaultPrimaryColor = themeConfig.seedColor
-        monet.defaultSecondaryColor = themeConfig.seedColor
-        monet.defaultAccentColor = themeConfig.seedColor
-        monet.updateConfiguration(context)
-        themeConfig.monetCompatSeedColor =
-            monet.getSelectedWallpaperColor() ?: themeConfig.seedColor
-        monet.updateMonetColors()
+    LaunchedEffect(source, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            // Allow the cached theme to draw before starting wallpaper IPC and palette work.
+            withFrameNanos { }
+            withFrameNanos { }
+            source.refresh()
+        }
     }
 }
 
@@ -484,12 +533,13 @@ private fun BackgroundLayer(
     settings: AppSettingsRepository,
     renderState: BackgroundRenderState,
 ) {
-    val backgroundUri = rememberSaveable { mutableStateOf(themeConfig.customBackgroundUri) }
+    val backgroundUri = remember(themeConfig.customBackgroundUri) {
+        themeConfig.customBackgroundUri
+    }
 
     LaunchedEffect(themeConfig.customBackgroundUri) {
-        backgroundUri.value = themeConfig.customBackgroundUri
-        renderState.imageBitmap = null
-        if (backgroundUri.value == null) {
+        if (themeConfig.customBackgroundUri == null) {
+            renderState.imageBitmap = null
             renderState.imagePainter = null
             renderState.blurImageBitmap = null
             renderState.seedColor = 0
@@ -497,17 +547,27 @@ private fun BackgroundLayer(
         }
     }
 
-    val hasBlurBitmap = renderState.blurImageBitmap != null
-
-    LaunchedEffect(themeConfig.isEnableBlurExp, hasBlurBitmap) {
-        if (!themeConfig.isEnableBlurExp || !hasBlurBitmap) return@LaunchedEffect
-
-        while (true) {
-            withFrameNanos { }
-            renderState.blurFrameTick = if (renderState.blurFrameTick == Int.MAX_VALUE) {
-                0
-            } else {
-                renderState.blurFrameTick + 1
+    // Translucent surfaces must re-sample/re-map the background only while content is actually
+    // moving: nested-scroll drags/flings (scrollActive) and horizontal pager swipes, which
+    // translate layers without re-recording backdrop nodes (pagerScrollActive). At rest the loop
+    // is suspended and no frame is produced, so hwui stays idle. The tick must never be bumped
+    // from a draw callback, which would self-sustain through consumers inside the source subtree.
+    LaunchedEffect(Unit) {
+        snapshotFlow {
+            renderState.imageBitmap != null &&
+                (renderState.scrollActive || renderState.pagerScrollActive)
+        }.collect { active ->
+            if (!active) return@collect
+            while (
+                renderState.imageBitmap != null &&
+                (renderState.scrollActive || renderState.pagerScrollActive)
+            ) {
+                withFrameNanos { }
+                renderState.blurFrameTick = if (renderState.blurFrameTick == Int.MAX_VALUE) {
+                    0
+                } else {
+                    renderState.blurFrameTick + 1
+                }
             }
         }
     }
@@ -528,12 +588,12 @@ private fun BackgroundLayer(
                 }
             }
             .background(
-                MaterialTheme.colorScheme.surfaceContainer
-            )
+                MaterialTheme.colorScheme.surfaceContainer,
+            ),
     )
 
     // 自定义背景
-    backgroundUri.value?.let { uri ->
+    backgroundUri?.let { uri ->
         BackgroundInitializer(
             uri = uri,
             themeConfig = themeConfig,
@@ -552,7 +612,7 @@ private const val BACKGROUND_BLUR_RADIUS = 45f
  */
 @Composable
 fun Modifier.blurSource(): Modifier {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return this
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return this
 
     return LocalBlurState.current?.let {
         this.then(Modifier.layerBackdrop(it))
@@ -563,22 +623,54 @@ fun Modifier.blurSource(): Modifier {
  * Render blur when backdrop available
  * Falls back to redrawing the app background below the content so translucent bars do not show
  * scrolling content through them when blur is disabled or unavailable.
+ * @param compensateHorizontalOverscroll reverse horizontal stretch in the sampled background
+ * @param compensateVerticalOverscroll reverse vertical stretch in the sampled background
+ * @param useFixedSurfaceBoundsForOverscroll use this surface's bounds with the published stretch
+ * amount; fixed navigation surfaces use this to stay visually stationary outside the scroller
  * @return modified modifier
  */
 @Composable
-fun Modifier.blurEffect(): Modifier {
+fun Modifier.blurEffect(
+    compensateHorizontalOverscroll: Boolean = true,
+    compensateVerticalOverscroll: Boolean = false,
+    useFixedSurfaceBoundsForOverscroll: Boolean = false,
+): Modifier {
     val themeConfig = koinInject<ThemeConfig>()
     val cardConfig = koinInject<CardConfig>()
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/theme/Theme.kt
     if (!themeConfig.isEnableBlur || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
         // 未启用 blur: 直接纯色背景, 不做背景重绘 (重绘是帧耗时 14ms 的元凶)
         return Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
+========
+    if (!themeConfig.isEnableBlur || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+        return renderBackgroundFallback(
+            compensateHorizontalOverscroll = compensateHorizontalOverscroll,
+            compensateVerticalOverscroll = compensateVerticalOverscroll,
+            useFixedSurfaceBoundsForOverscroll = useFixedSurfaceBoundsForOverscroll,
+        )
+    }
+
+    val renderState = LocalBackgroundRenderState.current
+    val backgroundAnchor = LocalBackgroundBlurAnchor.current
+    val stretchOverscrollState = LocalStretchOverscrollCompensationState.current
+    var coordinates by remember {
+        mutableStateOf<LayoutCoordinates?>(null)
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/theme/Theme.kt
     }
 
     return LocalBlurState.current?.let { backdrop ->
+        // 0.8f like haze, for material design without custom background enable
+        val blurTintAlpha = if (cardConfig.isCustomBackgroundEnabled) {
+            cardConfig.cardAlpha
+        } else {
+            0.8f
+        }
+
         val blendColor =
-            MaterialTheme.colorScheme.surfaceContainer.copy(alpha = cardConfig.cardAlpha)
+            MaterialTheme.colorScheme.surfaceContainer.copy(alpha = blurTintAlpha)
 
         this.then(
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/theme/Theme.kt
             Modifier.textureBlur(
                 backdrop = backdrop,
                 shape = RectangleShape,
@@ -589,11 +681,61 @@ fun Modifier.blurEffect(): Modifier {
                     )
                 )
             )
+========
+            Modifier
+                .onGloballyPositioned { newCoordinates ->
+                    coordinates = newCoordinates.takeIf { it.isAttached }
+                }
+                .drawBackdrop(
+                    backdrop = backdrop,
+                    shape = { RectangleShape },
+                    effects = {
+                        renderState.blurFrameTick
+                        stretchOverscrollState?.version
+
+                        textureBlurEffect(
+                            blurRadiusX = 25f,
+                            colors = BlurColors(
+                                blendColors = listOf(
+                                    BlendColorEntry(color = blendColor),
+                                ),
+                            ),
+                        )
+
+                        val boundsInBackground =
+                            coordinates?.boundsInBackgroundNow(backgroundAnchor)
+                        val stretchCompensation = stretchOverscrollState
+                            ?.resolveBitmapCompensation(
+                                backgroundCoordinates = backgroundAnchor,
+                                compensateHorizontal = compensateHorizontalOverscroll,
+                                compensateVertical = compensateVerticalOverscroll,
+                                compensationCoordinates = coordinates
+                                    .takeIf { useFixedSurfaceBoundsForOverscroll },
+                            )
+
+                        if (boundsInBackground != null && stretchCompensation != null) {
+                            stretchOverscrollCompensationEffect(
+                                boundsInBackground = boundsInBackground,
+                                compensation = stretchCompensation,
+                            )
+                        }
+                    },
+                ),
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/theme/Theme.kt
         )
-    } ?: renderBackgroundFallback()
+    } ?: renderBackgroundFallback(
+        compensateHorizontalOverscroll = compensateHorizontalOverscroll,
+        compensateVerticalOverscroll = compensateVerticalOverscroll,
+        useFixedSurfaceBoundsForOverscroll = useFixedSurfaceBoundsForOverscroll,
+    )
 }
 
-private fun Modifier.renderBackgroundFallback(): Modifier = composed {
+@Composable
+private fun Modifier.renderBackgroundFallback(
+    compensateHorizontalOverscroll: Boolean,
+    compensateVerticalOverscroll: Boolean,
+    useFixedSurfaceBoundsForOverscroll: Boolean,
+): Modifier {
     val themeConfig = koinInject<ThemeConfig>()
     val renderState = LocalBackgroundRenderState.current
     var coordinates by remember {
@@ -607,38 +749,75 @@ private fun Modifier.renderBackgroundFallback(): Modifier = composed {
     val pagerPage = LocalPagerPage.current
     val pagerState = null
     val layoutDirection = LocalLayoutDirection.current
+    val stretchOverscrollState = LocalStretchOverscrollCompensationState.current
+    val stretchRenderer = remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            StretchBackgroundRenderer()
+        } else {
+            null
+        }
+    }
 
-    this
+    return this
         .onGloballyPositioned { newCoordinates ->
             coordinates = newCoordinates.takeIf { it.isAttached }
         }
         .drawWithContent {
+            renderState.blurFrameTick
+            stretchOverscrollState?.version
+
             val boundsInBackground = coordinates?.boundsInBackgroundNow(backgroundAnchor)
+                ?: coordinates?.localBoundsInWindowNow()
             val viewportSize = backgroundAnchor
                 ?.takeIf { it.isAttached && it.size.width > 0 && it.size.height > 0 }
                 ?.size
                 ?: renderState.blurViewportSize
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/theme/Theme.kt
             val currentPagerState = null
             val physicalPageOffset = 0f
             val offsetBoundsInBackground = boundsInBackground?.let { bounds ->
                 if (false) {
+========
+            val currentPagerState = pagerState?.takeIf { state ->
+                pagerPage != null && pagerPage in 0 until state.pageCount
+            }
+            val hasPagerPage = currentPagerState != null
+            val pagerViewportSize = currentPagerState?.layoutInfo?.viewportSize?.takeIf {
+                it.width > 0 && it.height > 0
+            }
+            val pagerViewportWidth = pagerViewportSize?.width ?: viewportSize.width
+            val pageOffset = if (currentPagerState != null && pagerPage != null) {
+                currentPagerState.getOffsetDistanceInPages(pagerPage)
+            } else {
+                0f
+            }
+            val physicalPageOffset = pageOffset * pagerViewportWidth *
+                if (layoutDirection == LayoutDirection.Ltr) 1f else -1f
+            val offsetBoundsInBackground = boundsInBackground?.let { bounds ->
+                if (hasPagerPage) {
+                    val leadingNavigationWidth =
+                        (viewportSize.width - pagerViewportWidth).coerceAtLeast(0)
+                    val pagerViewportLeft = if (layoutDirection == LayoutDirection.Ltr) {
+                        leadingNavigationWidth.toFloat()
+                    } else {
+                        0f
+                    }
+
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/theme/Theme.kt
                     // Equivalent to translating the backdrop painter by -physicalPageOffset:
-                    // crop from the page offset so the background remains fixed while the page moves.
+                    // crop from the page offset and account for a leading landscape navigation rail
+                    // so the background remains fixed while the page moves.
                     Rect(
-                        left = physicalPageOffset,
+                        left = pagerViewportLeft + physicalPageOffset,
                         top = bounds.top,
-                        right = physicalPageOffset + bounds.width,
+                        right = pagerViewportLeft + physicalPageOffset + bounds.width,
                         bottom = bounds.bottom,
                     )
                 } else {
                     bounds
                 }
             }
-            val bitmapBounds = if (
-                themeConfig.backgroundImageLoaded &&
-                backgroundBitmap != null &&
-                offsetBoundsInBackground != null
-            ) {
+            val bitmapBounds = if (backgroundBitmap != null && offsetBoundsInBackground != null) {
                 offsetBoundsInBackground.mapToBitmapBounds(
                     bitmap = backgroundBitmap,
                     viewportSize = viewportSize,
@@ -646,12 +825,47 @@ private fun Modifier.renderBackgroundFallback(): Modifier = composed {
             } else {
                 null
             }
+            // Fixed navigation surfaces are outside the pager's stretch RenderNode. Their fallback
+            // draws the original, unstretched bitmap, so applying the published inverse mapping
+            // here would introduce movement instead of cancelling it.
+            val stretchCompensation = if (useFixedSurfaceBoundsForOverscroll) {
+                null
+            } else {
+                stretchOverscrollState
+                    ?.resolveBitmapCompensation(
+                        backgroundCoordinates = backgroundAnchor,
+                        compensateHorizontal = compensateHorizontalOverscroll,
+                        compensateVertical = compensateVerticalOverscroll,
+                    )
+                    ?.mapToBitmapCoordinates(
+                        bitmap = backgroundBitmap,
+                        viewportSize = viewportSize,
+                    )
+            }
 
             if (backgroundBitmap != null && bitmapBounds != null) {
-                drawBitmapIntersection(
-                    bitmap = backgroundBitmap,
-                    boundsInBackground = bitmapBounds,
-                )
+                if (stretchCompensation != null) {
+                    // in fact no need check sdk int. but make lint happy
+                    if (stretchRenderer != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        stretchRenderer.draw(
+                            scope = this,
+                            bitmap = backgroundBitmap,
+                            boundsInBackground = bitmapBounds,
+                            compensation = stretchCompensation,
+                        )
+                    } else {
+                        drawStretchCompensatedBitmap(
+                            bitmap = backgroundBitmap,
+                            boundsInBackground = bitmapBounds,
+                            compensation = stretchCompensation,
+                        )
+                    }
+                } else {
+                    drawBitmapIntersection(
+                        bitmap = backgroundBitmap,
+                        boundsInBackground = bitmapBounds,
+                    )
+                }
                 drawRect(color = dimColor)
             } else {
                 drawRect(color = backgroundColor)
@@ -691,22 +905,23 @@ private fun Rect.mapToBitmapBounds(
     )
 }
 
-
-@SuppressLint("NewApi")
+@Composable
 fun Modifier.renderBackgroundBlur(
-    tintColor: Color? = null
-): Modifier = composed {
+    tintColor: Color? = null,
+): Modifier {
+    if (LocalBackgroundBlurProvided.current) return this
+
     val themeConfig = koinInject<ThemeConfig>()
     val cardConfig = koinInject<CardConfig>()
     val renderState = LocalBackgroundRenderState.current
-    if (!themeConfig.isEnableBlurExp) return@composed this
+    if (!themeConfig.isEnableBlurExp) return this
 
     var coordinates by remember {
         mutableStateOf<LayoutCoordinates?>(null)
     }
 
     val tintColor = (tintColor ?: MaterialTheme.colorScheme.surfaceBright).copy(
-        alpha = cardConfig.cardAlpha
+        alpha = cardConfig.cardAlpha,
     )
     val backgroundBlurAnchor = LocalBackgroundBlurAnchor.current
     val stretchOverscrollState = LocalStretchOverscrollCompensationState.current
@@ -718,12 +933,13 @@ fun Modifier.renderBackgroundBlur(
         }
     }
 
-    this
+    return this
         .onGloballyPositioned { newCoordinates ->
             coordinates = newCoordinates.takeIf { it.isAttached }
         }
         .drawWithContent {
             renderState.blurFrameTick
+            stretchOverscrollState?.version
 
             val currentBitmap = renderState.blurImageBitmap
             val currentBoundsInBackground = coordinates?.boundsInBackgroundNow(backgroundBlurAnchor)
@@ -737,7 +953,8 @@ fun Modifier.renderBackgroundBlur(
                 currentBoundsInBackground.height > 0f
             ) {
                 if (stretchCompensation != null) {
-                    if (stretchRenderer != null) {
+                    // in fact no need check sdk int. but make lint happy
+                    if (stretchRenderer != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         stretchRenderer.draw(
                             scope = this,
                             bitmap = currentBitmap,
@@ -844,30 +1061,116 @@ private data class StretchBitmapCompensation(
     val verticalSize: Float,
 )
 
+private fun StretchBitmapCompensation.mapToBitmapCoordinates(
+    bitmap: ImageBitmap?,
+    viewportSize: IntSize,
+): StretchBitmapCompensation? {
+    if (
+        bitmap == null ||
+        bitmap.width <= 0 ||
+        bitmap.height <= 0 ||
+        viewportSize.width <= 0 ||
+        viewportSize.height <= 0
+    ) {
+        return null
+    }
+
+    val scale = maxOf(
+        viewportSize.width / bitmap.width.toFloat(),
+        viewportSize.height / bitmap.height.toFloat(),
+    )
+    val renderedLeft = (viewportSize.width - bitmap.width * scale) / 2f
+    val renderedTop = (viewportSize.height - bitmap.height * scale) / 2f
+
+    return StretchBitmapCompensation(
+        horizontalAmount = horizontalAmount,
+        horizontalOrigin = (horizontalOrigin - renderedLeft) / scale,
+        horizontalSize = horizontalSize / scale,
+        verticalAmount = verticalAmount,
+        verticalOrigin = (verticalOrigin - renderedTop) / scale,
+        verticalSize = verticalSize / scale,
+    )
+}
+
 private fun StretchOverscrollCompensationState.resolveBitmapCompensation(
     backgroundCoordinates: LayoutCoordinates?,
+    compensateHorizontal: Boolean = true,
+    compensateVertical: Boolean = true,
+    compensationCoordinates: LayoutCoordinates? = null,
 ): StretchBitmapCompensation? {
-    val horizontalBounds = horizontal
-        ?.takeIf { it.amount != 0f }
-        ?.coordinates
+    val compensationBounds = compensationCoordinates
         ?.boundsInBackgroundNow(backgroundCoordinates)
-        ?.takeIf { it.width > 0f }
-    val verticalBounds = vertical
-        ?.takeIf { it.amount != 0f }
-        ?.coordinates
-        ?.boundsInBackgroundNow(backgroundCoordinates)
-        ?.takeIf { it.height > 0f }
+    val horizontalAxis = horizontal
+        ?.takeIf { compensateHorizontal && it.amount != 0f }
+    val verticalAxis = vertical
+        ?.takeIf { compensateVertical && it.amount != 0f }
+    val horizontalBounds = horizontalAxis?.let { axis ->
+        compensationBounds
+            ?.takeIf { it.width > 0f }
+            ?: axis.coordinates
+                .boundsInBackgroundNow(backgroundCoordinates)
+                ?.takeIf { it.width > 0f }
+    }
+    val verticalBounds = verticalAxis?.let { axis ->
+        compensationBounds
+            ?.takeIf { it.height > 0f }
+            ?: axis.coordinates
+                .boundsInBackgroundNow(backgroundCoordinates)
+                ?.takeIf { it.height > 0f }
+    }
 
     if (horizontalBounds == null && verticalBounds == null) return null
 
     return StretchBitmapCompensation(
-        horizontalAmount = if (horizontalBounds != null) horizontal?.amount ?: 0f else 0f,
+        horizontalAmount = if (horizontalBounds != null) horizontalAxis.amount else 0f,
         horizontalOrigin = horizontalBounds?.left ?: 0f,
         horizontalSize = horizontalBounds?.width ?: 1f,
-        verticalAmount = if (verticalBounds != null) vertical?.amount ?: 0f else 0f,
+        verticalAmount = if (verticalBounds != null) verticalAxis.amount else 0f,
         verticalOrigin = verticalBounds?.top ?: 0f,
         verticalSize = verticalBounds?.height ?: 1f,
     )
+}
+
+private fun BackdropEffectScope.stretchOverscrollCompensationEffect(
+    boundsInBackground: Rect,
+    compensation: StretchBitmapCompensation,
+) {
+    val inputScale = downscaleFactor.coerceAtLeast(1).toFloat()
+    val inputPadding = padding
+
+    runtimeShaderEffect(
+        key = "StretchOverscrollCompensation",
+        shaderString = STRETCH_BACKGROUND_SHADER,
+        uniformShaderName = "background",
+    ) {
+        setFloatUniform(
+            "cardOrigin",
+            boundsInBackground.left - inputPadding,
+            boundsInBackground.top - inputPadding,
+        )
+        setFloatUniform("cardScale", inputScale, inputScale)
+        setFloatUniform(
+            "inputOrigin",
+            (-boundsInBackground.left + inputPadding) / inputScale,
+            (-boundsInBackground.top + inputPadding) / inputScale,
+        )
+        setFloatUniform("inputScale", 1f / inputScale, 1f / inputScale)
+        setFloatUniform(
+            "stretchAmount",
+            compensation.horizontalAmount,
+            compensation.verticalAmount,
+        )
+        setFloatUniform(
+            "stretchOrigin",
+            compensation.horizontalOrigin,
+            compensation.verticalOrigin,
+        )
+        setFloatUniform(
+            "stretchSize",
+            compensation.horizontalSize,
+            compensation.verticalSize,
+        )
+    }
 }
 
 private data class BitmapDrawSegment(
@@ -890,9 +1193,7 @@ private fun buildBitmapDrawSegments(
         return emptyList()
     }
 
-    fun mapToDestination(value: Float): Float {
-        return (value - sourceStart) / sourceSpan * destinationSize
-    }
+    fun mapToDestination(value: Float): Float = (value - sourceStart) / sourceSpan * destinationSize
 
     val segments = mutableListOf<BitmapDrawSegment>()
 
@@ -1023,6 +1324,8 @@ private const val STRETCH_BACKGROUND_SHADER = """
     uniform shader background;
     uniform float2 cardOrigin;
     uniform float2 cardScale;
+    uniform float2 inputOrigin;
+    uniform float2 inputScale;
     uniform float2 stretchAmount;
     uniform float2 stretchOrigin;
     uniform float2 stretchSize;
@@ -1095,7 +1398,7 @@ private const val STRETCH_BACKGROUND_SHADER = """
             compensateAxis(position.x, stretchAmount.x, stretchOrigin.x, stretchSize.x),
             compensateAxis(position.y, stretchAmount.y, stretchOrigin.y, stretchSize.y)
         );
-        return background.eval(samplePosition);
+        return background.eval(inputOrigin + samplePosition * inputScale);
     }
 """
 
@@ -1133,6 +1436,8 @@ private class StretchBackgroundRenderer {
                 boundsInBackground.width / size.width,
                 boundsInBackground.height / size.height,
             )
+            runtimeShader.setFloatUniform("inputOrigin", 0f, 0f)
+            runtimeShader.setFloatUniform("inputScale", 1f, 1f)
             runtimeShader.setFloatUniform(
                 "stretchAmount",
                 compensation.horizontalAmount,
@@ -1192,29 +1497,29 @@ private fun reverseStretchPosition(
     if (amount > 0f) {
         val numerator =
             (-normalizedInput * amount * amount) -
-                    (2f * normalizedInput * amount) -
-                    normalizedInput
+                (2f * normalizedInput * amount) -
+                normalizedInput
         val denominator =
             1f +
-                    (0.3f * amount) +
-                    (0.7f * normalizedInput * amount * amount) +
-                    (0.7f * normalizedInput * amount)
+                (0.3f * amount) +
+                (0.7f * normalizedInput * amount * amount) +
+                (0.7f * normalizedInput * amount)
         val output = -(numerator / denominator)
         return if (output <= 1f) output else output - distanceDifference
     }
 
     val numerator =
         (0.3f * amount * amount) -
-                (0.3f * normalizedInput * amount * amount) +
-                (1.3f * normalizedInput * amount) -
-                amount -
-                normalizedInput
+            (0.3f * normalizedInput * amount * amount) +
+            (1.3f * normalizedInput * amount) -
+            amount -
+            normalizedInput
     val denominator =
         (0.7f * normalizedInput * amount * amount) -
-                (0.7f * normalizedInput * amount) -
-                (0.7f * amount * amount) +
-                amount -
-                1f
+            (0.7f * normalizedInput * amount) -
+            (0.7f * amount * amount) +
+            amount -
+            1f
     val output = numerator / denominator
     return if (output >= 0f) output else output + distanceDifference
 }
@@ -1318,13 +1623,11 @@ private fun ContentDrawScope.drawStretchCompensatedBitmap(
     }
 }
 
-private fun Offset.isUsable(): Boolean {
-    return x.isFinite() && y.isFinite()
-}
+private fun Offset.isUsable(): Boolean = x.isFinite() && y.isFinite()
 
 private suspend fun Bitmap.extractSeedColor(
     maxColors: Int = 128,
-    fallbackColorArgb: Int = -12417548
+    fallbackColorArgb: Int = -12417548,
 ): Int = withContext(Dispatchers.IO) {
     val scaledBitmap = this@extractSeedColor.scale(128, 128)
 
@@ -1359,8 +1662,12 @@ private fun Bitmap.softwareFastBlur(radius: Int): Bitmap {
     val r = IntArray(wh)
     val g = IntArray(wh)
     val b = IntArray(wh)
-    var rsum: Int; var gsum: Int; var bsum: Int
-    var p: Int; var yp: Int; var yi: Int
+    var rsum: Int
+    var gsum: Int
+    var bsum: Int
+    var p: Int
+    var yp: Int
+    var yi: Int
     val vmin = IntArray(w.coerceAtLeast(h))
 
     var divsum = (div + 1) shr 1
@@ -1379,13 +1686,23 @@ private fun Bitmap.softwareFastBlur(radius: Int): Bitmap {
     var sir: IntArray
     var rbs: Int
     val r1 = radius + 1
-    var routsum: Int; var goutsum: Int; var boutsum: Int
-    var rinsum: Int; var ginsum: Int; var binsum: Int
+    var routsum: Int
+    var goutsum: Int
+    var boutsum: Int
+    var rinsum: Int
+    var ginsum: Int
+    var binsum: Int
 
     for (y in 0 until h) {
-        bsum = 0; gsum = 0; rsum = 0
-        boutsum = 0; goutsum = 0; routsum = 0
-        binsum = 0; ginsum = 0; rinsum = 0
+        bsum = 0
+        gsum = 0
+        rsum = 0
+        boutsum = 0
+        goutsum = 0
+        routsum = 0
+        binsum = 0
+        ginsum = 0
+        rinsum = 0
         for (i in -radius..radius) {
             p = pix[yi + wm.coerceAtMost(i.coerceAtLeast(0))]
             sir = stack[i + radius]
@@ -1456,9 +1773,15 @@ private fun Bitmap.softwareFastBlur(radius: Int): Bitmap {
     }
 
     for (x in 0 until w) {
-        bsum = 0; gsum = 0; rsum = 0
-        boutsum = 0; goutsum = 0; routsum = 0
-        binsum = 0; ginsum = 0; rinsum = 0
+        bsum = 0
+        gsum = 0
+        rsum = 0
+        boutsum = 0
+        goutsum = 0
+        routsum = 0
+        binsum = 0
+        ginsum = 0
+        rinsum = 0
         yp = -radius * w
         for (i in -radius..radius) {
             yi = (yp.coerceAtLeast(0)) + x
@@ -1533,8 +1856,8 @@ private fun Bitmap.blurBitmap(blurRadius: Float): Bitmap {
                 RenderEffect.createBlurEffect(
                     blurRadius,
                     blurRadius,
-                    Shader.TileMode.CLAMP
-                )
+                    Shader.TileMode.CLAMP,
+                ),
             )
         }
 
@@ -1550,7 +1873,6 @@ private fun Bitmap.blurBitmap(blurRadius: Float): Bitmap {
 
     return outputBitmap
 }
-
 
 @RequiresApi(Build.VERSION_CODES.S)
 private suspend fun Bitmap.createBackgroundBlurImage(
@@ -1616,11 +1938,9 @@ private fun Bitmap.createBackgroundBlurSource(viewportSize: IntSize): Bitmap {
     }
 }
 
-private fun backgroundBlurCacheFile(context: Context): File =
-    File(context.filesDir, "blured_custom_background.jpg")
+private fun backgroundBlurCacheFile(context: Context): File = File(context.filesDir, "blured_custom_background.jpg")
 
-private fun legacyBackgroundBlurCacheDir(context: Context): File =
-    File(context.filesDir, "background_blur_cache")
+private fun legacyBackgroundBlurCacheDir(context: Context): File = File(context.filesDir, "background_blur_cache")
 
 private fun saveBackgroundBlurCache(cacheFile: File, bitmap: Bitmap) {
     runCatching {
@@ -1649,16 +1969,18 @@ private fun BackgroundInitializer(
     val coroutineScope = rememberCoroutineScope()
 
     val dynamicColorFromSystem =
-        if (Build.VERSION.SDK_INT >= 31)
-            colorResource(id = R.color.system_accent1_500).toArgb()
-        else -12417548
+        if (Build.VERSION.SDK_INT >= 31) {
+            colorResource(id = android.R.color.system_accent1_500).toArgb()
+        } else {
+            themeConfig.monetCompatSeedColor
+        }
 
     val calcedCachedSeedColor =
         settings.getInt("cached_seed_color", dynamicColorFromSystem)
 
     LaunchedEffect(themeConfig.isEnableBlurExp, renderState.blurViewportSize) {
         if (
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             themeConfig.isEnableBlurExp &&
             renderState.blurViewportSize.width > 0 &&
             renderState.blurViewportSize.height > 0
@@ -1697,7 +2019,7 @@ private fun BackgroundInitializer(
             themeConfig.isThemeChanging = false
 
             if (
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                 themeConfig.isEnableBlurExp &&
                 renderState.blurViewportSize.width > 0 &&
                 renderState.blurViewportSize.height > 0
@@ -1716,12 +2038,12 @@ private fun BackgroundInitializer(
             renderState.seedColor = calcedCachedSeedColor
             coroutineScope.launch {
                 renderState.seedColor = bitmap.extractSeedColor(
-                    fallbackColorArgb = calcedCachedSeedColor
+                    fallbackColorArgb = calcedCachedSeedColor,
                 )
 
                 settings.putInt("cached_seed_color", renderState.seedColor)
             }
-        }
+        },
     )
 }
 
@@ -1733,10 +2055,10 @@ private fun generateTypography(themeConfig: ThemeConfig): androidx.compose.mater
         if (!themeConfig.isHighContrastMode) return originalShadow
         val shadow = originalShadow ?: Shadow(
             offset = Offset(1.5f, 1.5f),
-            blurRadius = 0f
+            blurRadius = 0f,
         )
         return shadow.copy(
-            color = if (darkMode) Color.Black.copy(alpha = 0.7f) else Color.White.copy(alpha = 0.7f)
+            color = if (darkMode) Color.Black.copy(alpha = 0.7f) else Color.White.copy(alpha = 0.7f),
         )
     }
 
@@ -1791,7 +2113,7 @@ private fun createColorScheme(
             }
 
             dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-                colorResource(id = R.color.system_accent1_500).toArgb()
+                colorResource(id = android.R.color.system_accent1_500).toArgb()
             }
 
             dynamicColor -> {
@@ -1827,19 +2149,21 @@ private fun SystemBarController(darkMode: Boolean) {
             } else {
                 SystemBarStyle.light(
                     Color.Transparent.toArgb(),
-                    Color.Transparent.toArgb()
+                    Color.Transparent.toArgb(),
                 )
-            }
+            },
         )
     }
 }
 
 @Composable
 @ReadOnlyComposable
-fun isInDarkTheme(themeMode: Boolean?): Boolean {
-    return when (themeMode) {
-        true -> true // 强制深色
-        false -> false // 强制浅色
-        null -> isSystemInDarkTheme() // 跟随系统
-    }
+fun isInDarkTheme(themeMode: Boolean?): Boolean = when (themeMode) {
+    // 强制深色
+    true -> true
+
+    // 强制浅色
+    false -> false
+
+    null -> isSystemInDarkTheme() // 跟随系统
 }

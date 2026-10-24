@@ -1,9 +1,18 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/theme/ThemeRepository.kt
 package com.tesla.resukisuultra.data.theme
 
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamiccolor.ColorSpec
 import com.tesla.resukisuultra.data.AppSettingsRepository
 import com.tesla.resukisuultra.domain.model.coerceCompatibleWith
+========
+package org.bakasu.bakasu.data.theme
+
+import com.materialkolor.PaletteStyle
+import com.materialkolor.dynamiccolor.ColorSpec
+import org.bakasu.bakasu.data.AppSettingsRepository
+import org.bakasu.bakasu.domain.model.coerceCompatibleWith
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/theme/ThemeRepository.kt
 
 class ThemeRepository(
     private val settings: AppSettingsRepository,
@@ -50,8 +59,7 @@ class ThemeRepository(
         settings.putBoolean("use_dynamic_color", enabled)
     }
 
-    fun loadDynamicColorState(): Boolean =
-        settings.getBoolean("use_dynamic_color", true)
+    fun loadDynamicColorState(): Boolean = settings.getBoolean("use_dynamic_color", true)
 
     fun saveDynamicColorSpec(
         spec: ColorSpec.SpecVersion,

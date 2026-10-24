@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/KernelFlashViewModel.kt
 package com.tesla.resukisuultra.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,12 @@ import com.tesla.resukisuultra.domain.usecase.ObserveKernelFlashUseCase
 import com.tesla.resukisuultra.domain.usecase.RebootUseCase
 import com.tesla.resukisuultra.domain.usecase.RemovePreferenceUseCase
 import com.tesla.resukisuultra.domain.usecase.StartKernelFlashUseCase
+========
+package org.bakasu.bakasu.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/KernelFlashViewModel.kt
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -17,6 +24,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.domain.model.FlashProgress
+import org.bakasu.bakasu.domain.usecase.GetBooleanPreferenceUseCase
+import org.bakasu.bakasu.domain.usecase.ObserveKernelFlashUseCase
+import org.bakasu.bakasu.domain.usecase.RebootUseCase
+import org.bakasu.bakasu.domain.usecase.RemovePreferenceUseCase
+import org.bakasu.bakasu.domain.usecase.StartKernelFlashUseCase
 
 data class KernelFlashUiState(
     val requestUri: String? = null,
@@ -27,7 +40,7 @@ data class KernelFlashUiState(
 )
 
 sealed interface KernelFlashUiAction {
-    data class Start(val uri: String, val selectedSlot: String?) : KernelFlashUiAction
+    data class Start(val uri: String, val selectedSlot: String?, val skipKsud: Boolean = false) : KernelFlashUiAction
     data object ConsumeAutoExit : KernelFlashUiAction
     data object Reboot : KernelFlashUiAction
 }
@@ -62,7 +75,8 @@ class KernelFlashViewModel(
 
     fun dispatch(action: KernelFlashUiAction) {
         when (action) {
-            is KernelFlashUiAction.Start -> startKernelFlash(action.uri, action.selectedSlot)
+            is KernelFlashUiAction.Start -> startKernelFlash(action.uri, action.selectedSlot, action.skipKsud)
+
             KernelFlashUiAction.ConsumeAutoExit -> {
                 removePreference(AUTO_EXIT_KEY)
                 autoExit.value = false

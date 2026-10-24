@@ -1,8 +1,13 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/DynamicManagerViewModel.kt
 package com.tesla.resukisuultra.ui.viewmodel
+========
+package org.bakasu.bakasu.ui.viewmodel
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/DynamicManagerViewModel.kt
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/DynamicManagerViewModel.kt
 import com.tesla.resukisuultra.domain.model.DynamicManagerApp
 import com.tesla.resukisuultra.domain.model.DynamicManagerConfig
 import com.tesla.resukisuultra.domain.usecase.ClearDynamicManagerUseCase
@@ -10,6 +15,8 @@ import com.tesla.resukisuultra.domain.usecase.ObserveDynamicManagerStateUseCase
 import com.tesla.resukisuultra.domain.usecase.RefreshDynamicManagerUseCase
 import com.tesla.resukisuultra.domain.usecase.SelectDynamicManagerUseCase
 import com.tesla.resukisuultra.domain.usecase.SetManualDynamicManagerUseCase
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/DynamicManagerViewModel.kt
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -19,6 +26,13 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.domain.model.DynamicManagerApp
+import org.bakasu.bakasu.domain.model.DynamicManagerConfig
+import org.bakasu.bakasu.domain.usecase.ClearDynamicManagerUseCase
+import org.bakasu.bakasu.domain.usecase.ObserveDynamicManagerStateUseCase
+import org.bakasu.bakasu.domain.usecase.RefreshDynamicManagerUseCase
+import org.bakasu.bakasu.domain.usecase.SelectDynamicManagerUseCase
+import org.bakasu.bakasu.domain.usecase.SetManualDynamicManagerUseCase
 
 typealias DynamicManagerAppItem = DynamicManagerApp
 
@@ -69,7 +83,7 @@ class DynamicManagerViewModel(
             } else {
                 source.apps.filter { app ->
                     app.label.contains(normalized, ignoreCase = true) ||
-                            app.packageName.contains(normalized, ignoreCase = true)
+                        app.packageName.contains(normalized, ignoreCase = true)
                 }
             },
             search = query,
@@ -87,7 +101,9 @@ class DynamicManagerViewModel(
     fun dispatch(action: DynamicManagerUiAction) {
         when (action) {
             DynamicManagerUiAction.Refresh -> viewModelScope.launch { refresh() }
+
             is DynamicManagerUiAction.Search -> search.value = action.query
+
             is DynamicManagerUiAction.SelectApp -> submit(DynamicManagerOperation.Set) {
                 selectDynamicManager(action.app.apkPath)
             }

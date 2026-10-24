@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/shell/ShortcutRepository.kt
 package com.tesla.resukisuultra.data.shell
+========
+package org.bakasu.bakasu.data.shell
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/shell/ShortcutRepository.kt
 
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream

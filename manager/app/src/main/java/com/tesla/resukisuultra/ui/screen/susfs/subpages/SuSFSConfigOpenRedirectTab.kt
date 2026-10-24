@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/subpages/SuSFSConfigOpenRedirectTab.kt
 package com.tesla.resukisuultra.ui.screen.susfs.subpages
+========
+package org.bakasu.bakasu.ui.screen.susfs.subpages
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/subpages/SuSFSConfigOpenRedirectTab.kt
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/subpages/SuSFSConfigOpenRedirectTab.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.OpenRedirectItem
 import com.tesla.resukisuultra.domain.model.UidScheme
@@ -40,7 +45,27 @@ import com.tesla.resukisuultra.ui.viewmodel.SuSFSUiAction
 import com.tesla.resukisuultra.ui.viewmodel.SuSFSViewModel
 import com.tesla.resukisuultra.ui.viewmodel.awaitSuSFSBoolean
 import com.tesla.resukisuultra.ui.viewmodel.awaitSuSFSConfig
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/subpages/SuSFSConfigOpenRedirectTab.kt
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.OpenRedirectItem
+import org.bakasu.bakasu.domain.model.UidScheme
+import org.bakasu.bakasu.ui.component.settings.SettingsDropdownWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsJumpPageWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsTextFieldWidget
+import org.bakasu.bakasu.ui.screen.susfs.RegisterSuSFSRefresh
+import org.bakasu.bakasu.ui.screen.susfs.SuSFSRefreshRegistrar
+import org.bakasu.bakasu.ui.screen.susfs.component.EntryDetailDialog
+import org.bakasu.bakasu.ui.screen.susfs.component.ManualAddDialog
+import org.bakasu.bakasu.ui.screen.susfs.component.SuSFSDescriptionCard
+import org.bakasu.bakasu.ui.screen.susfs.component.susfsEntryList
+import org.bakasu.bakasu.ui.util.LocalSnackbarHost
+import org.bakasu.bakasu.ui.util.showReplacingSnackbar
+import org.bakasu.bakasu.ui.viewmodel.SuSFSUiAction
+import org.bakasu.bakasu.ui.viewmodel.SuSFSViewModel
+import org.bakasu.bakasu.ui.viewmodel.awaitSuSFSBoolean
+import org.bakasu.bakasu.ui.viewmodel.awaitSuSFSConfig
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,9 +118,7 @@ fun OpenRedirectTab(
     val operationFailedMsg = stringResource(R.string.susfs_operation_failed)
     val selectedUidLabel = uidSchemeOptions.first { it.first == manualUidScheme }.second
 
-    fun UidScheme.localizedLabel(): String {
-        return uidSchemeOptions.first { it.first == this }.second
-    }
+    fun UidScheme.localizedLabel(): String = uidSchemeOptions.first { it.first == this }.second
 
     LazyColumn(
         modifier = Modifier
