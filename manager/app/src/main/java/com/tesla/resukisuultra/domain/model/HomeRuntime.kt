@@ -1,6 +1,12 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/HomeRuntime.kt
 package com.tesla.resukisuultra.domain.model
 
 import com.tesla.resukisuultra.KernelVersion
+========
+package org.bakasu.bakasu.domain.model
+
+import org.bakasu.bakasu.KernelVersion
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/HomeRuntime.kt
 
 data class HomeBasicInfo(
     val kernelRelease: String = "",
@@ -43,11 +49,8 @@ data class HomeDashboardState(
     val betaManagerUpdate: ManagerUpdateInfo? = null,
     val isBetaManagerUpdateCheckFailed: Boolean = false,
     val isSimpleMode: Boolean = false,
-    val isHideOtherInfo: Boolean = false,
-    val isHideSusfsStatus: Boolean = false,
-    val isHideZygiskImplement: Boolean = false,
-    val isHideMetaModuleImplement: Boolean = false,
-    val isHideLinkCard: Boolean = false,
+    val showNavigationBarBadge: Boolean = true,
+    val showHomeCardIcons: Boolean = false,
     val isInitialDataLoaded: Boolean = false,
     val isCoreDataLoaded: Boolean = false,
     val isExtendedDataLoaded: Boolean = false,

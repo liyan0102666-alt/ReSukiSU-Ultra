@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/KeyPointSlider.kt
 package com.tesla.resukisuultra.ui.component
+========
+package org.bakasu.bakasu.ui.component
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/KeyPointSlider.kt
 
 import androidx.annotation.IntRange
 import androidx.compose.foundation.Canvas
@@ -70,7 +74,7 @@ fun KeyPointSlider(
         computeTickValues(
             keyPoints = keyPoints,
             steps = steps,
-            valueRange = valueRange
+            valueRange = valueRange,
         )
     }
     val shouldAlwaysSnapToTick = keyPoints == null && steps > 0
@@ -81,14 +85,14 @@ fun KeyPointSlider(
             width = width,
             valueRange = valueRange,
             isRtl = layoutDirection == LayoutDirection.Rtl,
-            thumbWidthPx = with(density) { 4.dp.toPx() }
+            thumbWidthPx = with(density) { 4.dp.toPx() },
         )
 
         val snappedValue = rawValue.snapToNearestTick(
             valueRange = valueRange,
             ticks = tickValues,
             magnetThreshold = magnetThreshold,
-            alwaysSnap = shouldAlwaysSnapToTick
+            alwaysSnap = shouldAlwaysSnapToTick,
         )
         currentOnValueChange(snappedValue)
         return snappedValue
@@ -119,7 +123,7 @@ fun KeyPointSlider(
                         valueRange = valueRange,
                         ticks = tickValues,
                         magnetThreshold = magnetThreshold,
-                        alwaysSnap = shouldAlwaysSnapToTick
+                        alwaysSnap = shouldAlwaysSnapToTick,
                     )
                     if (snappedValue != value) {
                         currentOnValueChange(snappedValue)
@@ -132,14 +136,14 @@ fun KeyPointSlider(
                 progressBarRangeInfo = ProgressBarRangeInfo(
                     current = value.coerceIn(valueRange.start, valueRange.endInclusive),
                     range = valueRange,
-                    steps = steps
+                    steps = steps,
                 )
                 setProgress { target ->
                     val snappedValue = target.snapToNearestTick(
                         valueRange = valueRange,
                         ticks = tickValues,
                         magnetThreshold = magnetThreshold,
-                        alwaysSnap = shouldAlwaysSnapToTick
+                        alwaysSnap = shouldAlwaysSnapToTick,
                     )
                     if (snappedValue == value) {
                         false
@@ -149,7 +153,7 @@ fun KeyPointSlider(
                         true
                     }
                 }
-            }
+            },
     ) {
         drawKeyPointSlider(
             value = value,
@@ -163,7 +167,7 @@ fun KeyPointSlider(
             } else {
                 emptyList()
             },
-            colors = colors
+            colors = colors,
         )
     }
 }
@@ -179,7 +183,7 @@ fun keyPointSliderColors(): KeyPointSliderColors = KeyPointSliderColors(
     disabledActiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
     disabledActiveTickColor = MaterialTheme.colorScheme.surface,
     disabledInactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-    disabledInactiveTickColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+    disabledInactiveTickColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
 )
 
 @Immutable
@@ -235,7 +239,7 @@ private fun DrawScope.drawKeyPointSlider(
             top = trackTop,
             height = trackHeight,
             startCorner = trackInsideCorner,
-            endCorner = trackCorner
+            endCorner = trackCorner,
         )
         drawTrackSegment(
             color = inactiveTrackColor,
@@ -244,7 +248,7 @@ private fun DrawScope.drawKeyPointSlider(
             top = trackTop,
             height = trackHeight,
             startCorner = trackCorner,
-            endCorner = trackInsideCorner
+            endCorner = trackInsideCorner,
         )
     } else {
         drawTrackSegment(
@@ -254,7 +258,7 @@ private fun DrawScope.drawKeyPointSlider(
             top = trackTop,
             height = trackHeight,
             startCorner = trackCorner,
-            endCorner = trackInsideCorner
+            endCorner = trackInsideCorner,
         )
         drawTrackSegment(
             color = inactiveTrackColor,
@@ -263,7 +267,7 @@ private fun DrawScope.drawKeyPointSlider(
             top = trackTop,
             height = trackHeight,
             startCorner = trackInsideCorner,
-            endCorner = trackCorner
+            endCorner = trackCorner,
         )
     }
 
@@ -272,7 +276,7 @@ private fun DrawScope.drawKeyPointSlider(
         drawCircle(
             color = activeTrackColor,
             radius = stopIndicatorSize / 2f,
-            center = Offset(stopIndicatorX, centerY)
+            center = Offset(stopIndicatorX, centerY),
         )
     }
 
@@ -289,7 +293,7 @@ private fun DrawScope.drawKeyPointSlider(
         drawCircle(
             color = colors.tickColorCompat(enabled, active),
             radius = tickSize / 2f,
-            center = Offset(x, centerY)
+            center = Offset(x, centerY),
         )
     }
 
@@ -297,7 +301,7 @@ private fun DrawScope.drawKeyPointSlider(
         color = colors.thumbColorCompat(enabled),
         topLeft = Offset(thumbX - thumbWidth / 2f, centerY - thumbHeight / 2f),
         size = Size(thumbWidth, thumbHeight),
-        cornerRadius = CornerRadius(thumbWidth / 2f, thumbWidth / 2f)
+        cornerRadius = CornerRadius(thumbWidth / 2f, thumbWidth / 2f),
     )
 }
 
@@ -322,13 +326,13 @@ private fun DrawScope.drawTrackSegment(
         RoundRect(
             rect = Rect(
                 offset = Offset(startX, top),
-                size = Size(segmentWidth, height)
+                size = Size(segmentWidth, height),
             ),
             topLeft = CornerRadius(leftCorner, leftCorner),
             bottomLeft = CornerRadius(leftCorner, leftCorner),
             topRight = CornerRadius(rightCorner, rightCorner),
-            bottomRight = CornerRadius(rightCorner, rightCorner)
-        )
+            bottomRight = CornerRadius(rightCorner, rightCorner),
+        ),
     )
     drawPath(trackPath, color)
     trackPath.rewind()
@@ -390,28 +394,20 @@ private fun Float.calcFraction(start: Float, end: Float): Float {
     return ((this - start) / range).coerceIn(0f, 1f)
 }
 
-private fun lerp(start: Float, stop: Float, fraction: Float): Float {
-    return start + (stop - start) * fraction
+private fun lerp(start: Float, stop: Float, fraction: Float): Float = start + (stop - start) * fraction
+
+private fun KeyPointSliderColors.thumbColorCompat(enabled: Boolean): Color = if (enabled) thumbColor else disabledThumbColor
+
+private fun KeyPointSliderColors.trackColorCompat(enabled: Boolean, active: Boolean): Color = when {
+    enabled && active -> activeTrackColor
+    enabled -> inactiveTrackColor
+    active -> disabledActiveTrackColor
+    else -> disabledInactiveTrackColor
 }
 
-private fun KeyPointSliderColors.thumbColorCompat(enabled: Boolean): Color {
-    return if (enabled) thumbColor else disabledThumbColor
-}
-
-private fun KeyPointSliderColors.trackColorCompat(enabled: Boolean, active: Boolean): Color {
-    return when {
-        enabled && active -> activeTrackColor
-        enabled -> inactiveTrackColor
-        active -> disabledActiveTrackColor
-        else -> disabledInactiveTrackColor
-    }
-}
-
-private fun KeyPointSliderColors.tickColorCompat(enabled: Boolean, active: Boolean): Color {
-    return when {
-        enabled && active -> activeTickColor
-        enabled -> inactiveTickColor
-        active -> disabledActiveTickColor
-        else -> disabledInactiveTickColor
-    }
+private fun KeyPointSliderColors.tickColorCompat(enabled: Boolean, active: Boolean): Color = when {
+    enabled && active -> activeTickColor
+    enabled -> inactiveTickColor
+    active -> disabledActiveTickColor
+    else -> disabledInactiveTickColor
 }

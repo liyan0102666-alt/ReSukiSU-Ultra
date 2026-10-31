@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/TemplateViewModel.kt
 package com.tesla.resukisuultra.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,12 @@ import com.tesla.resukisuultra.domain.usecase.ObserveProfileTemplateOfflineUseCa
 import com.tesla.resukisuultra.domain.usecase.ObserveProfileTemplateRefreshingUseCase
 import com.tesla.resukisuultra.domain.usecase.ObserveProfileTemplatesUseCase
 import com.tesla.resukisuultra.domain.usecase.RefreshProfileTemplatesUseCase
+========
+package org.bakasu.bakasu.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/TemplateViewModel.kt
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,6 +24,13 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.domain.model.ProfileTemplate
+import org.bakasu.bakasu.domain.usecase.ExportProfileTemplatesUseCase
+import org.bakasu.bakasu.domain.usecase.ImportProfileTemplatesUseCase
+import org.bakasu.bakasu.domain.usecase.ObserveProfileTemplateOfflineUseCase
+import org.bakasu.bakasu.domain.usecase.ObserveProfileTemplateRefreshingUseCase
+import org.bakasu.bakasu.domain.usecase.ObserveProfileTemplatesUseCase
+import org.bakasu.bakasu.domain.usecase.RefreshProfileTemplatesUseCase
 
 data class TemplateUiState(
     val templateList: List<ProfileTemplate> = emptyList(),
@@ -79,6 +93,7 @@ class TemplateViewModel(
     fun dispatch(action: TemplateUiAction) {
         when (action) {
             is TemplateUiAction.Refresh -> viewModelScope.launch { fetchTemplates(action.synchronize) }
+
             is TemplateUiAction.Import -> viewModelScope.launch {
                 val result = importTemplatesUseCase(action.json)
                 result.fold(

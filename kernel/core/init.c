@@ -28,13 +28,16 @@
 #include "selinux/selinux.h"
 #include "hook/setuid_hook.h"
 #include "compat/kernel_compat.h"
-
+#include "feature/shell_su_adb_only.h"
 #include "feature/sulog.h"
 #include "feature/adb_root.h"
 #include "feature/dynamic_manager.h"
+#include "feature/module_blacklist.h"
 #include "feature/sucompat.h"
 #include "feature/selinux_hide.h"
 #include "infra/symbol_resolver.h"
+#include "preinit/preinit.h"
+#include "uapi/supercall.h"
 
 #ifdef CONFIG_ARM64
 #include "compat/apatch_conflict.h"
@@ -140,9 +143,11 @@ static inline void __exit ksu_hook_exit(void)
 void setup_ksu_cred(void)
 {
     setup_ksu_cred_selinux();
-#ifdef KSU_COMPAT_REQUIRE_SESSION_KEYRING
+    if (init_session_keyring == NULL) {
+        init_session_keyring = ksu_get_session_keyring(current_cred());
+    }
+
     setup_ksu_cred_session_keyring();
-#endif
 }
 
 #ifdef CONFIG_KSU_DEBUG
@@ -154,6 +159,7 @@ bool allow_shell = false;
 bool ksu_no_custom_rc = false;
 module_param_named(norc, ksu_no_custom_rc, bool, 0);
 
+<<<<<<< HEAD
 /* ReSukiSU-Ultra: FUSEBPF 直通修复开关 (控制 fs/fuse lookup revalidate 的 BPF 结果尊重) */
 #ifdef CONFIG_KSU_FUSEBPF_FIX
 extern void fuse_bpf_lookup_revalidate_set(bool enable);
@@ -196,6 +202,16 @@ module_param_cb(fusebpf_fix, &fusebpf_fix_ops, &fusebpf_fix_enabled, 0644);
 
 int ksu_netisolate_init(void);
 void ksu_netisolate_exit(void);
+=======
+#ifdef MODULE
+bool ksu_bundled = false;
+module_param_named(bundled, ksu_bundled, bool, 0);
+#endif
+
+char ksu_block_modules[256];
+module_param_string(block_modules, ksu_block_modules, sizeof(ksu_block_modules), 0);
+MODULE_PARM_DESC(block_modules, "Comma-separated preset module names to acknowledge without loading");
+>>>>>>> resukisu/main
 
 int __init kernelsu_init(void)
 {
@@ -209,14 +225,14 @@ int __init kernelsu_init(void)
     // manually ifdef in there...
 #ifdef MODULE
     #if defined(__x86_64__) 
-        pr_info("Initialized with driver version: %u, full_version: %s, ABI: x86-64, Work mode: LKM\n", KSU_VERSION, KSU_VERSION_FULL);
+        pr_info("Initialized with driver version: %u, full_version: %s, ABI: x86-64, Work mode: LKM, ksu_uapi_version: %d\n", KSU_VERSION, KSU_VERSION_FULL, KERNEL_SU_UAPI_VERSION);
     #elif defined(CONFIG_ARM64)
-        pr_info("Initialized with driver version: %u, full_version: %s, ABI: aarch64, Work mode: LKM\n", KSU_VERSION, KSU_VERSION_FULL);
+        pr_info("Initialized with driver version: %u, full_version: %s, ABI: aarch64, Work mode: LKM, ksu_uapi_version: %d\n", KSU_VERSION, KSU_VERSION_FULL, KERNEL_SU_UAPI_VERSION);
     #else
         #error Unsupported arch!
     #endif
 #else
-    pr_info("Initialized with driver version: %u, full_version: %s, ABI: %s, Work mode: Built-in\n", KSU_VERSION, KSU_VERSION_FULL, UTS_MACHINE);
+    pr_info("Initialized with driver version: %u, full_version: %s, ABI: %s, Work mode: Built-in, ksu_uapi_version: %d\n", KSU_VERSION, KSU_VERSION_FULL, UTS_MACHINE, KERNEL_SU_UAPI_VERSION);
 #endif
     // clang-format on
 
@@ -264,6 +280,7 @@ int __init kernelsu_init(void)
     ksu_cred = prepare_creds();
     if (!ksu_cred) {
         pr_err("prepare cred failed!\n");
+        return -ENOSYS;
     }
 
     ksu_init_symbol_resolver();
@@ -272,8 +289,10 @@ int __init kernelsu_init(void)
     ksu_sulog_init();
     ksu_adb_root_init();
     ksu_selinux_hide_init();
+    ksu_shell_su_adb_only_init();
 
     ksu_supercalls_init();
+    ksu_app_profile_init();
 
     ksu_setuid_hook_init();
     ksu_sucompat_init();
@@ -303,7 +322,9 @@ int __init kernelsu_init(void)
         ksu_netisolate_init();
 
         ksu_boot_completed = true;
-        track_throne(TRACK_THRONE_FORCE_SEARCH_MGR);
+        track_throne(TRACK_THRONE_FORCE_SYNCHRONOUS);
+
+        ksu_feature_apply_forced();
 
         if (!getenforce()) {
             pr_info("Permissive SELinux, enforcing\n");
@@ -313,11 +334,15 @@ int __init kernelsu_init(void)
     } else {
         ksu_hook_init();
 
+        ksu_module_blacklist_init(ksu_block_modules);
+
         ksu_allowlist_init();
 
         ksu_throne_tracker_init();
 
         ksu_ksud_init();
+
+        ksu_preinit_init();
 
         ksu_file_wrapper_init();
         ksu_netisolate_init();
@@ -336,8 +361,11 @@ void __exit kernelsu_exit(void)
     // Phase 1: Stop all hooks first to prevent new callbacks
     ksu_hook_exit();
     ksu_supercalls_exit();
-    if (!ksu_late_loaded)
+
+    if (!ksu_late_loaded) {
         ksu_ksud_exit();
+        ksu_preinit_exit();
+    }
 
     // Wait for any in-flight RCU readers (e.g. handler traversing allow_list)
     synchronize_rcu();
@@ -350,14 +378,14 @@ void __exit kernelsu_exit(void)
 
     ksu_allowlist_exit();
 
+    ksu_shell_su_adb_only_exit();
     ksu_selinux_hide_exit();
     ksu_adb_root_exit();
     ksu_sulog_exit();
     ksu_feature_exit();
+    ksu_module_blacklist_exit();
 
-    if (ksu_cred) {
-        put_cred(ksu_cred);
-    }
+    put_cred(ksu_cred);
 }
 
 #if NEED_OWN_STACKPROTECTOR

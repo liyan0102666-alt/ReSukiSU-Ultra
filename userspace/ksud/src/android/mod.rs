@@ -3,18 +3,27 @@ mod debug;
 mod dynamic_manager;
 mod fakelock;
 mod feature;
+<<<<<<< HEAD
 mod fusebpf;
+=======
+mod hot_install;
+>>>>>>> resukisu/main
 mod init_event;
 pub mod iosched;
 mod ksucalls;
 mod late_load;
 mod module;
+<<<<<<< HEAD
 mod netisolate;
 pub mod nomount;
+=======
+mod preinit;
+>>>>>>> resukisu/main
 mod profile;
 pub(crate) mod resetprop;
 mod restorecon;
 mod sepolicy;
+mod soft_reboot;
 mod su;
 mod sulog;
 pub mod susfs;

@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/subpages/SuSFSConfigStatusTab.kt
 package com.tesla.resukisuultra.ui.screen.susfs.subpages
+========
+package org.bakasu.bakasu.ui.screen.susfs.subpages
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/subpages/SuSFSConfigStatusTab.kt
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -34,6 +38,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/subpages/SuSFSConfigStatusTab.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.SuSFSStatusInfo
 import com.tesla.resukisuultra.ui.component.WarningCard
@@ -49,7 +54,24 @@ import com.tesla.resukisuultra.ui.viewmodel.SuSFSUiAction
 import com.tesla.resukisuultra.ui.viewmodel.SuSFSViewModel
 import com.tesla.resukisuultra.ui.viewmodel.awaitSuSFSBoolean
 import com.tesla.resukisuultra.ui.viewmodel.awaitSuSFSStatusInfo
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/subpages/SuSFSConfigStatusTab.kt
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.SuSFSStatusInfo
+import org.bakasu.bakasu.ui.component.WarningCard
+import org.bakasu.bakasu.ui.component.settings.SegmentedColumn
+import org.bakasu.bakasu.ui.component.settings.SettingsBaseWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsJumpPageWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsSwitchWidget
+import org.bakasu.bakasu.ui.screen.susfs.RegisterSuSFSRefresh
+import org.bakasu.bakasu.ui.screen.susfs.SuSFSRefreshRegistrar
+import org.bakasu.bakasu.ui.util.LocalSnackbarHost
+import org.bakasu.bakasu.ui.util.showReplacingSnackbar
+import org.bakasu.bakasu.ui.viewmodel.SuSFSUiAction
+import org.bakasu.bakasu.ui.viewmodel.SuSFSViewModel
+import org.bakasu.bakasu.ui.viewmodel.awaitSuSFSBoolean
+import org.bakasu.bakasu.ui.viewmodel.awaitSuSFSStatusInfo
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -82,11 +104,11 @@ fun StatusTab(
 
         item {
             AnimatedVisibility(
-                visible = configEnabledLoaded && !configEnabled
+                visible = configEnabledLoaded && !configEnabled,
             ) {
                 WarningCard(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    message = stringResource(R.string.susfs_management_disabled_warning),
+                    message = stringResource(R.string.susfs_config_disable_warning),
                 )
             }
         }
@@ -96,8 +118,8 @@ fun StatusTab(
                 item {
                     SettingsSwitchWidget(
                         icon = Icons.TwoTone.Save,
-                        title = stringResource(R.string.susfs_standard_config_enabled),
-                        description = stringResource(R.string.susfs_standard_config_enabled_desc),
+                        title = stringResource(R.string.susfs_enable_config),
+                        description = stringResource(R.string.susfs_enable_config_summary),
                         checked = configEnabled,
                         enabled = configEnabledLoaded,
                         onCheckedChange = onConfigEnabledChange,
@@ -109,7 +131,7 @@ fun StatusTab(
                         title = stringResource(R.string.susfs_status_version),
                         description = statusInfo.version.ifBlank {
                             stringResource(R.string.susfs_status_no_data)
-                        }
+                        },
                     )
                 }
                 item {
@@ -118,7 +140,7 @@ fun StatusTab(
                         title = stringResource(R.string.susfs_status_variant),
                         description = statusInfo.variant.ifBlank {
                             stringResource(R.string.susfs_status_no_data)
-                        }
+                        },
                     )
                 }
                 item {
@@ -127,7 +149,7 @@ fun StatusTab(
                         title = stringResource(R.string.susfs_status_enabled_features),
                         description = statusInfo.enabledFeatures.ifBlank {
                             stringResource(R.string.susfs_status_no_data)
-                        }
+                        },
                     )
                 }
             }
@@ -142,7 +164,6 @@ fun StatusTab(
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -174,7 +195,7 @@ fun BackupRestoreSection(
     val operationFailedMsg = stringResource(R.string.susfs_operation_failed)
 
     val exportLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("application/json")
+        ActivityResultContracts.CreateDocument("application/json"),
     ) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
         scope.launch {
@@ -188,7 +209,7 @@ fun BackupRestoreSection(
     }
 
     val importLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.OpenDocument()
+        ActivityResultContracts.OpenDocument(),
     ) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
         pendingImportUri = uri
@@ -203,7 +224,7 @@ fun BackupRestoreSection(
                 description = exportDesc,
                 onClick = {
                     exportLauncher.launch("susfs_backup.json")
-                }
+                },
             )
         }
         item {
@@ -213,7 +234,7 @@ fun BackupRestoreSection(
                 description = importDesc,
                 onClick = {
                     importLauncher.launch(arrayOf("application/json"))
-                }
+                },
             )
         }
         item {
@@ -255,7 +276,7 @@ fun BackupRestoreSection(
                                 }
                             }
                         }
-                    }
+                    },
                 ) {
                     Text(importLabel)
                 }
@@ -297,6 +318,6 @@ private fun RestoreDefaultRow(
                 }
                 snackbarHost.showReplacingSnackbar(if (ok) operationSuccessMsg else operationFailedMsg)
             }
-        }
+        },
     )
 }

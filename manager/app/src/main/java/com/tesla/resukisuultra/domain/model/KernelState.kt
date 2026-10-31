@@ -1,7 +1,14 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/KernelState.kt
 package com.tesla.resukisuultra.domain.model
 
 import com.tesla.resukisuultra.KernelVersion
 import com.tesla.resukisuultra.Natives.KernelPatchImplementation
+========
+package org.bakasu.bakasu.domain.model
+
+import org.bakasu.bakasu.KernelVersion
+import org.bakasu.bakasu.Natives.KernelPatchImplementation
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/KernelState.kt
 
 data class ManagerRecord(
     val uid: Int,
@@ -22,8 +29,7 @@ data class KernelStatus(
     val lkmMode: Boolean? = null,
     val kernelVersion: KernelVersion,
     val isRootAvailable: Boolean = false,
-    val requireNewKernel: Boolean = false,
-    val uapiMismatch: Boolean = false,
+    val isFullFeatured: Boolean = false,
     val isSELinuxPermissive: Boolean = false,
     val isOfficialSignature: Boolean = true,
     val kernelPatchImplementation: KernelPatchImplementation = KernelPatchImplementation.NONE,
@@ -31,10 +37,7 @@ data class KernelStatus(
     val isSafeMode: Boolean = false,
     val isLateLoadMode: Boolean = false,
     val isPrBuild: Boolean = false,
-) {
-    val isValid: Boolean
-        get() = isManager && !requireNewKernel && isRootAvailable
-}
+)
 
 data class KernelFeatureSettings(
     val suEnabled: Boolean,

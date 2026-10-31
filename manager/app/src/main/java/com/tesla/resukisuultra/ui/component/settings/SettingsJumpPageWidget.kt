@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/SettingsJumpPageWidget.kt
 package com.tesla.resukisuultra.ui.component.settings
+========
+package org.bakasu.bakasu.ui.component.settings
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/settings/SettingsJumpPageWidget.kt
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.RowScope
@@ -31,7 +35,7 @@ fun SettingsJumpPageWidget(
     onLongClick: ((Offset) -> Unit)? = null,
     hapticFeedbackType: HapticFeedbackType = HapticFeedbackType.ContextClick,
     leadingContent: (@Composable () -> Unit)? = null,
-    foreContent: @Composable RowScope.() -> Unit = {},
+    foreContent: (@Composable RowScope.() -> Unit)? = null,
     descriptionColumnContent: @Composable ColumnScope.() -> Unit = {},
     trailingIcon: ImageVector = Icons.Filled.ChevronRight,
 ) {
@@ -50,13 +54,13 @@ fun SettingsJumpPageWidget(
         clickHaptic = hapticFeedbackType,
         leadingContent = leadingContent,
         foreContent = foreContent,
-        descriptionColumnContent = descriptionColumnContent
+        descriptionColumnContent = descriptionColumnContent,
     ) {
         Icon(
             imageVector = trailingIcon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(24.dp),
         )
     }
 }
