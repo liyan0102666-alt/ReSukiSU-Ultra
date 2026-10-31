@@ -1,5 +1,10 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/themeSettings/component/ThemeSettingsDialogs.kt
 package com.tesla.resukisuultra.ui.screen.themeSettings.component
+========
+package org.bakasu.bakasu.ui.screen.themeSettings.component
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/themeSettings/component/ThemeSettingsDialogs.kt
 
+import android.graphics.Color as AndroidColor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -33,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/themeSettings/component/ThemeSettingsDialogs.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.usecase.IsSystemLanguageSettingsUseCase
 import com.tesla.resukisuultra.domain.usecase.LaunchSystemLanguageSettingsUseCase
@@ -41,14 +49,22 @@ import com.tesla.resukisuultra.ui.theme.ThemeConfig
 import com.tesla.resukisuultra.ui.viewmodel.SettingsUiAction
 import com.tesla.resukisuultra.ui.viewmodel.SettingsUiState
 import com.tesla.resukisuultra.ui.viewmodel.SettingsViewModel
+========
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.usecase.IsSystemLanguageSettingsUseCase
+import org.bakasu.bakasu.domain.usecase.LaunchSystemLanguageSettingsUseCase
+import org.bakasu.bakasu.ui.component.settings.SettingsChooseDialog
+import org.bakasu.bakasu.ui.theme.ThemeConfig
+import org.bakasu.bakasu.ui.viewmodel.SettingsUiAction
+import org.bakasu.bakasu.ui.viewmodel.SettingsUiState
+import org.bakasu.bakasu.ui.viewmodel.SettingsViewModel
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/themeSettings/component/ThemeSettingsDialogs.kt
 import org.koin.compose.koinInject
-import android.graphics.Color as AndroidColor
-
 
 @Composable
 fun ThemeSettingsDialogs(
     state: SettingsUiState,
-    viewModel: SettingsViewModel
+    viewModel: SettingsViewModel,
 ) {
     val themeConfig: ThemeConfig = koinInject()
     if (state.showThemeColorDialog) {
@@ -60,7 +76,7 @@ fun ThemeSettingsDialogs(
             },
             onDismiss = {
                 viewModel.dispatch(SettingsUiAction.SetThemeColorDialogVisible(false))
-            }
+            },
         )
     }
 }
@@ -70,7 +86,7 @@ fun ThemeSettingsDialogs(
 fun LanguageSelectionDialog(
     currentLocale: String,
     onLanguageSelected: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val isSystemLanguageSettingsUseCase =
         koinInject<IsSystemLanguageSettingsUseCase>()
@@ -91,7 +107,7 @@ fun LanguageSelectionDialog(
             val resourceDirs = listOf(
                 "ar", "bg", "de", "fa", "fr", "hu", "in", "it",
                 "ja", "ko", "pl", "pt-rBR", "ru", "th", "tr",
-                "uk", "vi", "zh-rCN", "zh-rTW"
+                "uk", "vi", "zh-rCN", "zh-rTW",
             )
 
             resourceDirs.forEach { dir ->
@@ -163,7 +179,7 @@ fun LanguageSelectionDialog(
                     val newLocale = allOptions[selectedIndex].first
                     onLanguageSelected(newLocale)
                 }
-            }
+            },
         )
     }
 }
@@ -172,7 +188,7 @@ fun LanguageSelectionDialog(
 fun ThemeColorDialog(
     currentSeedColor: Int,
     onColorSelected: (Int) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val initialHsv = remember(currentSeedColor) {
         FloatArray(3).also { AndroidColor.colorToHSV(currentSeedColor, it) }
@@ -201,7 +217,7 @@ fun ThemeColorDialog(
                 Icon(
                     Icons.TwoTone.Check,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
                 )
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(stringResource(R.string.confirm))
@@ -211,7 +227,7 @@ fun ThemeColorDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.cancel))
             }
-        }
+        },
     )
 }
 
@@ -230,19 +246,19 @@ private fun ColorPicker(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(color)
+                    .background(color),
             )
             Spacer(modifier = Modifier.size(16.dp))
             Text(
                 text = color.toHexString(),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
 
@@ -250,19 +266,19 @@ private fun ColorPicker(
             label = "H",
             value = hue,
             valueRange = 0f..360f,
-            onValueChange = onHueChange
+            onValueChange = onHueChange,
         )
         ColorSlider(
             label = "S",
             value = saturation,
             valueRange = 0f..1f,
-            onValueChange = onSaturationChange
+            onValueChange = onSaturationChange,
         )
         ColorSlider(
             label = "V",
             value = value,
             valueRange = 0f..1f,
-            onValueChange = onValueChange
+            onValueChange = onValueChange,
         )
     }
 }
@@ -274,33 +290,43 @@ private fun ColorSlider(
     valueRange: ClosedFloatingPointRange<Float>,
     onValueChange: (Float) -> Unit,
 ) {
+    val sliderState = rememberSliderState(
+        value = value,
+        steps = 0,
+        trackRange = valueRange,
+    )
+    LaunchedEffect(value) {
+        if (sliderState.value != value) {
+            sliderState.value = value
+        }
+    }
+
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.padding(end = 12.dp)
+            modifier = Modifier.padding(end = 12.dp),
         )
         Slider(
-            value = value,
+            state = sliderState,
             onValueChange = onValueChange,
-            valueRange = valueRange,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         Box(
             modifier = Modifier.padding(start = 12.dp),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Text( // Some stupid way to solve measure problem
                 text = "360.00",
                 style = MaterialTheme.typography.labelMediumEmphasized.copy(
-                    fontFeatureSettings = "tnum"
+                    fontFeatureSettings = "tnum",
                 ),
-                modifier = Modifier.alpha(0f)
+                modifier = Modifier.alpha(0f),
             )
             Text(
                 text = "%.2f".format(value),
                 style = MaterialTheme.typography.labelMediumEmphasized.copy(
-                    fontFeatureSettings = "tnum"
+                    fontFeatureSettings = "tnum",
                 ),
             )
         }
@@ -311,7 +337,7 @@ private fun Color.toHexString(): String {
     val argb = AndroidColor.rgb(
         (red * 255).toInt().coerceIn(0, 255),
         (green * 255).toInt().coerceIn(0, 255),
-        (blue * 255).toInt().coerceIn(0, 255)
+        (blue * 255).toInt().coerceIn(0, 255),
     )
     return "#%06X".format(argb and 0x00FFFFFF)
 }

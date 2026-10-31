@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="home">Inicio</string>
-    <string name="settings_check_update">Notificacións de actualización</string>
-    <string name="settings_check_update_summary">Comprobar automaticamente as actualizacións do módulo e do xestor</string>
     <string name="settings_sucompat">Redirixir o binario su</string>
     <string name="settings_sucompat_summary">Permite que as aplicacións con permiso de Superusuario no perfil da aplicación obteñan un shell de superusuario executando /system/bin/su; efectivo só para novos procesos.</string>
     <string name="settings_kernel_umount">Desmontar núcleo</string>
     <string name="settings_kernel_umount_summary">Comportamento de desmontaxe a nivel de núcleo controlado por KernelSU</string>
+<<<<<<< HEAD
 
     <string name="iosched_title">Planificador E/S</string>
     <string name="iosched_current">Planificador actual</string>
@@ -22,3 +21,6 @@
     <string name="settings_soft_reboot">Reinicio suave</string>
     <string name="settings_soft_reboot_summary">Preferir reinicio suave ao reiniciar (conserva jailbreak, aínda aplica cambios de módulos)</string>
 </resources>
+=======
+</resources>
+>>>>>>> resukisu/main

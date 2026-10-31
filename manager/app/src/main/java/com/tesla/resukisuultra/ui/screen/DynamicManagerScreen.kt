@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/DynamicManagerScreen.kt
 package com.tesla.resukisuultra.ui.screen
+========
+package org.bakasu.bakasu.ui.screen
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/DynamicManagerScreen.kt
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -45,6 +49,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/DynamicManagerScreen.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.DynamicManagerConfig
 import com.tesla.resukisuultra.ui.component.ConfirmResult
@@ -68,8 +73,35 @@ import com.tesla.resukisuultra.ui.viewmodel.DynamicManagerOperation
 import com.tesla.resukisuultra.ui.viewmodel.DynamicManagerUiAction
 import com.tesla.resukisuultra.ui.viewmodel.DynamicManagerUiEvent
 import com.tesla.resukisuultra.ui.viewmodel.DynamicManagerViewModel
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/DynamicManagerScreen.kt
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.DynamicManagerConfig
+import org.bakasu.bakasu.ui.component.ConfirmResult
+import org.bakasu.bakasu.ui.component.DialogHandle
+import org.bakasu.bakasu.ui.component.PackageIcon
+import org.bakasu.bakasu.ui.component.SearchAppBar
+import org.bakasu.bakasu.ui.component.SwipeableSnackbarHost
+import org.bakasu.bakasu.ui.component.rememberConfirmDialog
+import org.bakasu.bakasu.ui.component.rememberCustomDialog
+import org.bakasu.bakasu.ui.component.rememberSearchAppBarScrollBehavior
+import org.bakasu.bakasu.ui.component.settings.SegmentedColumn
+import org.bakasu.bakasu.ui.component.settings.SettingsBaseWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsTextFieldWidget
+import org.bakasu.bakasu.ui.component.settings.lazySegmentColumn
+import org.bakasu.bakasu.ui.navigation.LocalNavigator
+import org.bakasu.bakasu.ui.theme.blurSource
+import org.bakasu.bakasu.ui.util.ActivityResumeEffect
+import org.bakasu.bakasu.ui.util.LocalSnackbarHost
+import org.bakasu.bakasu.ui.util.adaptiveScaffoldWindowInsets
+import org.bakasu.bakasu.ui.util.showReplacingSnackbar
+import org.bakasu.bakasu.ui.viewmodel.DynamicManagerAppItem
+import org.bakasu.bakasu.ui.viewmodel.DynamicManagerOperation
+import org.bakasu.bakasu.ui.viewmodel.DynamicManagerUiAction
+import org.bakasu.bakasu.ui.viewmodel.DynamicManagerUiEvent
+import org.bakasu.bakasu.ui.viewmodel.DynamicManagerViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -78,8 +110,9 @@ fun DynamicManagerScreen() {
     val navigator = LocalNavigator.current
     val viewModel = koinViewModel<DynamicManagerViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = rememberSearchAppBarScrollBehavior(
+        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState()),
+    )
     val pullToRefreshState = rememberPullToRefreshState()
     val snackbarHost = LocalSnackbarHost.current
     val scope = rememberCoroutineScope()
@@ -101,7 +134,7 @@ fun DynamicManagerScreen() {
         val first = confirmDialog.awaitConfirm(
             title = grantConfirmTitle,
             content = grantConfirmMessage,
-            confirm = confirmText
+            confirm = confirmText,
         )
         return first == ConfirmResult.Confirmed
     }
@@ -118,7 +151,7 @@ fun DynamicManagerScreen() {
             val confirmed = confirmDialog.awaitConfirm(
                 title = clearConfirmTitle,
                 content = clearConfirmMessage,
-                confirm = confirmText
+                confirm = confirmText,
             )
             if (confirmed != ConfirmResult.Confirmed) return@launch
             viewModel.dispatch(DynamicManagerUiAction.Clear)
@@ -150,6 +183,7 @@ fun DynamicManagerScreen() {
     }
 
     Scaffold(
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         topBar = {
             SearchAppBar(
                 title = stringResource(R.string.dynamic_manager_title),
@@ -198,7 +232,7 @@ fun DynamicManagerScreen() {
                 },
                 modifier = Modifier
                     .fillMaxSize()
-                    .blurSource()
+                    .blurSource(),
             ) {
                 LazyColumn(
                     modifier = Modifier
@@ -208,8 +242,8 @@ fun DynamicManagerScreen() {
                         top = paddingValues.calculateTopPadding() + 5.dp,
                         start = 0.dp,
                         end = 0.dp,
-                        bottom = paddingValues.calculateBottomPadding() + 16.dp
-                    )
+                        bottom = paddingValues.calculateBottomPadding() + 16.dp,
+                    ),
                 ) {
                     item {
                         DynamicManagerStatusSection(
@@ -220,7 +254,7 @@ fun DynamicManagerScreen() {
                             },
                             onClearConfig = {
                                 runClearOperation()
-                            }
+                            },
                         )
                     }
 
@@ -244,7 +278,7 @@ fun DynamicManagerScreen() {
                             title = manageManagers,
                             items = uiState.apps,
                             key = { _, app -> "${app.uid}-${app.packageName}" },
-                            contentType = { _, _ -> "DynamicManagerAppItem" }
+                            contentType = { _, _ -> "DynamicManagerAppItem" },
                         ) { _, app ->
                             DynamicManagerAppItem(
                                 app = app,
@@ -267,16 +301,14 @@ fun DynamicManagerScreen() {
 @Composable
 private fun rememberDynamicManagerManualDialog(
     onConfirm: (Int, String) -> Unit,
-): DialogHandle {
-    return rememberCustomDialog { dismiss ->
-        DynamicManagerManualDialog(
-            onDismiss = dismiss,
-            onConfirm = { size, hash ->
-                dismiss()
-                onConfirm(size, hash)
-            }
-        )
-    }
+): DialogHandle = rememberCustomDialog { dismiss ->
+    DynamicManagerManualDialog(
+        onDismiss = dismiss,
+        onConfirm = { size, hash ->
+            dismiss()
+            onConfirm(size, hash)
+        },
+    )
 }
 
 @Composable
@@ -300,7 +332,7 @@ private fun DynamicManagerStatusSection(
                 icon = Icons.TwoTone.Security,
                 title = stringResource(R.string.dynamic_manager_current_status),
                 description = currentStatus,
-                onClick = {}
+                onClick = {},
             )
         }
 
@@ -309,7 +341,7 @@ private fun DynamicManagerStatusSection(
                 icon = Icons.TwoTone.Security,
                 title = stringResource(R.string.signature_hash),
                 description = config?.hash.orEmpty(),
-                onClick = {}
+                onClick = {},
             )
         }
 
@@ -350,12 +382,13 @@ private fun DynamicManagerAppItem(
             stringResource(
                 R.string.dynamic_manager_fixed_manager_summary,
                 app.packageName,
-                if ((app.managerSignatureIndex ?: 0) == 254)
+                if ((app.managerSignatureIndex ?: 0) == 254) {
                     "Debug"
-                else if ((app.managerSignatureIndex ?: 0) == 253)
+                } else if ((app.managerSignatureIndex ?: 0) == 253) {
                     "KernelSU Toolkit"
-                else
+                } else {
                     "Kernel"
+                },
             )
         } else {
             app.packageName
@@ -374,7 +407,7 @@ private fun DynamicManagerAppItem(
         Checkbox(
             checked = app.isSelected || !app.isChangeable,
             enabled = app.isChangeable,
-            onCheckedChange = null
+            onCheckedChange = null,
         )
     }
 }
@@ -447,7 +480,7 @@ private fun DynamicManagerManualDialog(
                 enabled = isValid,
                 onClick = {
                     onConfirm(sizeValue ?: return@TextButton, hash)
-                }
+                },
             ) {
                 Text(stringResource(android.R.string.ok))
             }
@@ -456,6 +489,6 @@ private fun DynamicManagerManualDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(android.R.string.cancel))
             }
-        }
+        },
     )
 }
