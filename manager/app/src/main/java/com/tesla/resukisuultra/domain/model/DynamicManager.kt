@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/DynamicManager.kt
 package com.tesla.resukisuultra.domain.model
+========
+package org.bakasu.bakasu.domain.model
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/DynamicManager.kt
 
 data class DynamicManagerConfig(
     val size: Int = 0,
@@ -6,7 +10,6 @@ data class DynamicManagerConfig(
 ) {
     val isValid: Boolean
         get() = size > 0 && hash.length == 64
-
 }
 
 data class DynamicManagerApp(

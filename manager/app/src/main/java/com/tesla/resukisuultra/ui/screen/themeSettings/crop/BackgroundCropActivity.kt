@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/themeSettings/crop/BackgroundCropActivity.kt
 package com.tesla.resukisuultra.ui.screen.themeSettings.crop
+========
+package org.bakasu.bakasu.ui.screen.themeSettings.crop
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/themeSettings/crop/BackgroundCropActivity.kt
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -69,9 +73,12 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.PopupPositionProvider
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/themeSettings/crop/BackgroundCropActivity.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.ui.component.KeyPointSlider
 import com.tesla.resukisuultra.ui.theme.KernelSUTheme
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/themeSettings/crop/BackgroundCropActivity.kt
 import com.yalantis.ucrop.UCrop
 import com.yalantis.ucrop.callback.BitmapCropCallback
 import com.yalantis.ucrop.view.OverlayView
@@ -80,6 +87,10 @@ import com.yalantis.ucrop.view.UCropView
 import java.io.Serializable
 import kotlin.math.max
 import kotlin.math.min
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.ui.component.KeyPointSlider
+import org.bakasu.bakasu.ui.theme.KernelSUTheme
+import org.bakasu.bakasu.ui.util.adaptiveScaffoldWindowInsets
 
 class BackgroundCropActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,7 +128,7 @@ class BackgroundCropActivity : ComponentActivity() {
                     onCropped = { uri, width, height, offsetX, offsetY ->
                         finishWithResult(uri, width, height, offsetX, offsetY)
                     },
-                    onError = ::finishWithError
+                    onError = ::finishWithError,
                 )
             }
         }
@@ -128,7 +139,7 @@ class BackgroundCropActivity : ComponentActivity() {
         width: Int,
         height: Int,
         offsetX: Int,
-        offsetY: Int
+        offsetY: Int,
     ) {
         val result = Intent()
             .putExtra(UCrop.EXTRA_OUTPUT_URI, uri)
@@ -178,7 +189,7 @@ private fun BackgroundCropScreen(
     maxSizeY: Int,
     onCancel: () -> Unit,
     onCropped: (Uri, Int, Int, Int, Int) -> Unit,
-    onError: (Throwable) -> Unit
+    onError: (Throwable) -> Unit,
 ) {
     val context = LocalContext.current
     var cropView by remember { mutableStateOf<UCropView?>(null) }
@@ -233,7 +244,7 @@ private fun BackgroundCropScreen(
                     offsetX: Int,
                     offsetY: Int,
                     imageWidth: Int,
-                    imageHeight: Int
+                    imageHeight: Int,
                 ) {
                     (context as Activity).runOnUiThread {
                         isCropping = false
@@ -247,11 +258,12 @@ private fun BackgroundCropScreen(
                         onError(t)
                     }
                 }
-            }
+            },
         )
     }
 
     Scaffold(
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         topBar = {
             LargeFlexibleTopAppBar(
                 title = { Text(stringResource(R.string.background_crop_title)) },
@@ -259,11 +271,11 @@ private fun BackgroundCropScreen(
                     CropTooltipIconButton(
                         tooltip = stringResource(R.string.cancel),
                         enabled = !isCropping,
-                        onClick = onCancel
+                        onClick = onCancel,
                     ) {
                         Icon(
                             Icons.TwoTone.Close,
-                            contentDescription = stringResource(R.string.cancel)
+                            contentDescription = stringResource(R.string.cancel),
                         )
                     }
                 },
@@ -277,49 +289,49 @@ private fun BackgroundCropScreen(
                             rotationAngle = 0f
                             cropViewReloadToken++
                         },
-                        enabled = !isLoading && !isCropping && !loadFailed
+                        enabled = !isLoading && !isCropping && !loadFailed,
                     ) {
                         Icon(
                             Icons.TwoTone.RestartAlt,
-                            contentDescription = stringResource(R.string.background_crop_reset)
+                            contentDescription = stringResource(R.string.background_crop_reset),
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
                 windowInsets = TopAppBarDefaults.windowInsets.add(WindowInsets(left = 12.dp)),
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
             )
         },
         bottomBar = {
             Surface(
                 modifier = Modifier.wrapContentHeight(),
                 color = MaterialTheme.colorScheme.surfaceContainer,
-                tonalElevation = 3.dp
+                tonalElevation = 3.dp,
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .navigationBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = stringResource(R.string.background_crop_rotation_angle),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.width(84.dp)
+                            modifier = Modifier.width(84.dp),
                         )
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .height(48.dp)
+                                .height(48.dp),
                         ) {
                             KeyPointSlider(
                                 value = rotationAngle.coerceIn(-180f, 180f),
@@ -337,38 +349,38 @@ private fun BackgroundCropScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier
                                 .width(48.dp)
-                                .padding(start = 8.dp)
+                                .padding(start = 8.dp),
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Button(
                             onClick = ::cropCurrentImage,
-                            enabled = !isLoading && !isCropping && !loadFailed
+                            enabled = !isLoading && !isCropping && !loadFailed,
                         ) {
                             Icon(
                                 imageVector = Icons.TwoTone.Check,
-                                contentDescription = null
+                                contentDescription = null,
                             )
                             Text(
                                 text = stringResource(R.string.background_crop_apply),
-                                modifier = Modifier.padding(start = 8.dp)
+                                modifier = Modifier.padding(start = 8.dp),
                             )
                         }
                     }
                 }
             }
         },
-        containerColor = MaterialTheme.colorScheme.surface
+        containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
             key(cropViewReloadToken) {
                 AndroidView(
@@ -377,7 +389,7 @@ private fun BackgroundCropScreen(
                         UCropView(viewContext, null).apply {
                             layoutParams = FrameLayout.LayoutParams(
                                 FrameLayout.LayoutParams.MATCH_PARENT,
-                                FrameLayout.LayoutParams.MATCH_PARENT
+                                FrameLayout.LayoutParams.MATCH_PARENT,
                             )
                             cropImageView.isScaleEnabled = true
                             cropImageView.isRotateEnabled = false
@@ -423,7 +435,7 @@ private fun BackgroundCropScreen(
                                     }
 
                                     override fun onScale(currentScale: Float) = Unit
-                                }
+                                },
                             )
                             cropView = this
                             runCatching {
@@ -442,7 +454,7 @@ private fun BackgroundCropScreen(
                         it.overlayView.setCropFrameColor(primaryColor)
                         it.overlayView.setCropGridColor(onSurfaceColor)
                         it.overlayView.setDimmedColor(scrimColor)
-                    }
+                    },
                 )
             }
 
@@ -450,20 +462,19 @@ private fun BackgroundCropScreen(
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     LoadingIndicator()
                     Text(
                         text = stringResource(R.string.background_crop_loading),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 16.dp)
+                        modifier = Modifier.padding(top = 16.dp),
                     )
                 }
             }
         }
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -473,7 +484,7 @@ private fun CropTooltipIconButton(
     tooltip: String,
     enabled: Boolean,
     onClick: () -> Unit,
-    icon: @Composable () -> Unit
+    icon: @Composable () -> Unit,
 ) {
     TooltipBox(
         positionProvider = remember { BelowAnchorTooltipPositionProvider() },
@@ -482,11 +493,11 @@ private fun CropTooltipIconButton(
                 Text(tooltip)
             }
         },
-        state = rememberTooltipState()
+        state = rememberTooltipState(),
     ) {
         IconButton(
             onClick = onClick,
-            enabled = enabled
+            enabled = enabled,
         ) {
             icon()
         }
@@ -511,7 +522,7 @@ private fun OverlayView.setAspectLockedCornerResize(aspectRatio: Float) {
                 activeCornerIndex = cropViewRect.findTouchedCropCorner(
                     touchX = event.x,
                     touchY = event.y,
-                    threshold = touchThreshold
+                    threshold = touchThreshold,
                 )
                 if (activeCornerIndex != -1) {
                     view.onTouchEvent(event)
@@ -533,7 +544,7 @@ private fun OverlayView.setAspectLockedCornerResize(aspectRatio: Float) {
                         minY = paddingTop.toFloat(),
                         maxX = (width - paddingRight).toFloat(),
                         maxY = (height - paddingBottom).toFloat(),
-                        minCropSize = minCropSize
+                        minCropSize = minCropSize,
                     )
                     val adjustedEvent = event.copyWithLocation(lockedPoint.x, lockedPoint.y)
                     try {
@@ -562,14 +573,18 @@ private fun OverlayView.setAspectLockedCornerResize(aspectRatio: Float) {
 private fun RectF.findTouchedCropCorner(
     touchX: Float,
     touchY: Float,
-    threshold: Float
+    threshold: Float,
 ): Int {
     val thresholdSquared = threshold * threshold
     val corners = floatArrayOf(
-        left, top,
-        right, top,
-        right, bottom,
-        left, bottom
+        left,
+        top,
+        right,
+        top,
+        right,
+        bottom,
+        left,
+        bottom,
     )
 
     var closestCornerIndex = -1
@@ -595,7 +610,7 @@ private fun RectF.aspectLockedCornerPoint(
     minY: Float,
     maxX: Float,
     maxY: Float,
-    minCropSize: Float
+    minCropSize: Float,
 ): CropTouchPoint {
     val anchorX: Float
     val anchorY: Float
@@ -632,9 +647,9 @@ private fun RectF.aspectLockedCornerPoint(
     }
 
     val projectedDistance = (
-            (touchX - anchorX) * directionX * aspectRatio +
-                    (touchY - anchorY) * directionY
-            ) / (aspectRatio * aspectRatio + 1f)
+        (touchX - anchorX) * directionX * aspectRatio +
+            (touchY - anchorY) * directionY
+        ) / (aspectRatio * aspectRatio + 1f)
     val maxWidth = if (directionX > 0f) maxX - anchorX else anchorX - minX
     val maxHeight = if (directionY > 0f) maxY - anchorY else anchorY - minY
     val maxDistance = min(maxWidth / aspectRatio, maxHeight).coerceAtLeast(0f)
@@ -647,18 +662,17 @@ private fun RectF.aspectLockedCornerPoint(
 
     return CropTouchPoint(
         x = anchorX + directionX * aspectRatio * safeDistance,
-        y = anchorY + directionY * safeDistance
+        y = anchorY + directionY * safeDistance,
     )
 }
 
-private fun MotionEvent.copyWithLocation(x: Float, y: Float): MotionEvent =
-    MotionEvent.obtain(this).apply {
-        setLocation(x, y)
-    }
+private fun MotionEvent.copyWithLocation(x: Float, y: Float): MotionEvent = MotionEvent.obtain(this).apply {
+    setLocation(x, y)
+}
 
 private data class CropTouchPoint(
     val x: Float,
-    val y: Float
+    val y: Float,
 )
 
 private class BelowAnchorTooltipPositionProvider : PopupPositionProvider {
@@ -666,7 +680,7 @@ private class BelowAnchorTooltipPositionProvider : PopupPositionProvider {
         anchorBounds: IntRect,
         windowSize: IntSize,
         layoutDirection: LayoutDirection,
-        popupContentSize: IntSize
+        popupContentSize: IntSize,
     ): IntOffset {
         val centeredX = anchorBounds.left + (anchorBounds.width - popupContentSize.width) / 2
         val x = centeredX.coerceIn(0, windowSize.width - popupContentSize.width)
@@ -681,13 +695,12 @@ private class BelowAnchorTooltipPositionProvider : PopupPositionProvider {
     }
 }
 
-private inline fun <reified T> Intent.getParcelableExtraCompat(name: String): T? =
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-        getParcelableExtra(name, T::class.java)
-    } else {
-        @Suppress("DEPRECATION")
-        getParcelableExtra(name)
-    }
+private inline fun <reified T> Intent.getParcelableExtraCompat(name: String): T? = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+    getParcelableExtra(name, T::class.java)
+} else {
+    @Suppress("DEPRECATION")
+    getParcelableExtra(name)
+}
 
 private fun Float.normalizedCropAngle(): Float {
     var angle = this % 360f
@@ -695,4 +708,3 @@ private fun Float.normalizedCropAngle(): Float {
     if (angle < -180) angle += 360f
     return angle
 }
-

@@ -1,9 +1,15 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/SettingsViewModel.kt
 package com.tesla.resukisuultra.ui.viewmodel
+========
+package org.bakasu.bakasu.ui.viewmodel
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/SettingsViewModel.kt
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamiccolor.ColorSpec
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/SettingsViewModel.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.AppearanceSetting
 import com.tesla.resukisuultra.domain.model.PlatformSetting
@@ -20,6 +26,9 @@ import com.tesla.resukisuultra.domain.usecase.SetSelinuxHideEnabledUseCase
 import com.tesla.resukisuultra.domain.usecase.SetSuEnabledUseCase
 import com.tesla.resukisuultra.domain.usecase.UpdateAppearanceUseCase
 import com.tesla.resukisuultra.domain.usecase.UpdatePlatformSettingUseCase
+========
+import java.util.Locale
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/SettingsViewModel.kt
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -28,28 +37,44 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Locale
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.AppearanceSetting
+import org.bakasu.bakasu.domain.model.PlatformSetting
+import org.bakasu.bakasu.domain.model.SettingsPlatformSnapshot
+import org.bakasu.bakasu.domain.model.coerceCompatibleWith
+import org.bakasu.bakasu.domain.usecase.ConfigureSuLogUseCase
+import org.bakasu.bakasu.domain.usecase.GetKernelFeatureSettingsUseCase
+import org.bakasu.bakasu.domain.usecase.GetPlatformFeatureStatusUseCase
+import org.bakasu.bakasu.domain.usecase.LoadSettingsPlatformUseCase
+import org.bakasu.bakasu.domain.usecase.SetDefaultUmountModulesUseCase
+import org.bakasu.bakasu.domain.usecase.SetKernelUmountEnabledUseCase
+import org.bakasu.bakasu.domain.usecase.SetSelinuxHideEnabledUseCase
+import org.bakasu.bakasu.domain.usecase.SetShellSuAdbOnlyEnabledUseCase
+import org.bakasu.bakasu.domain.usecase.SetSuEnabledUseCase
+import org.bakasu.bakasu.domain.usecase.UpdateAppearanceUseCase
+import org.bakasu.bakasu.domain.usecase.UpdatePlatformSettingUseCase
 
-enum class PredictiveBackAnimation(val value: String) {
-    None("none"),
-    AOSP("aosp"),
-    MIUIX("miuix"),
-    Scale("scale"),
-    KernelSUClassic("ksu_classic");
+enum class PredictiveBackAnimation(val value: String, @param:StringRes val resId: Int) {
+    None("none", R.string.predictive_back_animation_none),
+    AOSP("aosp", R.string.predictive_back_animation_aosp),
+    MIUIX("miuix", R.string.predictive_back_animation_miuix),
+    Scale("scale", R.string.predictive_back_animation_scale),
+    KernelSUClassic("ksu_classic", R.string.predictive_back_animation_ksu_classic),
+    ;
 
     companion object {
         fun fromValueOrDefault(value: String) = entries.find { it.value == value } ?: Scale
     }
 }
 
-enum class PredictiveBackExitDirection(val value: String) {
-    FOLLOW_GESTURE("follow_gesture"),
-    ALWAYS_RIGHT("always_right"),
-    ALWAYS_LEFT("always_left");
+enum class PredictiveBackExitDirection(val value: String, @param:StringRes val resId: Int) {
+    FOLLOW_GESTURE("follow_gesture", R.string.predictive_back_exit_direction_follow_gesture),
+    ALWAYS_RIGHT("always_right", R.string.predictive_back_exit_direction_always_right),
+    ALWAYS_LEFT("always_left", R.string.predictive_back_exit_direction_always_left),
+    ;
 
     companion object {
-        fun fromValueOrDefault(value: String) =
-            entries.find { it.value == value } ?: FOLLOW_GESTURE
+        fun fromValueOrDefault(value: String) = entries.find { it.value == value } ?: FOLLOW_GESTURE
     }
 }
 
@@ -78,6 +103,7 @@ data class SettingsUiState(
     val cardAlpha: Float = 1f,
     val backgroundDim: Float = 0f,
     val isCustomBackgroundEnabled: Boolean = false,
+    val isFlashCardBackgroundEnabled: Boolean = true,
     val systemDpi: Int = 0,
     val currentDpi: Int = 0,
     val tempDpi: Int = 0,
@@ -95,12 +121,18 @@ data class SettingsUiState(
     val autoJailbreakEnabled: Boolean = false,
     val adbRootStatus: String = "",
     val isAdbRootEnabled: Boolean = false,
+    val shellSuAdbOnlyStatus: String = "",
+    val isShellSuAdbOnlyEnabled: Boolean = false,
     val sulogStatus: String = "",
     val isSuLogEnabled: Boolean = false,
     val selinuxHideStatus: String = "",
     val isSelinuxHideEnabled: Boolean = false,
     val isRootAvailable: Boolean = false,
     val defaultUmountModules: Boolean = false,
+    val useBuiltinMonoFont: Boolean = false,
+    val useSoftReboot: Boolean = false,
+    val enableSwipeDismiss: Boolean = true,
+    val pagerInterceptionMode: Int = 1,
 )
 
 sealed interface SettingsUiAction {
@@ -122,6 +154,7 @@ sealed interface SettingsUiAction {
     data object RemoveCustomBackground : SettingsUiAction
     data class SetCardAlpha(val value: Float) : SettingsUiAction
     data class SetBackgroundDim(val value: Float) : SettingsUiAction
+    data class SetFlashCardBackground(val enabled: Boolean) : SettingsUiAction
     data object SaveCardConfig : SettingsUiAction
     data class SetLanguageDialogVisible(val visible: Boolean) : SettingsUiAction
     data class SetLanguage(val localeTag: String) : SettingsUiAction
@@ -137,8 +170,12 @@ sealed interface SettingsUiAction {
     data class SetAutoJailbreak(val enabled: Boolean) : SettingsUiAction
     data class SetSelinuxHide(val enabled: Boolean) : SettingsUiAction
     data class SetAdbRoot(val enabled: Boolean) : SettingsUiAction
+    data class SetShellSuAdbOnly(val enabled: Boolean) : SettingsUiAction
     data class SetSuLog(val enabled: Boolean) : SettingsUiAction
     data class SetDefaultUmountModules(val enabled: Boolean) : SettingsUiAction
+    data class SetUseSoftReboot(val enabled: Boolean) : SettingsUiAction
+    data class SetSwipeDismiss(val enabled: Boolean) : SettingsUiAction
+    data class SetPagerInterceptionMode(val index: Int) : SettingsUiAction
 }
 
 sealed interface SettingsUiEvent {
@@ -156,6 +193,7 @@ class SettingsViewModel(
     private val getKernelFeatureSettings: GetKernelFeatureSettingsUseCase,
     private val setSuEnabled: SetSuEnabledUseCase,
     private val setKernelUmountEnabled: SetKernelUmountEnabledUseCase,
+    private val setShellSuAdbOnlyEnabled: SetShellSuAdbOnlyEnabledUseCase,
     private val setSuLogEnabled: ConfigureSuLogUseCase,
     private val setSelinuxHideEnabled: SetSelinuxHideEnabledUseCase,
     private val setDefaultUmountModules: SetDefaultUmountModulesUseCase,
@@ -197,9 +235,20 @@ class SettingsViewModel(
         viewModelScope.launch {
             val features = getKernelFeatureSettings()
             val platform = getPlatformFeatureStatus()
-            val suCompatMode = platform.suCompatPersistValue?.let { value ->
-                if (value == 0L) 2 else if (!features.suEnabled) 1 else 0
-            } ?: if (!features.suEnabled) 1 else 0
+            // A forced feature value overrides the persisted configuration.
+            val suCompatMode = if (platform.suStatus == "forced") {
+                if (features.suEnabled) 0 else 2
+            } else {
+                platform.suCompatPersistValue?.let { value ->
+                    if (value == 0L) {
+                        2
+                    } else if (!features.suEnabled) {
+                        1
+                    } else {
+                        0
+                    }
+                } ?: if (!features.suEnabled) 1 else 0
+            }
             mutableState.update {
                 it.copy(
                     suCompatMode = suCompatMode,
@@ -207,9 +256,23 @@ class SettingsViewModel(
                     kernelUmountStatus = platform.kernelUmountStatus,
                     isKernelUmountEnabled = features.kernelUmountEnabled,
                     adbRootStatus = platform.adbRootStatus,
-                    isAdbRootEnabled = platform.adbRootEnabled,
+                    isAdbRootEnabled = if (platform.adbRootStatus == "forced") {
+                        platform.adbRootValue == 1L
+                    } else {
+                        platform.adbRootEnabled
+                    },
+                    shellSuAdbOnlyStatus = platform.shellSuAdbOnlyStatus,
+                    isShellSuAdbOnlyEnabled = if (platform.shellSuAdbOnlyStatus == "forced") {
+                        platform.shellSuAdbOnlyValue == 1L
+                    } else {
+                        platform.shellSuAdbOnlyPersistValue == 1L
+                    },
                     sulogStatus = platform.sulogStatus,
-                    isSuLogEnabled = features.suLogEnabled,
+                    isSuLogEnabled = if (platform.sulogStatus == "forced") {
+                        platform.sulogValue == 1L
+                    } else {
+                        features.suLogEnabled
+                    },
                     selinuxHideStatus = platform.selinuxHideStatus,
                     isRootAvailable = runCatching { ksuCliRepository.rootAvailable() }.getOrDefault(false),
                     isSelinuxHideEnabled = features.selinuxHideEnabled,
@@ -229,11 +292,9 @@ class SettingsViewModel(
         updatePlatformAsync(PlatformSetting.PredictiveBackExitDirection(direction.value))
     }
 
-    fun setThemeColorDialogVisible(visible: Boolean) =
-        mutableState.update { it.copy(showThemeColorDialog = visible) }
+    fun setThemeColorDialogVisible(visible: Boolean) = mutableState.update { it.copy(showThemeColorDialog = visible) }
 
-    fun setLanguageDialogVisible(visible: Boolean) =
-        mutableState.update { it.copy(showLanguageDialog = visible) }
+    fun setLanguageDialogVisible(visible: Boolean) = mutableState.update { it.copy(showLanguageDialog = visible) }
     fun handleLanguageChange(localeTag: String) {
         updatePlatformAsync(PlatformSetting.Locale(localeTag))
     }
@@ -247,8 +308,7 @@ class SettingsViewModel(
         updateAppearanceAsync(AppearanceSetting.ThemeMode(index))
     }
 
-    fun handleThemeColorChange(seedColor: Int) =
-        updateAppearanceAsync(AppearanceSetting.SeedColor(seedColor))
+    fun handleThemeColorChange(seedColor: Int) = updateAppearanceAsync(AppearanceSetting.SeedColor(seedColor))
 
     fun handleDynamicColorChange(enabled: Boolean) {
         mutableState.update { it.copy(useDynamicColor = enabled) }
@@ -281,7 +341,7 @@ class SettingsViewModel(
                 .onSuccess {
                     applySnapshot(it, resetTempDpi = true)
                     mutableEvents.tryEmit(
-                        SettingsUiEvent.Message(R.string.dpi_applied_success, current.tempDpi)
+                        SettingsUiEvent.Message(R.string.dpi_applied_success, current.tempDpi),
                     )
                 }
                 .onFailure(::emitError)
@@ -320,6 +380,11 @@ class SettingsViewModel(
     fun handleBackgroundDimChange(value: Float) {
         mutableState.update { it.copy(backgroundDim = value) }
         updateAppearanceAsync(AppearanceSetting.BackgroundDim(value))
+    }
+
+    fun handleFlashCardBackgroundChange(enabled: Boolean) {
+        mutableState.update { it.copy(isFlashCardBackgroundEnabled = enabled) }
+        updateAppearanceAsync(AppearanceSetting.FlashCardBackground(enabled))
     }
 
     fun saveCardConfig() = updateAppearanceAsync(AppearanceSetting.SaveCardConfig)
@@ -400,6 +465,14 @@ class SettingsViewModel(
         updatePlatformAsync(PlatformSetting.AdbRoot(checked))
     }
 
+    fun handleShellSuAdbOnlyChange(checked: Boolean) {
+        viewModelScope.launch {
+            if (setShellSuAdbOnlyEnabled(checked)) {
+                mutableState.update { it.copy(isShellSuAdbOnlyEnabled = checked) }
+            }
+        }
+    }
+
     fun handleSuLogChange(checked: Boolean) {
         viewModelScope.launch {
             if (setSuLogEnabled(checked)) mutableState.update { it.copy(isSuLogEnabled = checked) }
@@ -412,12 +485,13 @@ class SettingsViewModel(
             mutableState.update { it.copy(isSelinuxHideEnabled = checked) }
             when (status) {
                 0 -> Unit
+
                 -11 -> mutableEvents.emit(
-                    SettingsUiEvent.Message(R.string.settings_selinux_hide_reboot_required)
+                    SettingsUiEvent.Message(R.string.settings_selinux_hide_reboot_required),
                 )
 
                 else -> mutableEvents.emit(
-                    SettingsUiEvent.Message(R.string.settings_selinux_hide_failed, status)
+                    SettingsUiEvent.Message(R.string.settings_selinux_hide_failed, status),
                 )
             }
         }
@@ -431,13 +505,23 @@ class SettingsViewModel(
         }
     }
 
+    fun handleUseSoftRebootChange(enabled: Boolean) {
+        mutableState.update { it.copy(useSoftReboot = enabled) }
+        updatePlatformAsync(PlatformSetting.UseSoftReboot(enabled))
+    }
+
     fun dispatch(action: SettingsUiAction) {
         when (action) {
             SettingsUiAction.Initialize -> initialize()
+
             SettingsUiAction.InitializeFirstRun -> initializeFirstRunSettings()
+
             SettingsUiAction.LoadFeatureSettings -> loadFeatureSettings()
+
             is SettingsUiAction.SetThemeMode -> handleThemeModeChange(action.index)
+
             is SettingsUiAction.SetThemeColor -> handleThemeColorChange(action.color)
+
             is SettingsUiAction.SetThemeColorDialogVisible ->
                 setThemeColorDialogVisible(action.visible)
 
@@ -448,31 +532,82 @@ class SettingsViewModel(
                 setPredictiveBackExitDirection(action.direction)
 
             is SettingsUiAction.SetDynamicColor -> handleDynamicColorChange(action.enabled)
+
             is SettingsUiAction.SetDynamicColorSpec -> handleDynamicColorSpecChange(action.spec)
+
             is SettingsUiAction.SetDynamicPaletteStyle -> handleDynamicPaletteStyleChange(action.style)
+
             is SettingsUiAction.SetCustomBackground -> handleCustomBackground(action.uri)
+
             SettingsUiAction.RemoveCustomBackground -> handleRemoveCustomBackground()
+
             is SettingsUiAction.SetCardAlpha -> handleCardAlphaChange(action.value)
+
             is SettingsUiAction.SetBackgroundDim -> handleBackgroundDimChange(action.value)
+
+            is SettingsUiAction.SetFlashCardBackground ->
+                handleFlashCardBackgroundChange(action.enabled)
+
             SettingsUiAction.SaveCardConfig -> saveCardConfig()
+
             is SettingsUiAction.SetLanguageDialogVisible -> setLanguageDialogVisible(action.visible)
+
             is SettingsUiAction.SetLanguage -> handleLanguageChange(action.localeTag)
+
             SettingsUiAction.RestartActivity -> restartActivityForLanguage()
+
             SettingsUiAction.ApplyDpi -> handleDpiApply()
+
             is SettingsUiAction.SetTempDpi -> updateTempDpi(action.dpi)
+
             is SettingsUiAction.SetAlternateIcon -> handleIconChange(action.enabled)
+
             is SettingsUiAction.SetManagerUpdateCheck -> handleCheckManagerUpdateChange(action.enabled)
+
             is SettingsUiAction.SetBetaUpdateCheck -> handleCheckBetaUpdateChange(action.enabled)
+
             is SettingsUiAction.SetModuleUpdateCheck -> handleCheckModuleUpdateChange(action.enabled)
+
             is SettingsUiAction.SetSuCompatMode -> handleSuCompatModeChange(action.index)
+
             is SettingsUiAction.SetKernelUmount -> handleKernelUmountChange(action.enabled)
+
             is SettingsUiAction.SetAutoJailbreak -> handleAutoJailbreakChange(action.enabled)
+
             is SettingsUiAction.SetSelinuxHide -> handleSelinuxHideChange(action.enabled)
+
             is SettingsUiAction.SetAdbRoot -> handleAdbRootChange(action.enabled)
+
+            is SettingsUiAction.SetShellSuAdbOnly -> handleShellSuAdbOnlyChange(action.enabled)
+
             is SettingsUiAction.SetSuLog -> handleSuLogChange(action.enabled)
+
             is SettingsUiAction.SetDefaultUmountModules ->
                 handleDefaultUmountModulesChange(action.enabled)
+
+            is SettingsUiAction.SetUseSoftReboot ->
+                handleUseSoftRebootChange(action.enabled)
+
+            is SettingsUiAction.SetSwipeDismiss -> handleSwipeDismissChange(action.enabled)
+
+            is SettingsUiAction.SetPagerInterceptionMode ->
+                handlePagerInterceptionModeChange(action.index)
         }
+    }
+
+    fun handleBuiltinMonospaceFontChange(checked: Boolean) {
+        updatePlatformAsync(PlatformSetting.BuiltinMonospaceFont(checked))
+    }
+
+    fun handleSwipeDismissChange(enabled: Boolean) {
+        mutableState.update { it.copy(enableSwipeDismiss = enabled) }
+        updatePlatformAsync(PlatformSetting.SwipeDismiss(enabled))
+    }
+
+    fun handlePagerInterceptionModeChange(index: Int) {
+        val coerced = index.coerceIn(0, 2)
+        mutableState.update { it.copy(pagerInterceptionMode = coerced) }
+        updatePlatformAsync(PlatformSetting.PagerInterceptionMode(coerced))
     }
 
     private fun updateAppearanceAsync(setting: AppearanceSetting) {
@@ -509,6 +644,7 @@ class SettingsViewModel(
                 cardAlpha = snapshot.cardAlpha,
                 backgroundDim = snapshot.backgroundDim,
                 isCustomBackgroundEnabled = snapshot.customBackgroundEnabled,
+                isFlashCardBackgroundEnabled = snapshot.flashCardBackgroundEnabled,
                 systemDpi = snapshot.systemDpi,
                 currentDpi = snapshot.currentDpi,
                 tempDpi = if (resetTempDpi) snapshot.currentDpi else current.tempDpi,
@@ -518,6 +654,10 @@ class SettingsViewModel(
                 checkBetaUpdate = snapshot.checkBetaUpdate,
                 checkModuleUpdate = snapshot.checkModuleUpdate,
                 autoJailbreakEnabled = snapshot.autoJailbreakEnabled,
+                useBuiltinMonoFont = snapshot.useBuiltinMonoFont,
+                useSoftReboot = snapshot.useSoftReboot,
+                enableSwipeDismiss = snapshot.enableSwipeDismiss,
+                pagerInterceptionMode = snapshot.pagerInterceptionMode,
             )
         }
     }

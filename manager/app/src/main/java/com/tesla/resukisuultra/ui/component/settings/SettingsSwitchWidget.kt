@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/SettingsSwitchWidget.kt
 package com.tesla.resukisuultra.ui.component.settings
+========
+package org.bakasu.bakasu.ui.component.settings
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/settings/SettingsSwitchWidget.kt
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.size
@@ -81,7 +85,7 @@ fun SettingsSwitchWidget(
         clickHaptic = null,
         description = description,
         descriptionColumnContent = descriptionColumnContent,
-        containerColor = containerColor
+        containerColor = containerColor,
     ) { interactionSource ->
         Switch(
             modifier = Modifier.clearAndSetSemantics {},
@@ -90,17 +94,17 @@ fun SettingsSwitchWidget(
             interactionSource = interactionSource,
             colors = SwitchDefaults.colors(
                 checkedIconColor = MaterialTheme.colorScheme.primary,
-                uncheckedIconColor = MaterialTheme.colorScheme.surfaceBright
+                uncheckedIconColor = MaterialTheme.colorScheme.surfaceBright,
             ),
             thumbContent = {
                 Icon(
                     imageVector = if (checked) Icons.TwoTone.Check else Icons.TwoTone.Close,
                     contentDescription = null,
-                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                    modifier = Modifier.size(SwitchDefaults.IconSize),
                 )
             },
             // Pass null to disable internal touch handling and let BaseWidget calculate the exact ripple coordinates
-            onCheckedChange = null
+            onCheckedChange = null,
         )
     }
 }
