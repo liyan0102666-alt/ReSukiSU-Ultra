@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/NavigationIcon.kt
 package com.tesla.resukisuultra.ui.component.settings
+========
+package org.bakasu.bakasu.ui.component.settings
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/settings/NavigationIcon.kt
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +20,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/NavigationIcon.kt
 import com.tesla.resukisuultra.R
+========
+import org.bakasu.bakasu.R
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/settings/NavigationIcon.kt
 
 /**
  * A standardized back button for the application.
@@ -36,7 +44,7 @@ fun AppBackButton(
     onClick: () -> Unit,
     icon: ImageVector = Icons.AutoMirrored.TwoTone.ArrowBack, // Default icon is ArrowBack
     containerColor: Color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
-    contentDescription: String = stringResource(id = R.string.back)
+    contentDescription: String = stringResource(id = R.string.back),
 ) {
     Row {
         IconButton(
@@ -53,11 +61,11 @@ fun AppBackButton(
                 // The background color of the button.
                 // Using a more standard color for a filled icon button variant.
                 containerColor = containerColor,
-            )
+            ),
         ) {
             Icon(
                 imageVector = icon,
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
         }
 

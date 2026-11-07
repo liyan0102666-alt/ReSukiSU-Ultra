@@ -1,6 +1,12 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/AppProfile.kt
 package com.tesla.resukisuultra.domain.model
 
 import com.tesla.resukisuultra.Natives
+========
+package org.bakasu.bakasu.domain.model
+
+import org.bakasu.bakasu.Natives
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/AppProfile.kt
 
 data class AppProfile(
     val name: String,

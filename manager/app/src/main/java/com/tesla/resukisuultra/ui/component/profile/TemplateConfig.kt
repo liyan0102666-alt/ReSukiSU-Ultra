@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/profile/TemplateConfig.kt
 package com.tesla.resukisuultra.ui.component.profile
+========
+package org.bakasu.bakasu.ui.component.profile
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/profile/TemplateConfig.kt
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/profile/TemplateConfig.kt
 import org.koin.compose.viewmodel.koinViewModel
 import com.tesla.resukisuultra.domain.model.AppProfile
 import com.tesla.resukisuultra.R
@@ -30,7 +35,17 @@ import com.tesla.resukisuultra.ui.component.settings.SettingsChooseWidget
 import com.tesla.resukisuultra.ui.util.ActivityResumeEffect
 import com.tesla.resukisuultra.ui.viewmodel.TemplateViewModel
 import com.tesla.resukisuultra.ui.viewmodel.TemplateUiAction
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/profile/TemplateConfig.kt
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.AppProfile
+import org.bakasu.bakasu.ui.component.NetworkRefreshContent
+import org.bakasu.bakasu.ui.component.settings.SettingsChooseWidget
+import org.bakasu.bakasu.ui.util.ActivityResumeEffect
+import org.bakasu.bakasu.ui.viewmodel.TemplateUiAction
+import org.bakasu.bakasu.ui.viewmodel.TemplateViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * @author weishu
@@ -41,7 +56,7 @@ import kotlinx.coroutines.launch
 fun TemplateConfig(
     profile: AppProfile,
     onViewTemplate: (id: String) -> Unit = {},
-    onProfileChange: (AppProfile) -> Unit
+    onProfileChange: (AppProfile) -> Unit,
 ) {
     val viewModel = koinViewModel<TemplateViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -91,9 +106,9 @@ fun TemplateConfig(
                     .clickable {
                         onViewTemplate(profileTemplates[index])
                     }
-                    .padding(5.dp)
+                    .padding(5.dp),
             )
-        }
+        },
     ) { index ->
         if (index == 0) {
             template = ""
@@ -116,7 +131,7 @@ fun TemplateConfig(
                 context = templateInfo.context,
                 rules = templateInfo.rules.joinToString("\n"),
                 namespace = templateInfo.namespace,
-            )
+            ),
         )
     }
 }
