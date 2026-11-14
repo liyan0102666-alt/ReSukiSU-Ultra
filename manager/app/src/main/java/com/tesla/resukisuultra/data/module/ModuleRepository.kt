@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/module/ModuleRepository.kt
 package com.tesla.resukisuultra.data.module
 
 import com.tesla.resukisuultra.data.network.NetworkRequestRepository
@@ -7,6 +8,10 @@ import com.tesla.resukisuultra.domain.model.InstalledModule
 import com.tesla.resukisuultra.domain.model.InstalledModulesState
 import com.tesla.resukisuultra.domain.model.MetaModuleStatus
 import com.tesla.resukisuultra.domain.model.ModuleUpdateMetadata
+========
+package org.bakasu.bakasu.data.module
+
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/module/ModuleRepository.kt
 import com.topjohnwu.superuser.io.SuFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -19,6 +24,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.bakasu.bakasu.data.network.NetworkRequestRepository
+import org.bakasu.bakasu.data.network.NetworkStatusRepository
+import org.bakasu.bakasu.data.shell.KsuCliRepository
+import org.bakasu.bakasu.domain.model.InstalledModule
+import org.bakasu.bakasu.domain.model.InstalledModulesState
+import org.bakasu.bakasu.domain.model.MetaModuleStatus
+import org.bakasu.bakasu.domain.model.ModuleUpdateMetadata
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -51,9 +63,9 @@ class ModuleRepository(
                         async(Dispatchers.IO) {
                             val directory = "/data/adb/modules/${module.id}"
                             SuFile.open("$directory/system").exists() &&
-                                    !SuFile.open("$directory/skip_mount").exists() &&
-                                    !SuFile.open("$directory/disable").exists() &&
-                                    !SuFile.open("$directory/remove").exists()
+                                !SuFile.open("$directory/skip_mount").exists() &&
+                                !SuFile.open("$directory/disable").exists() &&
+                                !SuFile.open("$directory/remove").exists()
                         }
                     }.awaitAll().any { it }
                 }
@@ -71,17 +83,17 @@ class ModuleRepository(
                             async(Dispatchers.IO) {
                                 val shouldCheck =
                                     module.id + module.versionCode !in previousVersionKeys ||
-                                            module.updateJson.isEmpty() ||
-                                            module.remove || module.update || !module.enabled
+                                        module.updateJson.isEmpty() ||
+                                        module.remove || module.update || !module.enabled
                                 module.copy(
                                     moduleUpdate = if (shouldCheck) {
                                         checkUpdate(
                                             module.updateJson,
-                                            module.versionCode
+                                            module.versionCode,
                                         ).getOrNull()
                                     } else {
                                         null
-                                    }
+                                    },
                                 )
                             }
                         }.awaitAll()
@@ -94,46 +106,46 @@ class ModuleRepository(
         }
     }
 
-    suspend fun calculateInstalledModuleSize(moduleId: String): Long =
-        withContext(Dispatchers.IO) {
-            runCatching {
-                val result = ksuCliRepository.getRootShell().newJob()
-                    .add("/data/adb/ksu/bin/busybox du -sb /data/adb/modules/$moduleId")
-                    .to(ArrayList(), null)
-                    .exec()
-                if (result.isSuccess) {
-                    result.out.firstOrNull()?.split('\t')?.firstOrNull()?.toLongOrNull() ?: 0L
-                } else {
-                    0L
-                }
-            }.getOrDefault(0L)
-        }
+    suspend fun calculateInstalledModuleSize(moduleId: String): Long = withContext(Dispatchers.IO) {
+        runCatching {
+            val result = ksuCliRepository.getRootShell().newJob()
+                .add("/data/adb/ksu/bin/busybox du -sb /data/adb/modules/$moduleId")
+                .to(ArrayList(), null)
+                .exec()
+            if (result.isSuccess) {
+                result.out.firstOrNull()?.split('\t')?.firstOrNull()?.toLongOrNull() ?: 0L
+            } else {
+                0L
+            }
+        }.getOrDefault(0L)
+    }
 
     fun updateCachedEnabled(moduleId: String, enabled: Boolean) {
         mutableInstalledModules.update { current ->
             current.copy(
                 modules = current.modules.map { module ->
                     if (module.dirId == moduleId) module.copy(enabled = enabled) else module
-                }
+                },
             )
         }
     }
 
-    suspend fun setModuleEnabled(moduleId: String, enabled: Boolean): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            runCatching { check(ksuCliRepository.toggleModule(moduleId, enabled)) }
-                .onSuccess { updateCachedEnabled(moduleId, enabled) }
-        }
+    suspend fun setModuleEnabled(moduleId: String, enabled: Boolean): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching { check(ksuCliRepository.toggleModule(moduleId, enabled)) }
+            .onSuccess { updateCachedEnabled(moduleId, enabled) }
+    }
 
-    suspend fun setModuleRemoved(moduleId: String, removed: Boolean): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            runCatching {
-                check(
-                    if (removed) ksuCliRepository.uninstallModule(moduleId)
-                    else ksuCliRepository.undoUninstallModule(moduleId)
-                )
-            }
+    suspend fun setModuleRemoved(moduleId: String, removed: Boolean): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            check(
+                if (removed) {
+                    ksuCliRepository.uninstallModule(moduleId)
+                } else {
+                    ksuCliRepository.undoUninstallModule(moduleId)
+                },
+            )
         }
+    }
 
     suspend fun checkUpdate(
         url: String,
@@ -154,6 +166,7 @@ class ModuleRepository(
                         "_",
                     ),
                     changelog = json.optString("changelog"),
+                    versionCode = onlineVersionCode,
                 )
             }
         }
@@ -210,27 +223,25 @@ class ModuleRepository(
     }
 }
 
-private fun JSONObject.getBooleanCompat(key: String, default: Boolean = false): Boolean =
-    if (!has(key)) {
-        default
-    } else {
-        when (val value = opt(key)) {
-            null -> default
-            is Boolean -> value
-            is String -> value.equals("true", ignoreCase = true) || value == "1"
-            is Number -> value.toInt() != 0
-            else -> default
-        }
+private fun JSONObject.getBooleanCompat(key: String, default: Boolean = false): Boolean = if (!has(key)) {
+    default
+} else {
+    when (val value = opt(key)) {
+        null -> default
+        is Boolean -> value
+        is String -> value.equals("true", ignoreCase = true) || value == "1"
+        is Number -> value.toInt() != 0
+        else -> default
     }
+}
 
-private fun JSONObject.getIntCompat(key: String, default: Int = 0): Int =
-    if (!has(key)) {
-        default
-    } else {
-        when (val value = opt(key)) {
-            null -> default
-            is Number -> value.toInt()
-            is String -> value.toIntOrNull() ?: default
-            else -> default
-        }
+private fun JSONObject.getIntCompat(key: String, default: Int = 0): Int = if (!has(key)) {
+    default
+} else {
+    when (val value = opt(key)) {
+        null -> default
+        is Number -> value.toInt()
+        is String -> value.toIntOrNull() ?: default
+        else -> default
     }
+}

@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/NetworkRefreshContent.kt
 package com.tesla.resukisuultra.ui.component
+========
+package org.bakasu.bakasu.ui.component
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/NetworkRefreshContent.kt
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -6,8 +10,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.SignalWifiOff
 import androidx.compose.material3.Button
@@ -22,7 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/NetworkRefreshContent.kt
 import com.tesla.resukisuultra.R
+========
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.ui.theme.renderBackgroundBlur
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/NetworkRefreshContent.kt
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -36,7 +47,13 @@ fun NetworkRefreshContent(
         contentAlignment = Alignment.Center,
     ) {
         if (offline) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .renderBackgroundBlur(MaterialTheme.colorScheme.surfaceContainer)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 Box(
                     modifier = Modifier
                         .size(64.dp)

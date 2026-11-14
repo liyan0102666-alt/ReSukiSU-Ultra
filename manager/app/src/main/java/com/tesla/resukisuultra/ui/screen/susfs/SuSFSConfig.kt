@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/SuSFSConfig.kt
 package com.tesla.resukisuultra.ui.screen.susfs
+========
+package org.bakasu.bakasu.ui.screen.susfs
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/susfs/SuSFSConfig.kt
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -9,15 +13,11 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/SuSFSConfig.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.ui.component.SwipeableSnackbarHost
 import com.tesla.resukisuultra.ui.component.settings.AppBackButton
@@ -67,11 +68,35 @@ import com.tesla.resukisuultra.ui.viewmodel.SuSFSUiAction
 import com.tesla.resukisuultra.ui.viewmodel.SuSFSUiEvent
 import com.tesla.resukisuultra.ui.viewmodel.SuSFSViewModel
 import com.tesla.resukisuultra.ui.viewmodel.awaitSuSFSBoolean
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/susfs/SuSFSConfig.kt
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.ui.component.HorizontalPagerWithInteraction
+import org.bakasu.bakasu.ui.component.SwipeableSnackbarHost
+import org.bakasu.bakasu.ui.component.settings.AppBackButton
+import org.bakasu.bakasu.ui.navigation.LocalNavigator
+import org.bakasu.bakasu.ui.screen.susfs.subpages.OpenRedirectTab
+import org.bakasu.bakasu.ui.screen.susfs.subpages.StandardFeaturesTab
+import org.bakasu.bakasu.ui.screen.susfs.subpages.StatusTab
+import org.bakasu.bakasu.ui.screen.susfs.subpages.SusKstatTab
+import org.bakasu.bakasu.ui.screen.susfs.subpages.SusMapTab
+import org.bakasu.bakasu.ui.screen.susfs.subpages.SusPathTab
+import org.bakasu.bakasu.ui.theme.CardConfig
+import org.bakasu.bakasu.ui.theme.ThemeConfig
+import org.bakasu.bakasu.ui.theme.blurEffect
+import org.bakasu.bakasu.ui.theme.blurSource
+import org.bakasu.bakasu.ui.util.ActivityResumeEffect
+import org.bakasu.bakasu.ui.util.LocalSnackbarHost
+import org.bakasu.bakasu.ui.util.adaptiveScaffoldWindowInsets
+import org.bakasu.bakasu.ui.util.showReplacingSnackbar
+import org.bakasu.bakasu.ui.viewmodel.SuSFSUiAction
+import org.bakasu.bakasu.ui.viewmodel.SuSFSUiEvent
+import org.bakasu.bakasu.ui.viewmodel.SuSFSViewModel
+import org.bakasu.bakasu.ui.viewmodel.awaitSuSFSBoolean
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-
 
 private class SuSFSConfigSubpage(
     val requirePersist: Boolean,
@@ -129,7 +154,8 @@ fun SuSFSConfigScreen() {
         coroutineScope.launch {
             if (awaitSuSFSBoolean(configHelper) { reply ->
                     SuSFSUiAction.SetEnabled(newValue, reply)
-                }) {
+                }
+            ) {
                 configEnabled = newValue
             } else {
                 snackBarHost.showReplacingSnackbar(operationFailedMsg)
@@ -241,20 +267,22 @@ fun SuSFSConfigScreen() {
                         AppBackButton(
                             onClick = {
                                 navigator.pop()
-                            }
+                            },
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors().copy(
                         containerColor =
-                            if (themeConfig.isEnableBlur)
+                            if (themeConfig.isEnableBlur) {
                                 Color.Transparent
-                            else
-                                MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
-                        scrolledContainerColor =
-                            if (themeConfig.isEnableBlur)
-                                Color.Transparent
-                            else
+                            } else {
                                 MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                            },
+                        scrolledContainerColor =
+                            if (themeConfig.isEnableBlur) {
+                                Color.Transparent
+                            } else {
+                                MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                            },
                     ),
                     windowInsets = TopAppBarDefaults.windowInsets.add(WindowInsets(left = 12.dp)),
                 )
@@ -262,13 +290,14 @@ fun SuSFSConfigScreen() {
                 PrimaryScrollableTabRow(
                     selectedTabIndex = selectedTabIndex,
                     containerColor =
-                        if (themeConfig.isEnableBlur)
+                        if (themeConfig.isEnableBlur) {
                             Color.Transparent
-                        else
-                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
+                        } else {
+                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                        },
                     edgePadding = 0.dp,
                     minTabWidth = 0.dp,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     subpages.forEachIndexed { index, subpage ->
                         val tabVisible = !subpage.requirePersist || configEnabled == true
@@ -285,17 +314,17 @@ fun SuSFSConfigScreen() {
                                     }
                                 },
                                 modifier = Modifier.widthIn(
-                                    min = TabRowDefaults.ScrollableTabRowMinTabWidth
+                                    min = TabRowDefaults.ScrollableTabRowMinTabWidth,
                                 ),
                                 unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                text = { Text(subpage.title) }
+                                text = { Text(subpage.title) },
                             )
                         }
                     }
                 }
 
                 BackHandler(
-                    enabled = pagerState.currentPage != defaultPage
+                    enabled = pagerState.currentPage != defaultPage,
                 ) {
                     coroutineScope.launch {
                         pagerState.animateScrollToPage(defaultPage)
@@ -305,10 +334,8 @@ fun SuSFSConfigScreen() {
         },
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        contentWindowInsets = WindowInsets.safeDrawing.only(
-            WindowInsetsSides.Top + WindowInsetsSides.Horizontal
-        ),
-        snackbarHost = { SwipeableSnackbarHost(hostState = snackBarHost) }
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
+        snackbarHost = { SwipeableSnackbarHost(hostState = snackBarHost) },
     ) { innerPadding ->
         PullToRefreshBox(
             state = pullRefreshState,
@@ -329,9 +356,9 @@ fun SuSFSConfigScreen() {
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxSize(),
             ) {
-                HorizontalPager(
+                HorizontalPagerWithInteraction(
                     state = pagerState,
                     modifier = Modifier.fillMaxSize(),
                     userScrollEnabled = configEnabled == true,

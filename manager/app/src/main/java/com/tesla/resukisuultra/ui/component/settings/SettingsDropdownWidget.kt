@@ -1,14 +1,18 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/SettingsDropdownWidget.kt
 package com.tesla.resukisuultra.ui.component.settings
 import androidx.compose.ui.unit.dp
+========
+package org.bakasu.bakasu.ui.component.settings
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/settings/SettingsDropdownWidget.kt
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.DropdownMenuGroup
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.SelectableDropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,7 +39,7 @@ fun SettingsDropdownWidget(
     choice: Int,
     data: List<String>,
     leadingContent: (@Composable () -> Unit)? = null,
-    onChoiceChange: (Int) -> Unit
+    onChoiceChange: (Int) -> Unit,
 ) {
     var expanded by remember {
         mutableStateOf(false)
@@ -68,7 +72,7 @@ fun SettingsDropdownWidget(
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .offset(offsetX, offsetY)
+                .offset(offsetX, offsetY),
         ) {
             // Use DropdownMenuPopup to provide the foundation for building a custom menu
             DropdownMenuPopup(
@@ -77,24 +81,33 @@ fun SettingsDropdownWidget(
             ) {
                 // Use DropdownMenuGroup to create a visually distinct group
                 DropdownMenuGroup(
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/SettingsDropdownWidget.kt
                     shapes = androidx.compose.material3.MenuGroupShapes(
                 com.tesla.resukisuultra.ui.theme.ContinuousCornerShape(28.dp),
                 com.tesla.resukisuultra.ui.theme.ContinuousCornerShape(28.dp),
             )
+========
+                    shapes = MenuDefaults.groupShapes(),
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/settings/SettingsDropdownWidget.kt
                 ) {
                     data.forEachIndexed { index, item ->
                         val isSelected = index == choice
 
-                        // Utilize the selectable variation of DropdownMenuItem
-                        // MenuDefaults.itemShape(index, count) automatically handles the shapes
-                        DropdownMenuItem(
+                        SelectableDropdownMenuItem(
                             selected = isSelected,
                             onClick = {
                                 onChoiceChange(index)
                                 expanded = false
                             },
                             text = { Text(text = item) },
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/SettingsDropdownWidget.kt
                             shapes = com.tesla.resukisuultra.ui.theme.menuItemShapes(index, data.size)
+========
+                            shapes = MenuDefaults.itemShape(
+                                index = index,
+                                count = data.size,
+                            ),
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/settings/SettingsDropdownWidget.kt
                         )
                     }
                 }

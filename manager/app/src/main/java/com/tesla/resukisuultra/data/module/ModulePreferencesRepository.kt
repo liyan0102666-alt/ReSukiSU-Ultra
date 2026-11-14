@@ -1,11 +1,18 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/module/ModulePreferencesRepository.kt
 package com.tesla.resukisuultra.data.module
 
 import com.tesla.resukisuultra.data.AppSettingsRepository
 import com.tesla.resukisuultra.domain.model.ModulePreferences
+========
+package org.bakasu.bakasu.data.module
+
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/module/ModulePreferencesRepository.kt
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import org.bakasu.bakasu.data.AppSettingsRepository
+import org.bakasu.bakasu.domain.model.ModulePreferences
 
 class ModulePreferencesRepository(
     private val settings: AppSettingsRepository,
@@ -25,11 +32,6 @@ class ModulePreferencesRepository(
         settings.putBoolean(PREF_SORT_ACTION, actionFirst)
     }
 
-    fun setHideTagRow(enabled: Boolean) {
-        mutablePreferences.update { it.copy(isHideTagRow = enabled) }
-        settings.putBoolean(PREF_HIDE_TAG_ROW, enabled)
-    }
-
     fun setShowMoreInfo(enabled: Boolean) {
         mutablePreferences.update { it.copy(showMoreModuleInfo = enabled) }
         settings.putBoolean(PREF_SHOW_MORE_INFO, enabled)
@@ -39,13 +41,11 @@ class ModulePreferencesRepository(
         sortEnabledFirst = settings.getBoolean(PREF_SORT_ENABLED, false),
         sortActionFirst = settings.getBoolean(PREF_SORT_ACTION, false),
         showMoreModuleInfo = settings.getBoolean(PREF_SHOW_MORE_INFO, false),
-        isHideTagRow = settings.getBoolean(PREF_HIDE_TAG_ROW, false),
     )
 
     private companion object {
         const val PREF_SORT_ENABLED = "module_sort_enabled_first"
         const val PREF_SORT_ACTION = "module_sort_action_first"
         const val PREF_SHOW_MORE_INFO = "show_more_module_info"
-        const val PREF_HIDE_TAG_ROW = "is_hide_tag_row"
     }
 }

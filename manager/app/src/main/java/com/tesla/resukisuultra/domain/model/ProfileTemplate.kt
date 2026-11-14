@@ -1,8 +1,16 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/ProfileTemplate.kt
 package com.tesla.resukisuultra.domain.model
 
 import com.tesla.resukisuultra.Natives
 import com.tesla.resukisuultra.Natives.Profile.Namespace
 import com.tesla.resukisuultra.Natives.Profile.RootProfileFlag
+========
+package org.bakasu.bakasu.domain.model
+
+import org.bakasu.bakasu.Natives
+import org.bakasu.bakasu.Natives.Profile.Namespace
+import org.bakasu.bakasu.Natives.Profile.RootProfileFlag
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/ProfileTemplate.kt
 
 data class ProfileTemplate(
     val id: String = "",

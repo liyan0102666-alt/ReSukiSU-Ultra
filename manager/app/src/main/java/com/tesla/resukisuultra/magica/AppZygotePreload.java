@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/magica/AppZygotePreload.java
 package com.tesla.resukisuultra.magica;
+========
+package org.bakasu.bakasu.magica;
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/magica/AppZygotePreload.java
 
 import android.annotation.SuppressLint;
 import android.app.ZygotePreload;

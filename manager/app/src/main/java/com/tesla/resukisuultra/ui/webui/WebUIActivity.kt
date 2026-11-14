@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/webui/WebUIActivity.kt
 package com.tesla.resukisuultra.ui.webui
+========
+package org.bakasu.bakasu.ui.webui
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/webui/WebUIActivity.kt
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -21,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/webui/WebUIActivity.kt
 import com.tesla.resukisuultra.data.AppSettingsRepository
 import com.tesla.resukisuultra.data.packageinfo.AppIconDataSource
 import com.tesla.resukisuultra.data.packageinfo.InstalledPackageRepository
@@ -28,6 +33,14 @@ import com.tesla.resukisuultra.data.webui.WebUiRepository
 import com.tesla.resukisuultra.ui.theme.KernelSUTheme
 import com.tesla.resukisuultra.ui.viewmodel.ModuleViewModel
 import com.tesla.resukisuultra.ui.viewmodel.SuperUserViewModel
+========
+import org.bakasu.bakasu.data.AppSettingsRepository
+import org.bakasu.bakasu.data.packageinfo.AppIconDataSource
+import org.bakasu.bakasu.data.packageinfo.InstalledPackageRepository
+import org.bakasu.bakasu.data.webui.WebUiRepository
+import org.bakasu.bakasu.ui.theme.KernelSUTheme
+import org.bakasu.bakasu.ui.viewmodel.SuperUserViewModel
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/webui/WebUIActivity.kt
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -35,7 +48,6 @@ import org.koin.compose.viewmodel.koinViewModel
 class WebUIActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         // Enable edge to edge
         enableEdgeToEdge()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -56,9 +68,8 @@ class WebUIActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun MainContent(activity: ComponentActivity, onFinish: () -> Unit) {
-    val moduleId = remember { activity.intent.getStringExtra("id") }
+    val moduleId = remember { activity.intent.data?.getQueryParameter("id") }
     val webUIState = remember { WebUIState() }
-    val moduleViewModel = koinViewModel<ModuleViewModel>()
     val superUserViewModel = koinViewModel<SuperUserViewModel>()
     val settingsRepository = koinInject<AppSettingsRepository>()
     val packageRepository = koinInject<InstalledPackageRepository>()
@@ -77,7 +88,6 @@ private fun MainContent(activity: ComponentActivity, onFinish: () -> Unit) {
             activity,
             moduleId,
             webUIState,
-            moduleViewModel,
             superUserViewModel,
             settingsRepository,
             packageRepository,

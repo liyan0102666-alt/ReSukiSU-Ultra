@@ -1,5 +1,9 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/webui/WebUIScreen.kt
 package com.tesla.resukisuultra.ui.webui
 import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
+========
+package org.bakasu.bakasu.ui.webui
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/webui/WebUIScreen.kt
 
 import android.app.Activity
 import android.net.Uri
@@ -45,8 +49,13 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/webui/WebUIScreen.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.ui.component.settings.SettingsTextFieldWidget
+========
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.ui.component.settings.SettingsTextFieldWidget
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/webui/WebUIScreen.kt
 
 @Composable
 fun WebUIScreen(webUIState: WebUIState) {
@@ -82,7 +91,7 @@ fun WebUIScreen(webUIState: WebUIState) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(innerPadding)
+            .padding(innerPadding),
     ) {
         if (webUIState.webView != null) {
             AndroidView(
@@ -90,7 +99,8 @@ fun WebUIScreen(webUIState: WebUIState) {
                 factory = { _ ->
                     webUIState.webView!!.apply {
                         layoutParams = ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT,
                         )
                         if (!webUIState.isUrlLoaded) {
                             val homePage = "https://mui.kernelsu.org/index.html"
@@ -100,8 +110,15 @@ fun WebUIScreen(webUIState: WebUIState) {
                             } else {
                                 val listener = object : View.OnLayoutChangeListener {
                                     override fun onLayoutChange(
-                                        v: View, left: Int, top: Int, right: Int, bottom: Int,
-                                        oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int
+                                        v: View,
+                                        left: Int,
+                                        top: Int,
+                                        right: Int,
+                                        bottom: Int,
+                                        oldLeft: Int,
+                                        oldTop: Int,
+                                        oldRight: Int,
+                                        oldBottom: Int,
                                     ) {
                                         if (v.width > 0 && v.height > 0) {
                                             (v as WebView).loadUrl(homePage)
@@ -129,9 +146,8 @@ fun WebUIScreen(webUIState: WebUIState) {
 
 @Composable
 private fun HandleWebUIEvent(webUIState: WebUIState) {
-
     val fileLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
+        contract = ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         val uris: Array<Uri>? = if (result.resultCode == Activity.RESULT_OK) {
             result.data?.let { data ->
@@ -141,7 +157,9 @@ private fun HandleWebUIEvent(webUIState: WebUIState) {
                     data.data?.let { arrayOf(it) }
                 }
             }
-        } else null
+        } else {
+            null
+        }
         webUIState.onFileChooserResult(uris)
     }
 
@@ -168,7 +186,7 @@ private fun HandleWebUIEvent(webUIState: WebUIState) {
                         }) {
                             Text(text = stringResource(R.string.confirm))
                         }
-                    }
+                    },
                 )
             }
         }
@@ -203,7 +221,7 @@ private fun HandleWebUIEvent(webUIState: WebUIState) {
                         }) {
                             Text(text = stringResource(R.string.cancel))
                         }
-                    }
+                    },
                 )
             }
         }
@@ -223,8 +241,13 @@ private fun HandleWebUIEvent(webUIState: WebUIState) {
                     },
                     text = {
                         Surface(
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/webui/WebUIScreen.kt
                             modifier = Modifier.clip(ContinuousCornerShape(16.dp)),
                             color = MaterialTheme.colorScheme.surfaceBright
+========
+                            modifier = Modifier.clip(RoundedCornerShape(16.dp)),
+                            color = MaterialTheme.colorScheme.surfaceBright,
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/webui/WebUIScreen.kt
                         ) {
                             SettingsTextFieldWidget(
                                 state = state,
@@ -250,7 +273,7 @@ private fun HandleWebUIEvent(webUIState: WebUIState) {
                         }) {
                             Text(text = stringResource(R.string.cancel))
                         }
-                    }
+                    },
                 )
             }
         }

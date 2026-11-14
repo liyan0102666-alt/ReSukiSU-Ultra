@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/component/EntryDialogs.kt
 package com.tesla.resukisuultra.ui.screen.susfs.component
+========
+package org.bakasu.bakasu.ui.screen.susfs.component
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/component/EntryDialogs.kt
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -25,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/component/EntryDialogs.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.ui.component.settings.SegmentedColumn
 import com.tesla.resukisuultra.ui.component.settings.SegmentedColumnScope
@@ -32,9 +37,18 @@ import com.tesla.resukisuultra.ui.component.settings.SettingsDropdownWidget
 import com.tesla.resukisuultra.ui.component.settings.SettingsJumpPageWidget
 import com.tesla.resukisuultra.ui.util.LocalSnackbarHost
 import com.tesla.resukisuultra.ui.util.showReplacingSnackbar
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/component/EntryDialogs.kt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.ui.component.settings.SegmentedColumn
+import org.bakasu.bakasu.ui.component.settings.SegmentedColumnScope
+import org.bakasu.bakasu.ui.component.settings.SettingsDropdownWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsJumpPageWidget
+import org.bakasu.bakasu.ui.util.LocalSnackbarHost
+import org.bakasu.bakasu.ui.util.showReplacingSnackbar
 
 /**
  * Displays an entry's fields in a read-only dialog with a delete action.
@@ -69,12 +83,12 @@ fun EntryDetailDialog(
                             Text(
                                 text = label,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
                                 text = value,
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                     }
@@ -84,8 +98,8 @@ fun EntryDetailDialog(
                 Button(
                     onClick = onDelete,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    )
+                        containerColor = MaterialTheme.colorScheme.error,
+                    ),
                 ) {
                     Text(stringResource(R.string.delete))
                 }
@@ -126,7 +140,7 @@ fun ManualAddDialog(
     onConfirm: () -> Unit,
     showImportFromFile: Boolean = false,
     onImportFromFile: (String) -> Unit = {},
-    formContent: SegmentedColumnScope.() -> Unit
+    formContent: SegmentedColumnScope.() -> Unit,
 ) {
     val context = LocalContext.current
     val snackbarHost = LocalSnackbarHost.current
@@ -138,7 +152,7 @@ fun ManualAddDialog(
     val importFromFileLabel = stringResource(R.string.susfs_entry_import_from_file)
 
     val pickFileLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.OpenDocument()
+        ActivityResultContracts.OpenDocument(),
     ) { uri: Uri? ->
         uri?.let {
             scope.launch {
@@ -153,7 +167,7 @@ fun ManualAddDialog(
                 val error = decodedContent.exceptionOrNull()
                 if (error != null) {
                     snackbarHost.showReplacingSnackbar(
-                        if (error is CharacterCodingException) fileNotTextMsg else fileReadFailedMsg
+                        if (error is CharacterCodingException) fileNotTextMsg else fileReadFailedMsg,
                     )
                     return@launch
                 }
@@ -185,7 +199,7 @@ fun ManualAddDialog(
                                     choice = subtypes.indexOf(selectedSubtype).coerceAtLeast(0),
                                     data = subtypes,
                                     renderBackgroundBlur = false,
-                                    onChoiceChange = { index -> onSubtypeChange(subtypes[index]) }
+                                    onChoiceChange = { index -> onSubtypeChange(subtypes[index]) },
                                 )
                             }
                         }
@@ -206,7 +220,7 @@ fun ManualAddDialog(
             },
             confirmButton = {
                 Button(
-                    onClick = onConfirm
+                    onClick = onConfirm,
                 ) {
                     Text(stringResource(R.string.add))
                 }
@@ -220,9 +234,7 @@ fun ManualAddDialog(
     }
 }
 
-fun String.toImportedEntryLines(): List<String> {
-    return lineSequence()
-        .map { it.replace("\uFEFF", "").trim() }
-        .filter { it.isNotEmpty() && !it.startsWith("//") && !it.startsWith("#") }
-        .toList()
-}
+fun String.toImportedEntryLines(): List<String> = lineSequence()
+    .map { it.replace("\uFEFF", "").trim() }
+    .filter { it.isNotEmpty() && !it.startsWith("//") && !it.startsWith("#") }
+    .toList()
