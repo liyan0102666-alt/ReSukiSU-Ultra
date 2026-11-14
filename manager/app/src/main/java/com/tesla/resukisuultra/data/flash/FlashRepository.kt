@@ -1,8 +1,13 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/flash/FlashRepository.kt
 package com.tesla.resukisuultra.data.flash
+========
+package org.bakasu.bakasu.data.flash
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/flash/FlashRepository.kt
 
 import android.app.Application
 import android.net.Uri
 import androidx.core.net.toUri
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/flash/FlashRepository.kt
 import com.tesla.resukisuultra.data.file.ModuleFileRepository
 import com.tesla.resukisuultra.data.shell.KsuCliRepository
 import com.tesla.resukisuultra.domain.model.FlashOperation
@@ -11,6 +16,8 @@ import com.tesla.resukisuultra.domain.model.FlashProgress
 import com.tesla.resukisuultra.domain.model.InstallEnvironment
 import com.tesla.resukisuultra.domain.model.KernelFlashSession
 import com.tesla.resukisuultra.getKernelVersion
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/flash/FlashRepository.kt
 import com.topjohnwu.superuser.io.SuFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +34,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.bakasu.bakasu.data.file.ModuleFileRepository
+import org.bakasu.bakasu.data.shell.KsuCliRepository
+import org.bakasu.bakasu.domain.model.FlashOperation
+import org.bakasu.bakasu.domain.model.FlashOperationUpdate
+import org.bakasu.bakasu.domain.model.FlashProgress
+import org.bakasu.bakasu.domain.model.InstallEnvironment
+import org.bakasu.bakasu.domain.model.KernelFlashSession
+import org.bakasu.bakasu.getKernelVersion
 
 class FlashRepository(
     private val application: Application,
@@ -44,7 +59,7 @@ class FlashRepository(
     private var worker: HorizonKernelWorker? = null
     private val installEnvironmentMutex = Mutex()
 
-    fun startKernelFlash(uri: String, selectedSlot: String?) {
+    fun startKernelFlash(uri: String, selectedSlot: String?, skipKsud: Boolean = false) {
         val current = mutableSession.value
         if (current.requestUri == uri && current.selectedSlot == selectedSlot && worker != null) return
         workerState.reset()
@@ -66,6 +81,7 @@ class FlashRepository(
             state = workerState,
             ksuCliRepository = ksuCliRepository,
             slot = selectedSlot,
+            skipKsud = skipKsud,
         ).also {
             it.uri = uri.toUri()
             it.start()
@@ -80,19 +96,19 @@ class FlashRepository(
                 val abDevice = runCatching { ksuCliRepository.isAbDevice() }.getOrDefault(false)
                 InstallEnvironment(
                     rootAvailable = runCatching { ksuCliRepository.rootAvailable() }.getOrDefault(
-                        false
+                        false,
                     ),
                     isGki = runCatching { getKernelVersion().isGKI() }.getOrDefault(false),
                     isAbDevice = abDevice,
                     currentKmi = runCatching { ksuCliRepository.getCurrentKmi() }.getOrDefault(""),
                     defaultPartition = runCatching { ksuCliRepository.getDefaultPartition() }.getOrDefault(
-                        "boot"
+                        "boot",
                     ),
                     availablePartitions = runCatching { ksuCliRepository.getAvailablePartitions() }.getOrDefault(
-                        emptyList()
+                        emptyList(),
                     ),
                     activeSlotSuffix = runCatching { ksuCliRepository.getSlotSuffix(false) }.getOrDefault(
-                        ""
+                        "",
                     ),
                     inactiveSlotSuffix = if (abDevice) {
                         runCatching { ksuCliRepository.getSlotSuffix(true) }.getOrDefault("")
@@ -100,7 +116,7 @@ class FlashRepository(
                         ""
                     },
                     supportedKmis = runCatching { ksuCliRepository.getSupportedKmis() }.getOrDefault(
-                        emptyList()
+                        emptyList(),
                     ),
                 )
             }.also { mutableInstallEnvironment.value = it }
@@ -123,6 +139,9 @@ class FlashRepository(
                         operation.lkm,
                         operation.ota,
                         operation.partition,
+                        operation.allowShell,
+                        operation.enableAdb,
+                        operation.forceBackup,
                         onFinish,
                         onStdout,
                         onStderr,
@@ -139,13 +158,13 @@ class FlashRepository(
                     FlashOperation.Restore -> ksuCliRepository.restoreBoot(
                         onFinish,
                         onStdout,
-                        onStderr
+                        onStderr,
                     )
 
                     FlashOperation.Uninstall -> ksuCliRepository.uninstallPermanently(
                         onFinish,
                         onStdout,
-                        onStderr
+                        onStderr,
                     )
                 }
             }

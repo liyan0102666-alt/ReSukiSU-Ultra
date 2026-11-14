@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/Kernels.kt
 package com.tesla.resukisuultra
+========
+package org.bakasu.bakasu
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/Kernels.kt
 
 import android.system.Os
 

@@ -1,6 +1,12 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/overscroll/StretchOverscrollCompensationState.kt
 package com.tesla.resukisuultra.ui.overscroll
+========
+package org.bakasu.bakasu.ui.overscroll
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/overscroll/StretchOverscrollCompensationState.kt
 
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.layout.LayoutCoordinates
 
 /**
@@ -14,6 +20,15 @@ import androidx.compose.ui.layout.LayoutCoordinates
 class StretchOverscrollCompensationState {
     private val horizontalAxes = linkedMapOf<Any, StretchOverscrollAxis>()
     private val verticalAxes = linkedMapOf<Any, StretchOverscrollAxis>()
+    private val versionState = mutableIntStateOf(0)
+
+    // publishCompensation() runs on every draw pass even with no stretch, so the version must
+    // advance only when the published amounts actually change, otherwise the draw subscribers
+    // would invalidate themselves and loop forever at rest.
+    private var lastHorizontalAmount: Float? = null
+    private var lastVerticalAmount: Float? = null
+
+    val version: Int by versionState
 
     val horizontal: StretchOverscrollAxis?
         get() = horizontalAxes.values.lastOrNull()
@@ -28,11 +43,23 @@ class StretchOverscrollCompensationState {
     ) {
         horizontalAxes.update(owner, horizontal)
         verticalAxes.update(owner, vertical)
+        bumpIfChanged()
     }
 
     internal fun clear(owner: Any) {
         horizontalAxes.remove(owner)
         verticalAxes.remove(owner)
+        bumpIfChanged()
+    }
+
+    private fun bumpIfChanged() {
+        val h = horizontal?.amount
+        val v = vertical?.amount
+        if (h != lastHorizontalAmount || v != lastVerticalAmount) {
+            lastHorizontalAmount = h
+            lastVerticalAmount = v
+            versionState.intValue++
+        }
     }
 }
 

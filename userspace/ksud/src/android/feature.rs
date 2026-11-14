@@ -8,6 +8,7 @@ use std::{
 use anyhow::{Context, Result, bail};
 use const_format::concatcp;
 
+use crate::feature_id::{FeatureId, parse_feature_id};
 use crate::{
     android::{ksucalls, module, sulog},
     defs,
@@ -18,6 +19,7 @@ const FEATURE_CONFIG_PATH: &str = concatcp!(defs::WORKING_DIR, ".feature_config"
 const FEATURE_MAGIC: u32 = 0x7f4b5355;
 const FEATURE_VERSION: u32 = 1;
 
+<<<<<<< HEAD
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum FeatureId {
@@ -87,6 +89,14 @@ fn parse_feature_id(name: &str) -> Result<FeatureId> {
         "netisolate" | "5" => Ok(FeatureId::NetIsolate),
         "fusebpf" | "6" => Ok(FeatureId::Fusebpf),
         _ => bail!("Unknown feature: {name}"),
+=======
+fn on_feature_applied(feature_id: FeatureId, value: u64) {
+    if feature_id == FeatureId::Sulog
+        && value != 0
+        && let Err(err) = sulog::ensure_sulogd_running()
+    {
+        log::warn!("failed to ensure sulogd is running after feature init: {err:#}");
+>>>>>>> resukisu/main
     }
 }
 
@@ -94,14 +104,13 @@ fn set_kernel_feature(feature_id: FeatureId, value: u64) -> Result<()> {
     crate::android::ksucalls::set_feature(feature_id as u32, value)
         .with_context(|| format!("Failed to set feature {} to {value}", feature_id.name()))?;
 
-    if feature_id == FeatureId::Sulog
-        && value != 0
-        && let Err(err) = sulog::ensure_sulogd_running()
-    {
-        log::warn!("failed to ensure sulogd is running after feature init: {err:#}");
-    }
+    on_feature_applied(feature_id, value);
 
     Ok(())
+}
+
+fn is_forced(id: u32) -> bool {
+    ksucalls::get_feature(id).is_ok_and(|state| state.forced)
 }
 
 pub fn load_binary_config() -> Result<HashMap<u32, u64>> {
@@ -194,6 +203,10 @@ pub fn apply_config(features: &HashMap<u32, u64>) {
 
     let mut applied = 0;
     for (&id, &value) in features {
+        if is_forced(id) {
+            log::info!("Skip feature {id}: forced by boot config");
+            continue;
+        }
         match FeatureId::from_u32(id) {
             Some(feature_id) => match set_kernel_feature(feature_id, value) {
                 Ok(()) => {
@@ -221,21 +234,28 @@ pub fn apply_config(features: &HashMap<u32, u64>) {
 
 pub fn get_feature(id: &str) -> Result<()> {
     let feature_id = parse_feature_id(id)?;
-    let (value, supported) = ksucalls::get_feature(feature_id as u32)
+    let state = ksucalls::get_feature(feature_id as u32)
         .with_context(|| format!("Failed to get feature {id}"))?;
 
-    if !supported {
+    if !state.supported {
         println!("Feature '{id}' is not supported by kernel");
         return Ok(());
     }
 
     println!("Feature: {} ({})", feature_id.name(), feature_id as u32);
     println!("Description: {}", feature_id.description());
-    println!("Value: {value}");
+    println!("Value: {}", state.value);
     println!(
         "Status: {}",
-        if value != 0 { "enabled" } else { "disabled" }
+        if state.value != 0 {
+            "enabled"
+        } else {
+            "disabled"
+        }
     );
+    if state.forced {
+        println!("Forced: by boot config");
+    }
 
     Ok(())
 }
@@ -264,6 +284,16 @@ pub fn get_feature_config(id: &str) -> Result<()> {
 
 pub fn set_feature(id: &str, value: u64) -> Result<()> {
     let feature_id = parse_feature_id(id)?;
+
+    if let Ok(state) = ksucalls::get_feature(feature_id as u32)
+        && state.forced
+    {
+        bail!(
+            "Feature '{}' is forced to {} by boot config. Direct modification is not allowed.",
+            feature_id.name(),
+            state.value
+        );
+    }
 
     // Check if this feature is managed by any module
     if let Ok(managed_features_map) = module::get_managed_features() {
@@ -329,6 +359,7 @@ pub fn list_features() {
         }
     }
 
+<<<<<<< HEAD
     let all_features = [
         FeatureId::SuCompat,
         FeatureId::KernelUmount,
@@ -340,19 +371,24 @@ pub fn list_features() {
     ];
 
     for feature_id in &all_features {
+=======
+    for feature_id in &FeatureId::ALL {
+>>>>>>> resukisu/main
         let id = *feature_id as u32;
-        let (value, supported) = ksucalls::get_feature(id).unwrap_or((0, false));
+        let state = ksucalls::get_feature(id).unwrap_or_default();
 
-        let status = if !supported {
+        let status = if !state.supported {
             "NOT_SUPPORTED".to_string()
-        } else if value != 0 {
-            format!("ENABLED ({value})")
+        } else if state.value != 0 {
+            format!("ENABLED ({})", state.value)
         } else {
             "DISABLED".to_string()
         };
 
         let managed_by = feature_to_modules.get(feature_id.name());
-        let managed_mark = if managed_by.is_some() {
+        let managed_mark = if state.forced {
+            " [FORCED]"
+        } else if managed_by.is_some() {
             " [MODULE_MANAGED]"
         } else {
             ""
@@ -392,8 +428,11 @@ pub fn load_config_and_apply() -> Result<()> {
 }
 
 pub fn save_config() -> Result<()> {
-    let mut features = HashMap::new();
+    // Keep persisted values of forced features, they are in effect again once
+    // the boot config no longer forces them.
+    let mut features = load_binary_config().unwrap_or_default();
 
+<<<<<<< HEAD
     let all_features = [
         FeatureId::SuCompat,
         FeatureId::KernelUmount,
@@ -405,12 +444,16 @@ pub fn save_config() -> Result<()> {
     ];
 
     for feature_id in &all_features {
+=======
+    for feature_id in &FeatureId::ALL {
+>>>>>>> resukisu/main
         let id = *feature_id as u32;
-        if let Ok((value, supported)) = ksucalls::get_feature(id)
-            && supported
+        if let Ok(state) = ksucalls::get_feature(id)
+            && state.supported
+            && !state.forced
         {
-            features.insert(id, value);
-            log::info!("Saved feature {} = {value}", feature_id.name());
+            features.insert(id, state.value);
+            log::info!("Saved feature {} = {}", feature_id.name(), state.value);
         }
     }
 
@@ -425,6 +468,12 @@ pub fn save_config() -> Result<()> {
 pub fn check_feature(id: &str) -> Result<()> {
     let feature_id = parse_feature_id(id)?;
 
+    // Forced by boot config takes precedence over module management
+    if ksucalls::get_feature(feature_id as u32).is_ok_and(|state| state.forced) {
+        println!("forced");
+        return Ok(());
+    }
+
     // Check if this feature is managed by any module
     let managed_features_map = module::get_managed_features().unwrap_or_default();
     let is_managed = managed_features_map
@@ -437,16 +486,34 @@ pub fn check_feature(id: &str) -> Result<()> {
     }
 
     // Check if the feature is supported by kernel
-    let (_value, supported) = ksucalls::get_feature(feature_id as u32)
+    let state = ksucalls::get_feature(feature_id as u32)
         .with_context(|| format!("Failed to get feature {id}"))?;
 
-    if supported {
+    if state.supported {
         println!("supported");
     } else {
         println!("unsupported");
     }
 
     Ok(())
+}
+
+/// Forced features are applied by the kernel itself, only do the userspace part.
+/// Runs regardless of safe mode and the persisted config, as the kernel applies
+/// them in both cases.
+pub fn init_forced_features() {
+    for feature_id in FeatureId::ALL {
+        if let Ok(state) = ksucalls::get_feature(feature_id as u32)
+            && state.forced
+        {
+            log::info!(
+                "Feature '{}' is forced to {} by boot config, skip loading",
+                feature_id.name(),
+                state.value
+            );
+            on_feature_applied(feature_id, state.value);
+        }
+    }
 }
 
 pub fn init_features() -> Result<()> {

@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/KeyEventBlocker.kt
 package com.tesla.resukisuultra.ui.component
+========
+package org.bakasu.bakasu.ui.component
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/KeyEventBlocker.kt
 
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
@@ -20,7 +24,7 @@ fun KeyEventBlocker(predicate: (KeyEvent) -> Boolean) {
                 predicate(it)
             }
             .focusRequester(requester)
-            .focusable()
+            .focusable(),
     )
     LaunchedEffect(Unit) {
         requester.requestFocus()
