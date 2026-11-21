@@ -1,9 +1,16 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/SuSFSModels.kt
 package com.tesla.resukisuultra.domain.model
+========
+package org.bakasu.bakasu.domain.model
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/SuSFSModels.kt
 
-enum class SusKstatType {
-    Normal,
-    FullClone,
-    Statically,
+import androidx.annotation.StringRes
+import org.bakasu.bakasu.R
+
+enum class SusKstatType(@param:StringRes val resId: Int) {
+    Normal(R.string.susfs_kstat_subtype_normal),
+    FullClone(R.string.susfs_kstat_subtype_full_clone),
+    Statically(R.string.susfs_kstat_subtype_statically),
 }
 
 enum class UidScheme(val value: Int) {
@@ -75,5 +82,4 @@ data class SuSFSConfig(
     val sus_kstat: Set<SusKstatItem>,
     val open_redirect: Set<OpenRedirectItem>,
     val sus_map: Set<String>,
-) {
-}
+)

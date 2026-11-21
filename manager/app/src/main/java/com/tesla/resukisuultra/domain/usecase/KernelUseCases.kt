@@ -1,6 +1,12 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/usecase/KernelUseCases.kt
 package com.tesla.resukisuultra.domain.usecase
 
 import com.tesla.resukisuultra.data.kernel.KernelRepository
+========
+package org.bakasu.bakasu.domain.usecase
+
+import org.bakasu.bakasu.data.kernel.KernelRepository
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/usecase/KernelUseCases.kt
 
 class GetKernelStatusUseCase(private val repository: KernelRepository) {
     suspend operator fun invoke() = repository.getStatus()
@@ -20,6 +26,10 @@ class SetSuEnabledUseCase(private val repository: KernelRepository) {
 
 class SetKernelUmountEnabledUseCase(private val repository: KernelRepository) {
     suspend operator fun invoke(enabled: Boolean) = repository.setKernelUmountEnabled(enabled)
+}
+
+class SetShellSuAdbOnlyEnabledUseCase(private val repository: KernelRepository) {
+    suspend operator fun invoke(enabled: Boolean) = repository.setShellSuAdbOnlyEnabled(enabled)
 }
 
 class ConfigureSuLogUseCase(private val repository: KernelRepository) {
