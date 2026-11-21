@@ -1,16 +1,19 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/ExecuteModuleAction.kt
 package com.tesla.resukisuultra.ui.screen
+========
+package org.bakasu.bakasu.ui.component
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/ModuleActionOutput.kt
 
-import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -29,17 +32,14 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/ExecuteModuleAction.kt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.ui.component.KeyEventBlocker
@@ -56,119 +56,103 @@ import com.tesla.resukisuultra.ui.viewmodel.ExecuteModuleActionUiAction
 import com.tesla.resukisuultra.ui.viewmodel.ExecuteModuleActionUiEvent
 import com.tesla.resukisuultra.ui.viewmodel.ExecuteModuleActionViewModel
 import kotlinx.coroutines.flow.collectLatest
+========
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.ui.component.settings.AppBackButton
+import org.bakasu.bakasu.ui.theme.CardConfig
+import org.bakasu.bakasu.ui.theme.ThemeConfig
+import org.bakasu.bakasu.ui.theme.blurEffect
+import org.bakasu.bakasu.ui.theme.blurSource
+import org.bakasu.bakasu.ui.theme.monospaceFontFamily
+import org.bakasu.bakasu.ui.util.LocalSnackbarHost
+import org.bakasu.bakasu.ui.util.adaptiveScaffoldWindowInsets
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/ModuleActionOutput.kt
 import org.koin.compose.koinInject
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
-
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun ExecuteModuleActionScreen(moduleId: String) {
-    val viewModel = koinViewModel<ExecuteModuleActionViewModel>(
-        parameters = { parametersOf(moduleId) },
-    )
-    val moduleActionState by viewModel.state.collectAsStateWithLifecycle()
+fun ModuleActionOutput(
+    output: String,
+    running: Boolean,
+    title: String,
+    onBack: () -> Unit,
+    onSave: () -> Unit,
+    result: String? = null,
+    resultColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+) {
     val snackBarHost = LocalSnackbarHost.current
     val state = rememberLazyListState()
-    val context = LocalContext.current
-    val activity = LocalActivity.current
-    val navigator = LocalNavigator.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-
     LaunchedEffect(Unit) {
         scrollBehavior.state.heightOffset = scrollBehavior.state.heightOffsetLimit
     }
-
-    BackHandler(enabled = moduleActionState.running) {
-        // Disable back button if action is running
-    }
-
-    val fromShortcut = remember(activity) {
-        val intent = activity?.intent
-        intent?.getStringExtra("shortcut_type") == "module_action"
-    }
-
-    LaunchedEffect(viewModel, fromShortcut) {
-        viewModel.events.collectLatest { event ->
-            when (event) {
-                is ExecuteModuleActionUiEvent.Completed -> {
-                    if (event.successful && fromShortcut) {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.module_action_success),
-                            Toast.LENGTH_SHORT,
-                        ).show()
-                        activity?.finishAndRemoveTask()
-                    }
-                }
-
-                is ExecuteModuleActionUiEvent.LogSaved -> {
-                    snackBarHost.showReplacingSnackbar("Log saved to ${event.path}")
-                }
-
-                is ExecuteModuleActionUiEvent.Error -> {
-                    snackBarHost.showReplacingSnackbar(event.message)
-                }
-            }
-        }
-    }
-
+    BackHandler(enabled = running) {}
     Scaffold(
         topBar = {
             TopBar(
-                isActionRunning = moduleActionState.running,
-                onBack = {
-                    navigator.pop()
-                },
-                onSave = {
-                    viewModel.dispatch(ExecuteModuleActionUiAction.SaveLog)
-                },
+                isActionRunning = running,
+                title = title,
+                onBack = { if (!running) onBack() },
+                onSave = onSave,
                 scrollBehavior = scrollBehavior,
             )
         },
         floatingActionButton = {
-            if (!moduleActionState.running) {
-                val navigator = LocalNavigator.current
+            if (!running) {
                 ExtendedFloatingActionButton(
                     text = { Text(text = stringResource(R.string.close)) },
                     icon = { Icon(Icons.TwoTone.Close, contentDescription = null) },
-                    onClick = {
-                        navigator.pop()
-                    }
+                    onClick = onBack,
                 )
             }
         },
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        contentWindowInsets = WindowInsets.safeDrawing,
-        snackbarHost = { SwipeableSnackbarHost(hostState = snackBarHost) }
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
+        snackbarHost = { SwipeableSnackbarHost(hostState = snackBarHost) },
     ) { innerPadding ->
         KeyEventBlocker {
             it.key == Key.VolumeDown || it.key == Key.VolumeUp
         }
-        LaunchedEffect(moduleActionState.output) {
+        LaunchedEffect(output) {
             state.animateScrollToItem(2) // Spacer(bottom)
         }
         LazyColumn(
+            state = state,
             modifier = Modifier
                 .fillMaxSize(1f)
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .blurSource(),
         ) {
             item {
-                Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
+                Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding() + 12.dp))
             }
             item {
-                Text(
-                    modifier = Modifier.padding(8.dp),
-                    text = moduleActionState.output,
-                    fontSize = MaterialTheme.typography.bodySmall.fontSize,
-                    fontFamily = FontFamily.Monospace,
-                    lineHeight = MaterialTheme.typography.bodySmall.lineHeight,
-                )
+                CatalogCard(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                    Text(
+                        text = output,
+                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                        fontFamily = monospaceFontFamily(),
+                        lineHeight = MaterialTheme.typography.bodySmall.lineHeight,
+                    )
+                }
             }
             item {
+                result?.let {
+                    CatalogCard(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            Text(
+                                it,
+                                color = resultColor,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(16.dp),
+                            )
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(innerPadding.calculateBottomPadding()))
             }
         }
@@ -179,6 +163,7 @@ fun ExecuteModuleActionScreen(moduleId: String) {
 @Composable
 private fun TopBar(
     isActionRunning: Boolean,
+    title: String,
     onBack: () -> Unit = {},
     onSave: () -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior,
@@ -186,19 +171,18 @@ private fun TopBar(
     val themeConfig: ThemeConfig = koinInject()
     val cardConfig: CardConfig = koinInject()
     LargeFlexibleTopAppBar(
-        modifier = Modifier.blurEffect(
-        ),
-        title = { Text(stringResource(R.string.action)) },
+        modifier = Modifier.blurEffect(),
+        title = { Text(title) },
         scrollBehavior = scrollBehavior,
         navigationIcon = {
             AppBackButton(
-                onClick = onBack
+                onClick = onBack,
             )
         },
         actions = {
             IconButton(
                 onClick = onSave,
-                enabled = !isActionRunning
+                enabled = !isActionRunning,
             ) {
                 Icon(
                     imageVector = Icons.TwoTone.Save,
@@ -208,16 +192,18 @@ private fun TopBar(
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor =
-                if (themeConfig.isEnableBlur)
+                if (themeConfig.isEnableBlur) {
                     Color.Transparent
-                else
-                    MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                },
             scrolledContainerColor =
-                if (themeConfig.isEnableBlur)
+                if (themeConfig.isEnableBlur) {
                     Color.Transparent
-                else
-                    MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                },
         ),
-        windowInsets = TopAppBarDefaults.windowInsets.add(WindowInsets(left = 12.dp))
+        windowInsets = TopAppBarDefaults.windowInsets.add(WindowInsets(left = 12.dp)),
     )
 }

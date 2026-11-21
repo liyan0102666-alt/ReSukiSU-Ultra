@@ -1,29 +1,39 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/Sulog.kt
 package com.tesla.resukisuultra.domain.model
+========
+package org.bakasu.bakasu.domain.model
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/Sulog.kt
 
+import androidx.annotation.StringRes
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import org.bakasu.bakasu.R
 
 data class SulogFile(
     val name: String,
     val path: String,
 )
 
-enum class SulogEventType {
-    RootExecve,
-    SuCompat,
-    IoctlGrantRoot,
-    DaemonEvent,
-    Dropped,
-    Unknown,
+enum class SulogEventType(@param:StringRes val resId: Int) {
+    RootExecve(R.string.sulog_filter_root_execve),
+    SuCompat(R.string.sulog_filter_sucompat),
+    IoctlGrantRoot(R.string.sulog_filter_ioctl_grant_root),
+    DaemonEvent(R.string.sulog_filter_daemon_restart),
+    Dropped(R.string.sulog_event_dropped),
+    Unknown(R.string.sulog_entry_unknown_event),
 }
 
-enum class SulogEventFilter(val eventType: SulogEventType?) {
+enum class SulogEventFilter(val eventType: SulogEventType) {
     RootExecve(SulogEventType.RootExecve),
     SuCompat(SulogEventType.SuCompat),
     IoctlGrantRoot(SulogEventType.IoctlGrantRoot),
     DaemonEvent(SulogEventType.DaemonEvent),
+    ;
+
+    @get:StringRes
+    val resId: Int get() = eventType.resId
 }
 
 data class SulogEntry(
@@ -62,12 +72,11 @@ data class SulogState(
 
 fun defaultSulogEventFilters(): Set<SulogEventFilter> = SulogEventFilter.entries.toSet()
 
-fun String.toSulogDisplayName(): String =
-    if (startsWith("sulog-") && endsWith(".log")) {
-        removePrefix("sulog-").removeSuffix(".log")
-    } else {
-        this
-    }
+fun String.toSulogDisplayName(): String = if (startsWith("sulog-") && endsWith(".log")) {
+    removePrefix("sulog-").removeSuffix(".log")
+} else {
+    this
+}
 
 fun filterSulogEntries(
     entries: List<SulogEntry>,
@@ -160,6 +169,7 @@ private fun parseQuotedValue(line: String, startIndex: Int): Pair<String, Int> {
     while (index < line.length) {
         when (val char = line[index]) {
             '"' -> return value.toString() to (index + 1)
+
             '\\' -> {
                 val next = line.getOrNull(index + 1)
                 when (next) {

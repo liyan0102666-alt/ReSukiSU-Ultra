@@ -1,5 +1,9 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/themeSettings/ThemeSettings.kt
 package com.tesla.resukisuultra.ui.screen.themeSettings
 import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
+========
+package org.bakasu.bakasu.ui.screen.themeSettings
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/themeSettings/themeSettings/ThemeSettings.kt
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -34,6 +38,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Android
 import androidx.compose.material.icons.twotone.Animation
+import androidx.compose.material.icons.twotone.Badge
 import androidx.compose.material.icons.twotone.BlurOn
 import androidx.compose.material.icons.twotone.Brush
 import androidx.compose.material.icons.twotone.Check
@@ -41,6 +46,7 @@ import androidx.compose.material.icons.twotone.ColorLens
 import androidx.compose.material.icons.twotone.Contrast
 import androidx.compose.material.icons.twotone.DarkMode
 import androidx.compose.material.icons.twotone.DesignServices
+import androidx.compose.material.icons.twotone.Dock
 import androidx.compose.material.icons.twotone.Draw
 import androidx.compose.material.icons.twotone.FormatColorFill
 import androidx.compose.material.icons.twotone.FormatSize
@@ -48,10 +54,12 @@ import androidx.compose.material.icons.twotone.Info
 import androidx.compose.material.icons.twotone.LightMode
 import androidx.compose.material.icons.twotone.Opacity
 import androidx.compose.material.icons.twotone.Palette
+import androidx.compose.material.icons.twotone.Pin
 import androidx.compose.material.icons.twotone.Style
 import androidx.compose.material.icons.twotone.SwapHoriz
+import androidx.compose.material.icons.twotone.Swipe
 import androidx.compose.material.icons.twotone.Translate
-import androidx.compose.material.icons.twotone.VisibilityOff
+import androidx.compose.material.icons.twotone.ViewCarousel
 import androidx.compose.material.icons.twotone.Wallpaper
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -77,15 +85,16 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamiccolor.ColorSpec
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/themeSettings/ThemeSettings.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.availablePaletteStyles
 import com.tesla.resukisuultra.ui.component.ConfirmResult
@@ -121,19 +130,57 @@ import com.tesla.resukisuultra.ui.viewmodel.SettingsUiAction
 import com.tesla.resukisuultra.ui.viewmodel.SettingsUiState
 import com.tesla.resukisuultra.ui.viewmodel.SettingsViewModel
 import com.tesla.resukisuultra.ui.viewmodel.dpiFriendlyNameRes
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/themeSettings/themeSettings/ThemeSettings.kt
 import com.yalantis.ucrop.UCrop
+import java.io.File
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.availablePaletteStyles
+import org.bakasu.bakasu.ui.component.ConfirmResult
+import org.bakasu.bakasu.ui.component.KeyPointSlider
+import org.bakasu.bakasu.ui.component.rememberConfirmDialog
+import org.bakasu.bakasu.ui.component.settings.AppBackButton
+import org.bakasu.bakasu.ui.component.settings.SegmentedColumn
+import org.bakasu.bakasu.ui.component.settings.SegmentedColumnScope
+import org.bakasu.bakasu.ui.component.settings.SettingsBaseWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsChooseDialog
+import org.bakasu.bakasu.ui.component.settings.SettingsChooseWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsJumpPageWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsSwitchWidget
+import org.bakasu.bakasu.ui.navigation.LocalNavigator
+import org.bakasu.bakasu.ui.screen.themeSettings.component.LanguageSelectionDialog
+import org.bakasu.bakasu.ui.screen.themeSettings.component.ThemeSettingsDialogs
+import org.bakasu.bakasu.ui.screen.themeSettings.crop.BackgroundCropActivity
+import org.bakasu.bakasu.ui.theme.BackgroundManager
+import org.bakasu.bakasu.ui.theme.BottomBarStyle
+import org.bakasu.bakasu.ui.theme.CardConfig
+import org.bakasu.bakasu.ui.theme.ThemeConfig
+import org.bakasu.bakasu.ui.theme.blurEffect
+import org.bakasu.bakasu.ui.theme.blurSource
+import org.bakasu.bakasu.ui.util.adaptiveScaffoldWindowInsets
+import org.bakasu.bakasu.ui.viewmodel.HomeUiAction
+import org.bakasu.bakasu.ui.viewmodel.HomeUiState
+import org.bakasu.bakasu.ui.viewmodel.HomeViewModel
+import org.bakasu.bakasu.ui.viewmodel.ModuleUiAction
+import org.bakasu.bakasu.ui.viewmodel.ModuleUiState
+import org.bakasu.bakasu.ui.viewmodel.ModuleViewModel
+import org.bakasu.bakasu.ui.viewmodel.PredictiveBackAnimation
+import org.bakasu.bakasu.ui.viewmodel.PredictiveBackExitDirection
+import org.bakasu.bakasu.ui.viewmodel.SettingsUiAction
+import org.bakasu.bakasu.ui.viewmodel.SettingsUiState
+import org.bakasu.bakasu.ui.viewmodel.SettingsViewModel
+import org.bakasu.bakasu.ui.viewmodel.dpiFriendlyNameRes
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-import java.io.File
-import kotlin.math.roundToInt
-
 
 @SuppressLint(
-    "LocalContextConfigurationRead", "LocalContextResourcesRead", "ObsoleteSdkInt",
-    "RestrictedApi"
+    "LocalContextConfigurationRead",
+    "LocalContextResourcesRead",
+    "ObsoleteSdkInt",
 )
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -165,13 +212,13 @@ fun ThemeSettingsScreen(
     val backgroundCropFailed = stringResource(R.string.background_crop_failed)
 
     val uCropLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
+        ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.let { data ->
                 UCrop.getOutput(data)?.let {
                     settingsViewModel.dispatch(
-                        SettingsUiAction.SetCustomBackground(it.toString())
+                        SettingsUiAction.SetCustomBackground(it.toString()),
                     )
                 }
             }
@@ -179,19 +226,19 @@ fun ThemeSettingsScreen(
             Toast.makeText(
                 context,
                 backgroundCropFailed,
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_SHORT,
             ).show()
         }
     }
 
     val externalCropLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
+        ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val outputUri = pendingExternalCropOutputUri ?: result.data?.data
             outputUri?.let {
                 settingsViewModel.dispatch(
-                    SettingsUiAction.SetCustomBackground(it.toString())
+                    SettingsUiAction.SetCustomBackground(it.toString()),
                 )
             }
         }
@@ -246,14 +293,14 @@ fun ThemeSettingsScreen(
             Toast.makeText(
                 context,
                 externalCropUnavailable,
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_SHORT,
             ).show()
             launchInAppCrop(sourceUri)
         }
     }
 
     val pickImageLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
+        ActivityResultContracts.GetContent(),
     ) { uri: Uri? ->
         uri?.let {
             pendingBackgroundImageUri = it
@@ -266,7 +313,7 @@ fun ThemeSettingsScreen(
         title = stringResource(R.string.background_crop_method_title),
         items = listOf(
             stringResource(R.string.background_crop_method_in_app),
-            stringResource(R.string.background_crop_method_external)
+            stringResource(R.string.background_crop_method_external),
         ),
         selectedIndex = 0,
         onDismiss = {
@@ -280,13 +327,13 @@ fun ThemeSettingsScreen(
                     1 -> launchExternalCrop(sourceUri)
                 }
             }
-        }
+        },
     )
 
     // 各种设置对话框
     ThemeSettingsDialogs(
         state = settingsState,
-        viewModel = settingsViewModel
+        viewModel = settingsViewModel,
     )
 
     val navigator = LocalNavigator.current
@@ -296,6 +343,7 @@ fun ThemeSettingsScreen(
     }
 
     Scaffold(
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeFlexibleTopAppBar(
@@ -303,30 +351,32 @@ fun ThemeSettingsScreen(
                     .blurEffect(),
                 title = {
                     Text(
-                        text = stringResource(R.string.theme_settings)
+                        text = stringResource(R.string.theme_settings),
                     )
                 },
                 navigationIcon = {
                     AppBackButton(
                         onClick = {
                             navigator.pop()
-                        }
+                        },
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor =
-                        if (themeConfig.isEnableBlur)
+                        if (themeConfig.isEnableBlur) {
                             Color.Transparent
-                        else
-                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
+                        } else {
+                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                        },
                     scrolledContainerColor =
-                        if (themeConfig.isEnableBlur)
+                        if (themeConfig.isEnableBlur) {
                             Color.Transparent
-                        else
-                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
+                        } else {
+                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                        },
                 ),
                 windowInsets = TopAppBarDefaults.windowInsets.add(WindowInsets(left = 12.dp)),
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
             )
         },
         containerColor = Color.Transparent,
@@ -336,7 +386,7 @@ fun ThemeSettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .blurSource()
+                .blurSource(),
         ) {
             item {
                 Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding()))
@@ -348,43 +398,67 @@ fun ThemeSettingsScreen(
                     state = settingsState,
                     viewModel = settingsViewModel,
                     pickImageLauncher = pickImageLauncher,
-                    coroutineScope = coroutineScope
+                    coroutineScope = coroutineScope,
                 )
             }
 
             item {
                 // Predictive Back Settings
-                val transition = LocalNavAnimatedContentScope.current.transition
-
                 SegmentedColumn(
-                    title = stringResource(R.string.predictive_back_settings)
+                    title = stringResource(R.string.predictive_back_settings),
                 ) {
                     item {
                         PredictiveBackAnimationWidget(settingsState) { animation ->
-                            // Hey Google
-                            // Why you keep playing the animation even we are already play completed?
-
-                            // This is very dirty, We are using RestrictedApi, but we don't have other choice
-                            transition.setPlaytimeAfterInitialAndTargetStateEstablished(
-                                transition.targetState,
-                                transition.targetState,
-                                transition.playTimeNanos
-                            )
-
                             settingsViewModel.dispatch(
-                                SettingsUiAction.SetPredictiveBackAnimation(animation)
+                                SettingsUiAction.SetPredictiveBackAnimation(animation),
                             )
                         }
                     }
                     item(
-                        visible = settingsState.predictiveBackAnimation == PredictiveBackAnimation.Scale ||
-                                settingsState.predictiveBackAnimation == PredictiveBackAnimation.AOSP
+                        visible = settingsState.predictiveBackAnimation == PredictiveBackAnimation.Scale,
                     ) {
                         PredictiveBackAnimationDirectionWidget(settingsState) { direction ->
                             settingsViewModel.dispatch(
-                                SettingsUiAction.SetPredictiveBackExitDirection(direction)
+                                SettingsUiAction.SetPredictiveBackExitDirection(direction),
                             )
                         }
+                    }
+                }
+            }
+
+            item {
+                SegmentedColumn(
+                    title = stringResource(R.string.settings_pager_gesture_mode),
+                ) {
+                    item {
+                        SettingsSwitchWidget(
+                            icon = Icons.TwoTone.Swipe,
+                            title = stringResource(R.string.settings_enable_swipe_dismiss),
+                            description = stringResource(R.string.settings_enable_swipe_dismiss_summary),
+                            checked = settingsState.enableSwipeDismiss,
+                            onCheckedChange = { enabled ->
+                                settingsViewModel.dispatch(
+                                    SettingsUiAction.SetSwipeDismiss(enabled),
+                                )
+                            },
+                        )
+                    }
+                    item {
+                        SettingsChooseWidget(
+                            icon = Icons.TwoTone.ViewCarousel,
+                            title = stringResource(R.string.settings_pager_gesture_mode),
+                            items = listOf(
+                                stringResource(R.string.settings_pager_gesture_native),
+                                stringResource(R.string.settings_pager_gesture_cross_axis),
+                                stringResource(R.string.settings_pager_gesture_ios_like),
+                            ),
+                            selectedIndex = settingsState.pagerInterceptionMode.coerceIn(0, 2),
+                            onSelectedIndexChange = { index ->
+                                settingsViewModel.dispatch(
+                                    SettingsUiAction.SetPagerInterceptionMode(index),
+                                )
+                            },
+                        )
                     }
                 }
             }
@@ -397,7 +471,7 @@ fun ThemeSettingsScreen(
                     moduleUiState = moduleUiState,
                     moduleViewModel = moduleViewModel,
                     settingsUiState = settingsState,
-                    settingsViewModel = settingsViewModel
+                    settingsViewModel = settingsViewModel,
                 )
             }
 
@@ -442,49 +516,39 @@ private fun createBackgroundCropOutputUri(context: Context, prefix: String): Uri
     return FileProvider.getUriForFile(
         context,
         "${context.packageName}.fileprovider",
-        outputFile
+        outputFile,
     )
 }
 
 @Composable
 fun PredictiveBackAnimationWidget(
     uiState: SettingsUiState,
-    onSelect: (PredictiveBackAnimation) -> Unit
+    onSelect: (PredictiveBackAnimation) -> Unit,
 ) {
     SettingsChooseWidget(
         icon = Icons.TwoTone.Animation,
         title = stringResource(R.string.predictive_back_animation),
-        items = listOf(
-            stringResource(R.string.predictive_back_animation_none),
-            stringResource(R.string.predictive_back_animation_aosp),
-            stringResource(R.string.predictive_back_animation_miuix),
-            stringResource(R.string.predictive_back_animation_scale),
-            stringResource(R.string.predictive_back_animation_ksu_classic)
-        ),
+        items = PredictiveBackAnimation.entries.map { stringResource(it.resId) },
         selectedIndex = uiState.predictiveBackAnimation.ordinal,
         onSelectedIndexChange = { index ->
             PredictiveBackAnimation.entries.getOrNull(index)?.let(onSelect)
-        }
+        },
     )
 }
 
 @Composable
 fun PredictiveBackAnimationDirectionWidget(
     uiState: SettingsUiState,
-    onSelect: (PredictiveBackExitDirection) -> Unit
+    onSelect: (PredictiveBackExitDirection) -> Unit,
 ) {
     SettingsChooseWidget(
         icon = Icons.TwoTone.SwapHoriz,
         title = stringResource(R.string.predictive_back_exit_direction),
-        items = listOf(
-            stringResource(R.string.predictive_back_exit_direction_follow_gesture),
-            stringResource(R.string.predictive_back_exit_direction_always_right),
-            stringResource(R.string.predictive_back_exit_direction_always_left)
-        ),
+        items = PredictiveBackExitDirection.entries.map { stringResource(it.resId) },
         selectedIndex = uiState.predictiveBackExitDirection.ordinal,
         onSelectedIndexChange = { index ->
             PredictiveBackExitDirection.entries.getOrNull(index)?.let(onSelect)
-        }
+        },
     )
 }
 
@@ -493,12 +557,15 @@ private fun AppearanceSettings(
     state: SettingsUiState,
     viewModel: SettingsViewModel,
     pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
 ) {
     val themeConfig: ThemeConfig = koinInject()
     val cardConfig: CardConfig = koinInject()
     val backgroundManager: BackgroundManager = koinInject()
     val paletteStyles = state.dynamicColorSpec.availablePaletteStyles()
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.screenWidthDp < configuration.screenHeightDp ||
+        (configuration.screenHeightDp.toFloat() / configuration.screenWidthDp > 1.4f)
     SegmentedColumn(title = stringResource(R.string.appearance_settings)) {
         item {
             // 语言设置
@@ -514,29 +581,31 @@ private fun AppearanceSettings(
                 selectedIndex = state.themeMode,
                 onSelectedIndexChange = { index ->
                     viewModel.dispatch(SettingsUiAction.SetThemeMode(index))
-                }
+                },
             )
         }
 
-        item {
-            // 动态颜色开关
-            SettingsSwitchWidget(
-                icon = Icons.TwoTone.ColorLens,
-                title = stringResource(R.string.dynamic_color_title),
-                description = stringResource(R.string.dynamic_color_summary),
-                checked = state.useDynamicColor,
-                onCheckedChange = { enabled ->
-                    viewModel.dispatch(SettingsUiAction.SetDynamicColor(enabled))
-                }
-            )
-        }
-
-        item(
-            visible = !state.useDynamicColor,
-            topPadding = 1.dp,
+        expandableItem(
+            expanded = !state.useDynamicColor,
+            topContent = {
+                SettingsSwitchWidget(
+                    icon = Icons.TwoTone.ColorLens,
+                    title = stringResource(R.string.dynamic_color_title),
+                    description = stringResource(R.string.dynamic_color_summary),
+                    checked = state.useDynamicColor,
+                    onCheckedChange = { enabled ->
+                        viewModel.dispatch(SettingsUiAction.SetDynamicColor(enabled))
+                    },
+                )
+            },
         ) {
-            // 主题色选择
-            ThemeColorSelection(viewModel = viewModel)
+            item(
+                visible = !state.useDynamicColor,
+                topPadding = 1.dp,
+            ) {
+                // 主题色选择
+                ThemeColorSelection(viewModel = viewModel)
+            }
         }
 
         item {
@@ -548,10 +617,10 @@ private fun AppearanceSettings(
                 onSelectedIndexChange = { index ->
                     viewModel.dispatch(
                         SettingsUiAction.SetDynamicPaletteStyle(
-                            paletteStyles.getOrElse(index) { PaletteStyle.TonalSpot }
-                        )
+                            paletteStyles.getOrElse(index) { PaletteStyle.TonalSpot },
+                        ),
                     )
-                }
+                },
             )
         }
 
@@ -566,14 +635,16 @@ private fun AppearanceSettings(
                         SettingsUiAction.SetDynamicColorSpec(
                             ColorSpec.SpecVersion.entries.getOrElse(index) {
                                 ColorSpec.SpecVersion.SPEC_2021
-                            }
-                        )
+                            },
+                        ),
                     )
-                }
+                },
             )
         }
 
-        item {
+        item(
+            forceFlatBottom = true,
+        ) {
             SettingsBaseWidget(
                 icon = Icons.TwoTone.FormatSize,
                 title = stringResource(R.string.app_dpi_title),
@@ -583,31 +654,62 @@ private fun AppearanceSettings(
                 Text(
                     text = stringResource(dpiFriendlyNameRes(state.tempDpi)),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         }
 
         item(
             topPadding = 1.dp,
+            forceFlatTop = true,
         ) { shape ->
             Surface(
                 modifier = Modifier
-                    .clip(shape)
-                    .renderBackgroundBlur(MaterialTheme.colorScheme.surfaceBright),
-                color = if (themeConfig.isEnableBlurExp) Color.Transparent else MaterialTheme.colorScheme.surfaceBright.copy(
-                    alpha = cardConfig.cardAlpha
-                ),
-                shape = shape
+                    .clip(shape),
+                color = if (themeConfig.isEnableBlurExp) {
+                    Color.Transparent
+                } else {
+                    MaterialTheme.colorScheme.surfaceBright.copy(
+                        alpha = cardConfig.cardAlpha,
+                    )
+                },
             ) {
                 Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                     DpiSliderControls(
                         state = state,
                         viewModel = viewModel,
-                        coroutineScope = coroutineScope
+                        coroutineScope = coroutineScope,
                     )
                 }
             }
+        }
+
+        item(visible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            SettingsSwitchWidget(
+                icon = Icons.TwoTone.BlurOn,
+                title = stringResource(id = R.string.settings_config_enable_blur),
+                description = stringResource(id = R.string.settings_config_enable_blur_summary),
+                checked = themeConfig.isEnableBlur,
+                onCheckedChange = { isChecked ->
+                    backgroundManager.saveEnableBlur(isChecked)
+                    if (!isChecked) {
+                        backgroundManager.saveEnableBlurExp(false)
+                    }
+                },
+            )
+        }
+
+        item(visible = isPortrait) {
+            SettingsSwitchWidget(
+                icon = Icons.TwoTone.Dock,
+                title = stringResource(R.string.enable_floating_bottom_bar),
+                description = stringResource(R.string.enable_floating_bottom_bar_summary),
+                checked = themeConfig.bottomBarStyle == BottomBarStyle.FLOATING,
+                onCheckedChange = { enabled ->
+                    val style = if (enabled) BottomBarStyle.FLOATING else BottomBarStyle.MATERIAL3_EXPRESSIVE
+                    backgroundManager.saveBottomBarStyle(style)
+                },
+            )
         }
 
         expandableItem(
@@ -627,8 +729,22 @@ private fun AppearanceSettings(
                     themeConfig,
                     backgroundManager,
                 )
-            }
+            },
         )
+
+        item(topPadding = 1.dp) {
+            // 刷写/输出界面卡片背景。启用自定义背景后强制开启，避免日志文字压在背景图上。
+            SettingsSwitchWidget(
+                icon = Icons.TwoTone.Wallpaper,
+                title = stringResource(id = R.string.settings_flash_card_background),
+                description = stringResource(id = R.string.settings_flash_card_background_summary),
+                enabled = !state.isCustomBackgroundEnabled,
+                checked = state.isCustomBackgroundEnabled || state.isFlashCardBackgroundEnabled,
+                onCheckedChange = { isChecked ->
+                    viewModel.dispatch(SettingsUiAction.SetFlashCardBackground(isChecked))
+                },
+            )
+        }
     }
 }
 
@@ -651,7 +767,7 @@ private fun CustomizationSettings(
                 checked = settingsUiState.useAltIcon,
                 onCheckedChange = { enabled ->
                     settingsViewModel.dispatch(SettingsUiAction.SetAlternateIcon(enabled))
-                }
+                },
             )
         }
 
@@ -664,7 +780,18 @@ private fun CustomizationSettings(
                 checked = moduleUiState.showMoreModuleInfo,
                 onCheckedChange = { enabled ->
                     moduleViewModel.dispatch(ModuleUiAction.SetShowMoreInfo(enabled))
-                }
+                },
+            )
+        }
+
+        item {
+            // 使用内置Mono字体开关
+            SettingsSwitchWidget(
+                icon = Icons.TwoTone.FormatSize,
+                title = stringResource(R.string.settings_custom_monospace_font),
+                description = stringResource(R.string.settings_custom_monospace_font_summary),
+                checked = settingsUiState.useBuiltinMonoFont,
+                onCheckedChange = { settingsViewModel.handleBuiltinMonospaceFontChange(it) },
             )
         }
 
@@ -677,96 +804,33 @@ private fun CustomizationSettings(
                 checked = homeUiState.isSimpleMode,
                 onCheckedChange = { enabled ->
                     homeViewModel.dispatch(HomeUiAction.SetSimpleMode(enabled))
-                }
+                },
             )
         }
 
-        hideOptionsSettings(homeUiState, moduleUiState, homeViewModel, moduleViewModel)
-    }
-}
+        item {
+            SettingsSwitchWidget(
+                icon = Icons.TwoTone.Pin,
+                title = stringResource(R.string.navigation_bar_badge),
+                description = stringResource(R.string.navigation_bar_badge_summary),
+                checked = homeUiState.showNavigationBarBadge,
+                onCheckedChange = { enabled ->
+                    homeViewModel.dispatch(HomeUiAction.SetNavigationBarBadge(enabled))
+                },
+            )
+        }
 
-private fun SegmentedColumnScope.hideOptionsSettings(
-    homeUiState: HomeUiState,
-    moduleUiState: ModuleUiState,
-    homeViewModel: HomeViewModel,
-    moduleViewModel: ModuleViewModel,
-) {
-    item {
-        // 隐藏模块数量等信息
-        SettingsSwitchWidget(
-            icon = Icons.TwoTone.VisibilityOff,
-            title = stringResource(R.string.hide_other_info),
-            description = stringResource(R.string.hide_other_info_summary),
-            checked = homeUiState.isHideOtherInfo,
-            onCheckedChange = { enabled ->
-                homeViewModel.dispatch(HomeUiAction.SetHideOtherInfo(enabled))
-            }
-        )
-    }
-
-    item {
-        // SuSFS 状态信息
-        SettingsSwitchWidget(
-            icon = Icons.TwoTone.VisibilityOff,
-            title = stringResource(R.string.hide_susfs_status),
-            description = stringResource(R.string.hide_susfs_status_summary),
-            checked = homeUiState.isHideSusfsStatus,
-            onCheckedChange = { enabled ->
-                homeViewModel.dispatch(HomeUiAction.SetHideSusfsStatus(enabled))
-            }
-        )
-    }
-
-    item {
-        // Zygisk 实现状态信息
-        SettingsSwitchWidget(
-            icon = Icons.TwoTone.VisibilityOff,
-            title = stringResource(R.string.hide_zygisk_implement),
-            description = stringResource(R.string.hide_zygisk_implement_summary),
-            checked = homeUiState.isHideZygiskImplement,
-            onCheckedChange = { enabled ->
-                homeViewModel.dispatch(HomeUiAction.SetHideZygiskImplement(enabled))
-            }
-        )
-    }
-
-    item {
-        // 元模块实现状态信息
-        SettingsSwitchWidget(
-            icon = Icons.TwoTone.VisibilityOff,
-            title = stringResource(R.string.hide_meta_module_implement),
-            description = stringResource(R.string.hide_meta_module_implement_summary),
-            checked = homeUiState.isHideMetaModuleImplement,
-            onCheckedChange = { enabled ->
-                homeViewModel.dispatch(HomeUiAction.SetHideMetaModuleImplement(enabled))
-            }
-        )
-    }
-
-    item {
-        // 隐藏链接信息
-        SettingsSwitchWidget(
-            icon = Icons.TwoTone.VisibilityOff,
-            title = stringResource(R.string.hide_link_card),
-            description = stringResource(R.string.hide_link_card_summary),
-            checked = homeUiState.isHideLinkCard,
-            onCheckedChange = { enabled ->
-                homeViewModel.dispatch(HomeUiAction.SetHideLinkCard(enabled))
-            }
-        )
-    }
-
-    item {
-        // 隐藏标签行
-        SettingsSwitchWidget(
-            icon = Icons.TwoTone.VisibilityOff,
-            title = stringResource(R.string.hide_tag_card),
-            description = stringResource(R.string.hide_tag_card_summary),
-            checked = moduleUiState.isHideTagRow,
-            onCheckedChange = { enabled ->
-                moduleViewModel.dispatch(ModuleUiAction.SetHideTagRow(enabled))
-            }
-        )
+        item {
+            SettingsSwitchWidget(
+                icon = Icons.TwoTone.Badge,
+                title = stringResource(R.string.home_card_icons),
+                description = stringResource(R.string.home_card_icons_summary),
+                checked = homeUiState.showHomeCardIcons,
+                onCheckedChange = { enabled ->
+                    homeViewModel.dispatch(HomeUiAction.SetHomeCardIcons(enabled))
+                },
+            )
+        }
     }
 }
 
@@ -785,7 +849,7 @@ private fun ThemeColorSelection(viewModel: SettingsViewModel) {
             modifier = Modifier
                 .size(20.dp)
                 .clip(CircleShape)
-                .background(Color(themeConfig.seedColor))
+                .background(Color(themeConfig.seedColor)),
         )
     }
 }
@@ -796,7 +860,7 @@ private fun Int.toSeedColorHex(): String = "#%06X".format(this and 0x00FFFFFF)
 private fun DpiSliderControls(
     state: SettingsUiState,
     viewModel: SettingsViewModel,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
 ) {
     val confirmDialog = rememberConfirmDialog()
     val dpiConfirmTitle = stringResource(R.string.dpi_confirm_title)
@@ -807,7 +871,7 @@ private fun DpiSliderControls(
 
     val sliderValue by animateFloatAsState(
         targetValue = state.tempDpi.toFloat(),
-        label = "DPI Slider Animation"
+        label = "DPI Slider Animation",
     )
 
     KeyPointSlider(
@@ -828,10 +892,11 @@ private fun DpiSliderControls(
     ) {
         state.dpiPresets.forEach { (nameResource, dpi) ->
             val isSelected = state.tempDpi == dpi
-            val buttonColor = if (isSelected)
+            val buttonColor = if (isSelected) {
                 MaterialTheme.colorScheme.primaryContainer
-            else
+            } else {
                 MaterialTheme.colorScheme.surfaceBright
+            }
 
             Box(
                 modifier = Modifier
@@ -843,29 +908,31 @@ private fun DpiSliderControls(
                         viewModel.dispatch(SettingsUiAction.SetTempDpi(dpi))
                     }
                     .padding(vertical = 8.dp, horizontal = 4.dp),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = stringResource(nameResource),
                     style = MaterialTheme.typography.labelMedium,
-                    color = if (isSelected)
+                    color = if (isSelected) {
                         MaterialTheme.colorScheme.onPrimaryContainer
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant,
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
     }
 
     Text(
-        text = if (state.isDpiCustom)
+        text = if (state.isDpiCustom) {
             "${stringResource(R.string.dpi_size_custom)}: ${state.tempDpi}"
-        else
-            "${stringResource(dpiFriendlyNameRes(state.tempDpi))}: ${state.tempDpi}",
+        } else {
+            "${stringResource(dpiFriendlyNameRes(state.tempDpi))}: ${state.tempDpi}"
+        },
         style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier.padding(top = 8.dp)
+        modifier = Modifier.padding(top = 8.dp),
     )
 
     Button(
@@ -875,7 +942,7 @@ private fun DpiSliderControls(
                     title = dpiConfirmTitle,
                     content = dpiConfirmMessage,
                     confirm = confirmText,
-                    dismiss = cancelText
+                    dismiss = cancelText,
                 )
 
                 if (confirmResult != ConfirmResult.Confirmed) return@launch
@@ -886,12 +953,12 @@ private fun DpiSliderControls(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp),
-        enabled = state.tempDpi != state.currentDpi
+        enabled = state.tempDpi != state.currentDpi,
     ) {
         Icon(
             Icons.TwoTone.Check,
             contentDescription = null,
-            modifier = Modifier.size(16.dp)
+            modifier = Modifier.size(16.dp),
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(stringResource(R.string.dpi_apply_settings))
@@ -929,62 +996,40 @@ private fun SegmentedColumnScope.backgroundAdjustmentControls(
     backgroundManager: BackgroundManager,
 ) {
     item(
-        topPadding = 1.dp
+        topPadding = 1.dp,
     ) {
         AlphaSlider(
             state = state,
             viewModel = viewModel,
-            coroutineScope = coroutineScope
+            coroutineScope = coroutineScope,
         )
     }
 
     item(
-        topPadding = 1.dp
+        topPadding = 1.dp,
     ) {
         DimSlider(
             state = state,
             viewModel = viewModel,
-            coroutineScope = coroutineScope
+            coroutineScope = coroutineScope,
         )
     }
 
-    expandableItem(
-        animatedVisibility = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
-        expanded = themeConfig.isEnableBlur,
-        topPadding = 1.dp,
-        topContent = {
-            SettingsSwitchWidget(
-                icon = Icons.TwoTone.BlurOn,
-                title = stringResource(id = R.string.settings_config_enable_blur),
-                description = stringResource(id = R.string.settings_config_enable_blur_summary),
-                checked = themeConfig.isEnableBlur,
-                onCheckedChange = { isChecked ->
-                    backgroundManager.saveEnableBlur(isChecked)
-                    if (!isChecked)
-                        backgroundManager.saveEnableBlurExp(false)
-                }
-            )
-        },
-        bottomContent = {
-            item(
-                topPadding = 1.dp,
-            ) {
-                SettingsSwitchWidget(
-                    icon = Icons.TwoTone.Draw,
-                    title = stringResource(id = R.string.settings_exp_draw_background_to_blur),
-                    description = stringResource(id = R.string.settings_exp_draw_background_to_blur_description),
-                    isError = true,
-                    checked = themeConfig.isEnableBlurExp,
-                    onCheckedChange = { isChecked ->
-                        backgroundManager.saveEnableBlurExp(isChecked)
-                    }
-                )
-            }
-        }
-    )
+    item(visible = themeConfig.isEnableBlur, topPadding = 1.dp) {
+        SettingsSwitchWidget(
+            icon = Icons.TwoTone.Draw,
+            title = stringResource(id = R.string.settings_exp_draw_background_to_blur),
+            description = stringResource(id = R.string.settings_exp_draw_background_to_blur_description),
+            isError = true,
+            checked = themeConfig.isEnableBlurExp,
+            onCheckedChange = { isChecked ->
+                backgroundManager.saveEnableBlurExp(isChecked)
+            },
+        )
+    }
 
     item(
-        visible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && state.useDynamicColor,
+        visible = state.useDynamicColor,
         topPadding = 1.dp,
     ) {
         SettingsSwitchWidget(
@@ -994,7 +1039,7 @@ private fun SegmentedColumnScope.backgroundAdjustmentControls(
             checked = themeConfig.isUseBackgroundSeedColor,
             onCheckedChange = { isChecked ->
                 backgroundManager.saveUseBackgroundSeedColor(isChecked)
-            }
+            },
         )
     }
 
@@ -1009,7 +1054,7 @@ private fun SegmentedColumnScope.backgroundAdjustmentControls(
             checked = themeConfig.isHighContrastMode,
             onCheckedChange = { isChecked ->
                 backgroundManager.saveEnableHighContrastMode(isChecked)
-            }
+            },
         )
     }
 }
@@ -1018,7 +1063,7 @@ private fun SegmentedColumnScope.backgroundAdjustmentControls(
 private fun AlphaSlider(
     state: SettingsUiState,
     viewModel: SettingsViewModel,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
 ) {
     SettingsBaseWidget(
         icon = Icons.TwoTone.Opacity,
@@ -1026,7 +1071,7 @@ private fun AlphaSlider(
         descriptionColumnContent = {
             val alphaSliderValue by animateFloatAsState(
                 targetValue = state.cardAlpha,
-                label = "Alpha Slider Animation"
+                label = "Alpha Slider Animation",
             )
 
             KeyPointSlider(
@@ -1042,17 +1087,17 @@ private fun AlphaSlider(
                 valueRange = 0f..1f,
                 keyPoints = listOf(0.25f, 0.5f, 0.75f),
             )
-        }
+        },
     ) {
         Box(contentAlignment = Alignment.CenterEnd) {
             Text( // Some stupid way to solve measure problem
                 text = "100%",
                 style = MaterialTheme.typography.labelMediumEmphasized,
-                modifier = Modifier.alpha(0f)
+                modifier = Modifier.alpha(0f),
             )
             Text(
                 text = "${(state.cardAlpha * 100).roundToInt()}%",
-                style = MaterialTheme.typography.labelMediumEmphasized
+                style = MaterialTheme.typography.labelMediumEmphasized,
             )
         }
     }
@@ -1062,7 +1107,7 @@ private fun AlphaSlider(
 private fun DimSlider(
     state: SettingsUiState,
     viewModel: SettingsViewModel,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
 ) {
     SettingsBaseWidget(
         icon = Icons.TwoTone.LightMode,
@@ -1070,7 +1115,7 @@ private fun DimSlider(
         descriptionColumnContent = {
             val dimSliderValue by animateFloatAsState(
                 targetValue = state.backgroundDim,
-                label = "Dim Slider Animation"
+                label = "Dim Slider Animation",
             )
 
             KeyPointSlider(
@@ -1086,13 +1131,13 @@ private fun DimSlider(
                 valueRange = 0f..1f,
                 keyPoints = listOf(0.25f, 0.5f, 0.75f),
             )
-        }
+        },
     ) {
         Box(contentAlignment = Alignment.CenterEnd) {
             Text( // Some stupid way to solve measure problem
                 text = "100%",
                 style = MaterialTheme.typography.labelMediumEmphasized,
-                modifier = Modifier.alpha(0f)
+                modifier = Modifier.alpha(0f),
             )
 
             Text(
@@ -1124,7 +1169,7 @@ private fun LanguageSetting(state: SettingsUiState, viewModel: SettingsViewModel
         description = currentLanguageDisplay,
         onClick = {
             viewModel.dispatch(SettingsUiAction.SetLanguageDialogVisible(true))
-        }
+        },
     )
 
     // Language Selection Dialog
@@ -1141,7 +1186,7 @@ private fun LanguageSetting(state: SettingsUiState, viewModel: SettingsViewModel
             },
             onDismiss = {
                 viewModel.dispatch(SettingsUiAction.SetLanguageDialogVisible(false))
-            }
+            },
         )
     }
 }

@@ -1,6 +1,12 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/magica/BootCompletedReceiver.java
 package com.tesla.resukisuultra.magica;
 
 import static com.tesla.resukisuultra.magica.AppZygotePreload.TAG;
+========
+package org.bakasu.bakasu.magica;
+
+import static org.bakasu.bakasu.magica.AppZygotePreload.TAG;
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/magica/BootCompletedReceiver.java
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,7 +23,11 @@ public class BootCompletedReceiver extends BroadcastReceiver {
         var action = intent.getAction();
         if (!Intent.ACTION_LOCKED_BOOT_COMPLETED.equals(action)
                 && !Intent.ACTION_BOOT_COMPLETED.equals(action)
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/magica/BootCompletedReceiver.java
                 && !"com.tesla.resukisuultra.magica.LAUNCH".equals(action)) {
+========
+                && !"org.bakasu.bakasu.magica.LAUNCH".equals(action)) {
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/magica/BootCompletedReceiver.java
             return;
         }
         try {

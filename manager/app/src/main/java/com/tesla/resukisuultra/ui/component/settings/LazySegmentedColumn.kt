@@ -1,5 +1,9 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/settings/LazySegmentedColumn.kt
 package com.tesla.resukisuultra.ui.component.settings
 import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
+========
+package org.bakasu.bakasu.ui.component.settings
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/settings/LazySegmentedColumn.kt
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -13,7 +17,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import org.bakasu.bakasu.ui.theme.ThemeConfig
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 inline fun <T> LazyListScope.lazySegmentColumn(
@@ -22,6 +29,7 @@ inline fun <T> LazyListScope.lazySegmentColumn(
     noHorizontalPadding: Boolean = false,
     noinline key: ((index: Int, item: T) -> Any)? = null,
     crossinline contentType: (index: Int, item: T) -> Any? = { _, _ -> null },
+    itemSpacing: Dp = ListItemDefaults.SegmentedGap,
     crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit,
 ) {
     if (title != null) {
@@ -33,8 +41,8 @@ inline fun <T> LazyListScope.lazySegmentColumn(
                 modifier = Modifier.padding(
                     top = 8.dp,
                     start = if (noHorizontalPadding) 0.dp else 32.dp, // 16.dp + 16.dp
-                    bottom = 8.dp
-                )
+                    bottom = 8.dp,
+                ),
             )
         }
     }
@@ -42,31 +50,45 @@ inline fun <T> LazyListScope.lazySegmentColumn(
     items(
         count = items.size,
         key = if (key != null) { index: Int -> key(index, items[index]) } else null,
-        contentType = { index: Int -> contentType(index, items[index]) }
+        contentType = { index: Int -> contentType(index, items[index]) },
     ) { index ->
         val item = items[index]
+        val themeConfig = koinInject<ThemeConfig>()
+        val continuous = themeConfig.isEnableBlurExp
 
         val isFirst = index == 0
         val isLast = index == items.lastIndex
 
-        val topRadius = if (isFirst) 16.dp else 5.dp
-        val bottomRadius = if (isLast) 16.dp else 5.dp
+        val topRadius = if (isFirst) {
+            16.dp
+        } else if (continuous) {
+            0.dp
+        } else {
+            5.dp
+        }
+        val bottomRadius = if (isLast) {
+            16.dp
+        } else if (continuous) {
+            0.dp
+        } else {
+            5.dp
+        }
 
         val shape = ContinuousCornerShape(
             topStart = topRadius,
             topEnd = topRadius,
             bottomStart = bottomRadius,
-            bottomEnd = bottomRadius
+            bottomEnd = bottomRadius,
         )
 
-        val topPadding = if (isFirst) 0.dp else ListItemDefaults.SegmentedGap
+        val topPadding = if (isFirst || continuous) 0.dp else itemSpacing
 
         val horizontalPadding = if (noHorizontalPadding) 0.dp else 16.dp
 
         Box(
             modifier = Modifier
                 .padding(top = topPadding)
-                .padding(horizontal = horizontalPadding)
+                .padding(horizontal = horizontalPadding),
         ) {
             CompositionLocalProvider(LocalSegmentedItemShape provides shape) {
                 itemContent(index, item)

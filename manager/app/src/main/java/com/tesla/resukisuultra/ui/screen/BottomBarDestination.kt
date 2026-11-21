@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/BottomBarDestination.kt
 package com.tesla.resukisuultra.ui.screen
+========
+package org.bakasu.bakasu.ui.screen
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/BottomBarDestination.kt
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
@@ -9,11 +13,19 @@ import androidx.compose.material.icons.twotone.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/BottomBarDestination.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.ui.screen.main.HomePage
 import com.tesla.resukisuultra.ui.screen.main.ModulePage
 import com.tesla.resukisuultra.ui.screen.main.SettingsPage
 import com.tesla.resukisuultra.ui.screen.main.SuperUserPage
+========
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.ui.screen.main.HomePage
+import org.bakasu.bakasu.ui.screen.main.ModulePage
+import org.bakasu.bakasu.ui.screen.main.SettingsPage
+import org.bakasu.bakasu.ui.screen.main.SuperUserPage
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/BottomBarDestination.kt
 
 enum class BottomBarDestination(
     val direction: @Composable (bottomPadding: Dp) -> Unit,
@@ -27,39 +39,38 @@ enum class BottomBarDestination(
         R.string.home,
         Icons.TwoTone.Home,
         Icons.TwoTone.Home,
-        false
+        false,
     ),
     SuperUser(
         { bottomPadding -> SuperUserPage(bottomPadding) },
         R.string.superuser,
         Icons.TwoTone.AdminPanelSettings,
         Icons.TwoTone.AdminPanelSettings,
-        true
+        true,
     ),
     Module(
         { bottomPadding -> ModulePage(bottomPadding) },
         R.string.module,
         Icons.TwoTone.Extension,
         Icons.TwoTone.Extension,
-        true
+        true,
     ),
     Settings(
         { bottomPadding -> SettingsPage(bottomPadding) },
         R.string.settings,
         Icons.TwoTone.Settings,
         Icons.TwoTone.Settings,
-        false
-    );
+        false,
+    ),
+    ;
 
     companion object {
-        fun getPages(isKsuValid: Boolean): List<BottomBarDestination> {
-            return if (isKsuValid) {
-                // 全功能管理器
-                BottomBarDestination.entries.toList()
-            } else {
-                BottomBarDestination.entries.filter {
-                    !it.rootRequired
-                }
+        fun getPages(isKsuValid: Boolean): List<BottomBarDestination> = if (isKsuValid) {
+            // 全功能管理器
+            BottomBarDestination.entries.toList()
+        } else {
+            BottomBarDestination.entries.filter {
+                !it.rootRequired
             }
         }
     }

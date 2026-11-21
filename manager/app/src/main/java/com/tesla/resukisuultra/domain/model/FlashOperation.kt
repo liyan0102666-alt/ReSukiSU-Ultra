@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/FlashOperation.kt
 package com.tesla.resukisuultra.domain.model
+========
+package org.bakasu.bakasu.domain.model
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/FlashOperation.kt
 
 sealed interface FlashOperation {
     data class Boot(
@@ -6,6 +10,9 @@ sealed interface FlashOperation {
         val lkm: LkmSelection = LkmSelection.KmiNone,
         val ota: Boolean,
         val partition: String?,
+        val allowShell: Boolean = false,
+        val enableAdb: Boolean = false,
+        val forceBackup: Boolean = false,
     ) : FlashOperation
 
     data class Module(val uri: String) : FlashOperation

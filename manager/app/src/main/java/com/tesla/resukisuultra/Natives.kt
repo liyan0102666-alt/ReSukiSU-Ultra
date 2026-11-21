@@ -1,11 +1,19 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/Natives.kt
 package com.tesla.resukisuultra
+========
+package org.bakasu.bakasu
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/Natives.kt
 
 import android.os.Parcelable
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/Natives.kt
 import com.tesla.resukisuultra.Natives.Profile.RootProfileFlag
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/Natives.kt
 import kotlinx.parcelize.Parcelize
+import org.bakasu.bakasu.Natives.Profile.RootProfileFlag
 
 /**
  * @author weishu
@@ -20,7 +28,7 @@ object Natives {
     // 11071: Fix the issue of failing to set a custom SELinux type.
     // 12143: breaking: new supercall impl
     // 32310: new get_allow_list ioctl
-    // 34634(upstream 32336): new set_sepolicy ioctl 
+    // 34634(upstream 32336): new set_sepolicy ioctl
     // 34685(upstream 32377): add set_init_pgrp ioctl
     // 34709: breaking: unify uapi
     // 34713: change kernel_su_domain to u:r:ksu:s0
@@ -55,6 +63,9 @@ object Natives {
         external get
 
     val isLkmMode: Boolean
+        external get
+
+    val isLkmBundled: Boolean
         external get
 
     val isLateLoadMode: Boolean
@@ -179,7 +190,7 @@ object Natives {
             NON_ROOT_DEFAULT_PROFILE_KEY,
             NOBODY_UID,
             false,
-            umountModules = umountModules
+            umountModules = umountModules,
         ).let {
             return setAppProfile(it)
         }
@@ -197,26 +208,18 @@ object Natives {
     val managerUAPIVersion: Int
         external get
 
-    fun checkUAPIMismatch(): Boolean {
-        return kernelUAPIVersion != managerUAPIVersion
-    }
-
-    fun requireNewKernel(): Boolean {
-        return (version != -1 && version < MINIMAL_SUPPORTED_KERNEL) || checkUAPIMismatch()
-    }
+    fun isFullFeatured(): Boolean = isManager && kernelUAPIVersion == managerUAPIVersion
 
     @Immutable
     @Parcelize
     @Keep
     data class DynamicManagerConfig(
         val size: Int = 0,
-        val hash: String = ""
+        val hash: String = "",
     ) : Parcelable {
 
-        fun isValid(): Boolean {
-            return size > 0 && hash.length == 64 && hash.all {
-                it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F'
-            }
+        fun isValid(): Boolean = size > 0 && hash.length == 64 && hash.all {
+            it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F'
         }
     }
 
@@ -225,7 +228,7 @@ object Natives {
     @Keep
     data class ManagersList(
         val count: Int = 0,
-        val managers: List<ManagerInfo> = emptyList()
+        val managers: List<ManagerInfo> = emptyList(),
     ) : Parcelable
 
     @Immutable
@@ -233,7 +236,7 @@ object Natives {
     @Keep
     data class ManagerInfo(
         val uid: Int = 0,
-        val signatureIndex: Int = 0
+        val signatureIndex: Int = 0,
     ) : Parcelable
 
     @Immutable
@@ -269,8 +272,8 @@ object Natives {
         enum class RootProfileFlag(val display: String, @param:StringRes val desc: Int) {
             NO_NEW_PRIVS(
                 "NO_NEW_PRIVS",
-                R.string.profile_flags_desc_no_new_privs
-            )
+                R.string.profile_flags_desc_no_new_privs,
+            ),
         }
 
         enum class Namespace {
@@ -285,8 +288,6 @@ object Natives {
     const val FLAG_KSU_NO_NEW_PRIVS = 1L
 }
 
-fun List<RootProfileFlag>.toRawFlags(): Long =
-    fold(0L) { acc, flag -> acc.or(1L.shl(flag.ordinal)) }
+fun List<RootProfileFlag>.toRawFlags(): Long = fold(0L) { acc, flag -> acc.or(1L.shl(flag.ordinal)) }
 
-fun Long.toRootProfileFlags(): List<RootProfileFlag> =
-    RootProfileFlag.entries.filter { 1L.shl(it.ordinal).and(this) != 0L }.toList()
+fun Long.toRootProfileFlags(): List<RootProfileFlag> = RootProfileFlag.entries.filter { 1L.shl(it.ordinal).and(this) != 0L }.toList()

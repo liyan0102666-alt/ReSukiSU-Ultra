@@ -1,7 +1,14 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/usecase/ProfileTemplateUseCases.kt
 package com.tesla.resukisuultra.domain.usecase
 
 import com.tesla.resukisuultra.data.profile.ProfileTemplateRepository
 import com.tesla.resukisuultra.domain.model.ProfileTemplate
+========
+package org.bakasu.bakasu.domain.usecase
+
+import org.bakasu.bakasu.data.profile.ProfileTemplateRepository
+import org.bakasu.bakasu.domain.model.ProfileTemplate
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/usecase/ProfileTemplateUseCases.kt
 
 class ObserveProfileTemplatesUseCase(private val repository: ProfileTemplateRepository) {
     operator fun invoke() = repository.templates
@@ -24,8 +31,7 @@ class GetProfileTemplateUseCase(private val repository: ProfileTemplateRepositor
 }
 
 class SaveProfileTemplateUseCase(private val repository: ProfileTemplateRepository) {
-    suspend operator fun invoke(template: ProfileTemplate, create: Boolean = false) =
-        repository.save(template, create)
+    suspend operator fun invoke(template: ProfileTemplate, create: Boolean = false) = repository.save(template, create)
 }
 
 class DeleteProfileTemplateUseCase(private val repository: ProfileTemplateRepository) {

@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/packageinfo/InstalledPackageCache.kt
 package com.tesla.resukisuultra.data.packageinfo
+========
+package org.bakasu.bakasu.data.packageinfo
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/packageinfo/InstalledPackageCache.kt
 
 import android.content.pm.PackageInfo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +17,5 @@ class InstalledPackageCache {
         mutablePackages.value = packages.toList()
     }
 
-    fun find(packageName: String): PackageInfo? =
-        mutablePackages.value.firstOrNull { it.packageName == packageName }
+    fun find(packageName: String): PackageInfo? = mutablePackages.value.firstOrNull { it.packageName == packageName }
 }
-
