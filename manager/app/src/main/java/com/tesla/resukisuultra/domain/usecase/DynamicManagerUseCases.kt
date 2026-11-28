@@ -1,6 +1,12 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/usecase/DynamicManagerUseCases.kt
 package com.tesla.resukisuultra.domain.usecase
 
 import com.tesla.resukisuultra.data.application.DynamicManagerRepository
+========
+package org.bakasu.bakasu.domain.usecase
+
+import org.bakasu.bakasu.data.application.DynamicManagerRepository
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/usecase/DynamicManagerUseCases.kt
 
 class ObserveDynamicManagerStateUseCase(private val repository: DynamicManagerRepository) {
     operator fun invoke() = repository.state

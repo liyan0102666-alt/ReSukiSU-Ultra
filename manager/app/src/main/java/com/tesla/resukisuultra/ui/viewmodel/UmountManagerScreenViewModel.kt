@@ -1,13 +1,21 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/UmountManagerScreenViewModel.kt
 package com.tesla.resukisuultra.ui.viewmodel
+========
+package org.bakasu.bakasu.ui.viewmodel
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/UmountManagerScreenViewModel.kt
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/UmountManagerScreenViewModel.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.UmountPath
 import com.tesla.resukisuultra.domain.usecase.AddUmountPathUseCase
 import com.tesla.resukisuultra.domain.usecase.ObserveUmountStateUseCase
 import com.tesla.resukisuultra.domain.usecase.RefreshUmountPathsUseCase
 import com.tesla.resukisuultra.domain.usecase.RemoveUmountPathUseCase
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/UmountManagerScreenViewModel.kt
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,6 +24,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.UmountPath
+import org.bakasu.bakasu.domain.usecase.AddUmountPathUseCase
+import org.bakasu.bakasu.domain.usecase.ObserveUmountStateUseCase
+import org.bakasu.bakasu.domain.usecase.RefreshUmountPathsUseCase
+import org.bakasu.bakasu.domain.usecase.RemoveUmountPathUseCase
 
 data class UmountManagerUiState(
     val umountPaths: List<UmountPath> = emptyList(),
@@ -30,10 +44,11 @@ sealed interface UmountManagerUiAction {
 }
 
 sealed interface UmountManagerUiEvent {
-    data class Message(val stringResource: Int) : UmountManagerUiEvent
+    data class Message(val message: String) : UmountManagerUiEvent
 }
 
 class UmountManagerScreenViewModel(
+    private val context: Context,
     observeState: ObserveUmountStateUseCase,
     private val refreshPaths: RefreshUmountPathsUseCase,
     private val addPath: AddUmountPathUseCase,
@@ -56,6 +71,7 @@ class UmountManagerScreenViewModel(
     fun dispatch(action: UmountManagerUiAction) {
         when (action) {
             is UmountManagerUiAction.Refresh -> viewModelScope.launch { refreshPaths() }
+
             is UmountManagerUiAction.Remove -> submit(
                 command = { removePath(action.entry) },
                 successMessage = R.string.umount_path_removed,
@@ -74,7 +90,7 @@ class UmountManagerScreenViewModel(
     ) {
         viewModelScope.launch {
             val message = if (command().isSuccess) successMessage else R.string.operation_failed
-            mutableEvents.emit(UmountManagerUiEvent.Message(message))
+            mutableEvents.emit(UmountManagerUiEvent.Message(context.getString(message)))
         }
     }
 }

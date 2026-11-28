@@ -1,8 +1,15 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/MainIntentViewModel.kt
 package com.tesla.resukisuultra.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tesla.resukisuultra.domain.usecase.GetInstallEnvironmentUseCase
+========
+package org.bakasu.bakasu.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/MainIntentViewModel.kt
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -11,6 +18,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.domain.usecase.GetInstallEnvironmentUseCase
 
 data class MainIntentUiState(
     val rootAvailable: Boolean = false,

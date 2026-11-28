@@ -78,7 +78,7 @@ pub enum SuSFSSubCommands {
     /// This command must be completed with <update_sus_kstat> later after the added path is bind mounted or overlayed.
     ///
     /// * Important Notes *
-    /// - Only effective for umounted process with uid >= 10000.
+    /// - Effective for all processes with uid >= 10000
     #[command(name = "add_sus_kstat")]
     AddSusKstat {
         /// Path of file or directory
@@ -90,7 +90,7 @@ pub enum SuSFSSubCommands {
     /// This updates the target ino, but size and blocks are remained the same as current stat.
     ///
     /// * Important Notes *
-    /// - Only effective for umounted process with uid >= 10000.
+    /// - Effective for all processes with uid >= 10000
     #[command(name = "update_sus_kstat")]
     UpdateSusKstat {
         /// Path of file or directory
@@ -102,7 +102,7 @@ pub enum SuSFSSubCommands {
     /// This updates the target ino only, other stat members are remained the same as the original stat.
     ///
     /// * Important Notes *
-    /// - Only effective for umounted process with uid >= 10000.
+    /// - Effective for all processes with uid >= 10000
     #[command(name = "update_sus_kstat_full_clone")]
     UpdateSusKstatFullClone {
         /// Path of file or directory
@@ -112,7 +112,7 @@ pub enum SuSFSSubCommands {
     /// Spoof the kstat of a file or directory by static fields.
     ///
     /// * Important Notes *
-    /// - Only effective for umounted process with uid >= 10000.
+    /// - Effective for all processes with uid >= 10000.
     #[command(name = "add_sus_kstat_statically")]
     AddSusKstatStatically {
         /// Path of file or directory
@@ -207,6 +207,16 @@ pub enum SuSFSSubCommands {
         #[arg(action = ArgAction::Set, value_parser = treat_int_as_boolean)]
         enabled: bool,
     },
+
+    /// Replace the app package list whose UIDs are hidden from priority syscalls.
+    /// Pass an empty string to clear the filter. Only app UIDs 10000..19999 are supported.
+    #[command(name = "set_priority_uid_filter")]
+    SetPriorityUidFilter { apps: String },
+
+    /// Replace the comma-separated list of apps allowed to see SUS paths.
+    /// Only app UIDs 10000..19999 can be selected. Pass an empty string to clear.
+    #[command(name = "set_sus_path_uid_filter")]
+    SetSusPathUidFilter { apps: String },
 
     /// Show version, enabled_features, or variant info.
     Show {
@@ -339,6 +349,12 @@ pub fn run_main(args: SusfsArgs) -> Result<()> {
         }
         SuSFSSubCommands::EnableAvcLogSpoofing { enabled } => {
             api::enable_avc_log_spoofing(enabled)?;
+        }
+        SuSFSSubCommands::SetPriorityUidFilter { apps } => {
+            api::set_priority_uid_filter(&apps)?;
+        }
+        SuSFSSubCommands::SetSusPathUidFilter { apps } => {
+            api::set_sus_path_uid_filter(&apps)?;
         }
         SuSFSSubCommands::Show { info_type } => match info_type {
             ShowType::Version => {

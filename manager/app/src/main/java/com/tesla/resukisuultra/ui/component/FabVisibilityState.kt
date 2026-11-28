@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/FabVisibilityState.kt
 package com.tesla.resukisuultra.ui.component
+========
+package org.bakasu.bakasu.ui.component
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/FabVisibilityState.kt
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
@@ -51,14 +55,13 @@ fun rememberFabVisibilityState(listState: LazyListState): State<Boolean> {
 fun AnimatedFab(
     visible: Boolean,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
-
     AnimatedVisibility(
         modifier = modifier,
         visible = visible,
         enter = fadeIn() + scaleIn(),
-        exit = fadeOut() + scaleOut(targetScale = 0.8f)
+        exit = fadeOut() + scaleOut(targetScale = 0.8f),
     ) {
         content()
     }

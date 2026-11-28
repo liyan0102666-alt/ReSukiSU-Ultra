@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/SulogViewModel.kt
 package com.tesla.resukisuultra.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,12 @@ import com.tesla.resukisuultra.domain.usecase.GetStringSetPreferenceUseCase
 import com.tesla.resukisuultra.domain.usecase.ObserveSulogStateUseCase
 import com.tesla.resukisuultra.domain.usecase.RefreshSulogUseCase
 import com.tesla.resukisuultra.domain.usecase.SetStringSetPreferenceUseCase
+========
+package org.bakasu.bakasu.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/SulogViewModel.kt
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +30,17 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.domain.model.SulogEntry
+import org.bakasu.bakasu.domain.model.SulogEventFilter
+import org.bakasu.bakasu.domain.model.SulogFile
+import org.bakasu.bakasu.domain.model.defaultSulogEventFilters
+import org.bakasu.bakasu.domain.model.filterSulogEntries
+import org.bakasu.bakasu.domain.usecase.CleanSulogUseCase
+import org.bakasu.bakasu.domain.usecase.EnableSulogUseCase
+import org.bakasu.bakasu.domain.usecase.GetStringSetPreferenceUseCase
+import org.bakasu.bakasu.domain.usecase.ObserveSulogStateUseCase
+import org.bakasu.bakasu.domain.usecase.RefreshSulogUseCase
+import org.bakasu.bakasu.domain.usecase.SetStringSetPreferenceUseCase
 
 data class SulogScreenState(
     val isLoading: Boolean = true,
@@ -82,7 +100,7 @@ class SulogViewModel(
         getStringSetPreference(PREF_SULOG_FILTERS)
             .mapNotNull { raw -> SulogEventFilter.entries.firstOrNull { it.name == raw } }
             .toSet()
-            .ifEmpty(::defaultSulogEventFilters)
+            .ifEmpty(::defaultSulogEventFilters),
     )
     private var refreshJob: Job? = null
     private val mutableEvents = MutableSharedFlow<SulogUiEvent>(extraBufferCapacity = 1)
@@ -116,7 +134,9 @@ class SulogViewModel(
     fun dispatch(action: SulogUiAction) {
         when (action) {
             SulogUiAction.Refresh -> refresh(state.value.selectedFilePath)
+
             SulogUiAction.RefreshLatest -> refresh(null)
+
             SulogUiAction.Enable -> viewModelScope.launch {
                 val result = setSulogEnabled(true)
                 result.exceptionOrNull()?.let {
@@ -134,6 +154,7 @@ class SulogViewModel(
             }
 
             is SulogUiAction.Search -> search.value = action.query
+
             is SulogUiAction.ToggleFilter -> {
                 filters.value = filters.value.toMutableSet().apply {
                     if (!add(action.filter)) remove(action.filter)

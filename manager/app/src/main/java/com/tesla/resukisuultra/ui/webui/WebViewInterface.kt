@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/webui/WebViewInterface.kt
 package com.tesla.resukisuultra.ui.webui
+========
+package org.bakasu.bakasu.ui.webui
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/webui/WebViewInterface.kt
 
 import android.app.Activity
 import android.os.Handler
@@ -9,11 +13,18 @@ import android.webkit.JavascriptInterface
 import android.widget.Toast
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/webui/WebViewInterface.kt
 import com.tesla.resukisuultra.data.packageinfo.InstalledPackageRepository
 import com.tesla.resukisuultra.data.webui.WebUiRepository
+========
+import java.io.File
+import org.bakasu.bakasu.data.packageinfo.InstalledPackageRepository
+import org.bakasu.bakasu.data.webui.WebUiRepository
+import org.bakasu.bakasu.ui.webui.file.KsuIO
+import org.bakasu.bakasu.ui.webui.pm.KsuPm
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/webui/WebViewInterface.kt
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.File
 
 @Suppress("unused")
 class WebViewInterface(
@@ -21,13 +32,15 @@ class WebViewInterface(
     private val packageRepository: InstalledPackageRepository,
     private val webUiRepository: WebUiRepository,
 ) {
-    private val webView get() = state.webView!!
+    private val mainHandler = Handler(Looper.getMainLooper())
     private val modDir get() = state.modDir
 
-    @JavascriptInterface
-    fun exec(cmd: String): String {
-        return webUiRepository.execute(cmd).stdout
+    private fun postToWebView(action: (android.webkit.WebView) -> Unit) {
+        mainHandler.post { state.webView?.let(action) }
     }
+
+    @JavascriptInterface
+    fun exec(cmd: String): String = webUiRepository.execute(cmd).stdout
 
     @JavascriptInterface
     fun exec(cmd: String, callbackFunc: String) {
@@ -35,18 +48,20 @@ class WebViewInterface(
     }
 
     private fun processOptions(sb: StringBuilder, options: String?) {
-        val opts = if (options == null) JSONObject() else {
+        val opts = if (options == null) {
+            JSONObject()
+        } else {
             JSONObject(options)
         }
 
         val cwd = opts.optString("cwd")
         if (!TextUtils.isEmpty(cwd)) {
-            sb.append("cd ${cwd};")
+            sb.append("cd $cwd;")
         }
 
         opts.optJSONObject("env")?.let { env ->
             env.keys().forEach { key ->
-                sb.append("export ${key}=${env.getString(key)};")
+                sb.append("export $key=${env.getString(key)};")
             }
         }
     }
@@ -55,7 +70,7 @@ class WebViewInterface(
     fun exec(
         cmd: String,
         options: String?,
-        callbackFunc: String
+        callbackFunc: String,
     ) {
         val finalCommand = StringBuilder()
         processOptions(finalCommand, options)
@@ -66,14 +81,12 @@ class WebViewInterface(
         val stderr = result.stderr
 
         val jsCode =
-            "javascript: (function() { try { ${callbackFunc}(${result.code}, ${
+            "javascript: (function() { try { $callbackFunc(${result.code}, ${
                 JSONObject.quote(
-                    stdout
+                    stdout,
                 )
             }, ${JSONObject.quote(stderr)}); } catch(e) { console.error(e); } })();"
-        webView.post {
-            webView.loadUrl(jsCode)
-        }
+        postToWebView { it.loadUrl(jsCode) }
     }
 
     @JavascriptInterface
@@ -96,14 +109,12 @@ class WebViewInterface(
 
         val emitData = fun(name: String, data: String) {
             val jsCode =
-                "javascript: (function() { try { ${callbackFunc}.${name}.emit('data', ${
+                "javascript: (function() { try { $callbackFunc.$name.emit('data', ${
                     JSONObject.quote(
-                        data
+                        data,
                     )
                 }); } catch(e) { console.error('emitData', e); } })();"
-            webView.post {
-                webView.loadUrl(jsCode)
-            }
+            postToWebView { it.loadUrl(jsCode) }
         }
 
         val process = webUiRepository.spawn(finalCommand.toString(), true)
@@ -111,47 +122,43 @@ class WebViewInterface(
             onStdout = { emitData("stdout", it) },
             onStderr = { emitData("stderr", it) },
             onComplete = { result ->
-            val emitExitCode =
-                "javascript: (function() { try { ${callbackFunc}.emit('exit', ${result.code}); } catch(e) { console.error(`emitExit error: \${e}`); } })();"
-            webView.post {
-                webView.loadUrl(emitExitCode)
-            }
+                val emitExitCode =
+                    "javascript: (function() { try { $callbackFunc.emit('exit', ${result.code}); } catch(e) { console.error(`emitExit error: \${e}`); } })();"
+                postToWebView { it.loadUrl(emitExitCode) }
 
-            if (result.code != 0) {
-                val emitErrCode =
-                    "javascript: (function() { try { var err = new Error(); err.exitCode = ${result.code}; err.message = ${
-                        JSONObject.quote(
-                            result.stderr
-                        )
-                    };${callbackFunc}.emit('error', err); } catch(e) { console.error('emitErr', e); } })();"
-                webView.post {
-                    webView.loadUrl(emitErrCode)
+                if (result.code != 0) {
+                    val emitErrCode =
+                        "javascript: (function() { try { var err = new Error(); err.exitCode = ${result.code}; err.message = ${
+                            JSONObject.quote(
+                                result.stderr,
+                            )
+                        };$callbackFunc.emit('error', err); } catch(e) { console.error('emitErr', e); } })();"
+                    postToWebView { it.loadUrl(emitErrCode) }
                 }
-            }
-            }
+            },
         )
     }
 
     @JavascriptInterface
     fun toast(msg: String) {
-        webView.post {
-            Toast.makeText(webView.context, msg, Toast.LENGTH_SHORT).show()
+        postToWebView { view ->
+            Toast.makeText(view.context, msg, Toast.LENGTH_SHORT).show()
         }
     }
 
     @JavascriptInterface
     fun fullScreen(enable: Boolean) {
-        val context = webView.context
-        if (context is Activity) {
-            Handler(Looper.getMainLooper()).post {
+        postToWebView { view ->
+            val context = view.context
+            if (context is Activity) {
                 if (enable) {
                     hideSystemUI(context.window)
                 } else {
                     showSystemUI(context.window)
                 }
             }
+            enableEdgeToEdge(enable)
         }
-        enableEdgeToEdge(enable)
     }
 
     @JavascriptInterface
@@ -186,6 +193,7 @@ class WebViewInterface(
         return currentModuleInfo.toString()
     }
 
+    @Deprecated("Use ksu.pm().listPackages() instead")
     @JavascriptInterface
     fun listPackages(type: String): String {
         val packageNames = packageRepository.packages.value
@@ -206,6 +214,7 @@ class WebViewInterface(
         return jsonArray.toString()
     }
 
+    @Deprecated("Use ksu.pm().getPackagesInfo() instead")
     @JavascriptInterface
     fun getPackagesInfo(packageNamesJson: String): String {
         val packageNames = JSONArray(packageNamesJson)
@@ -237,13 +246,21 @@ class WebViewInterface(
     fun exit() {
         state.requestExit()
     }
+
+    @JavascriptInterface
+    fun io() = KsuIO
+
+    @JavascriptInterface
+    fun pm() = KsuPm(packageRepository)
+
+    fun destroy() {
+        KsuIO.destroy()
+    }
 }
 
-fun hideSystemUI(window: Window) =
-    WindowInsetsControllerCompat(window, window.decorView).let { controller ->
-        controller.hide(WindowInsetsCompat.Type.systemBars())
-        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-    }
+fun hideSystemUI(window: Window) = WindowInsetsControllerCompat(window, window.decorView).let { controller ->
+    controller.hide(WindowInsetsCompat.Type.systemBars())
+    controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+}
 
-fun showSystemUI(window: Window) =
-    WindowInsetsControllerCompat(window, window.decorView).show(WindowInsetsCompat.Type.systemBars())
+fun showSystemUI(window: Window) = WindowInsetsControllerCompat(window, window.decorView).show(WindowInsetsCompat.Type.systemBars())

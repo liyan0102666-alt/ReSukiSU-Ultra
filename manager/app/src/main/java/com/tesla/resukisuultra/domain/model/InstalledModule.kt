@@ -1,4 +1,11 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/domain/model/InstalledModule.kt
 package com.tesla.resukisuultra.domain.model
+========
+package org.bakasu.bakasu.domain.model
+
+import androidx.annotation.StringRes
+import org.bakasu.bakasu.R
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/domain/model/InstalledModule.kt
 
 data class InstalledModule(
     val id: String,
@@ -32,12 +39,11 @@ data class ModulePreferences(
     val sortEnabledFirst: Boolean = false,
     val sortActionFirst: Boolean = false,
     val showMoreModuleInfo: Boolean = false,
-    val isHideTagRow: Boolean = false,
 )
 
-enum class MetaModuleStatus {
+enum class MetaModuleStatus(@param:StringRes val resId: Int? = null) {
     ACTIVE,
-    MISSING,
-    REMOVED,
-    DISABLED,
+    MISSING(R.string.no_meta_module_installed),
+    REMOVED(R.string.meta_module_removed),
+    DISABLED(R.string.meta_module_disabled),
 }
