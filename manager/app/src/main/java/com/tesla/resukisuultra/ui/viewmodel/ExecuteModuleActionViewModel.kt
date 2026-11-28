@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/ExecuteModuleActionViewModel.kt
 package com.tesla.resukisuultra.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
@@ -5,6 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.tesla.resukisuultra.domain.model.ModuleActionUpdate
 import com.tesla.resukisuultra.domain.usecase.ExecuteModuleActionUseCase
 import com.tesla.resukisuultra.domain.usecase.SaveModuleActionLogUseCase
+========
+package org.bakasu.bakasu.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/ExecuteModuleActionViewModel.kt
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +21,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.domain.model.ModuleActionUpdate
+import org.bakasu.bakasu.domain.usecase.ExecuteModuleActionUseCase
+import org.bakasu.bakasu.domain.usecase.SaveModuleActionLogUseCase
 
 data class ExecuteModuleActionUiState(
     val output: String = "",
@@ -60,6 +70,7 @@ class ExecuteModuleActionViewModel(
             executeModuleAction(moduleId).collect { update ->
                 when (update) {
                     is ModuleActionUpdate.Output -> appendOutput(update.text, update.isError)
+
                     is ModuleActionUpdate.Completed -> {
                         mutableState.update { it.copy(running = false) }
                         mutableEvents.emit(ExecuteModuleActionUiEvent.Completed(update.successful))

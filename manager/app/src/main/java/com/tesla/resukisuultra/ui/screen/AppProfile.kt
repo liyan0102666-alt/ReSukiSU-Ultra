@@ -1,5 +1,9 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/AppProfile.kt
 package com.tesla.resukisuultra.ui.screen
 import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
+========
+package org.bakasu.bakasu.ui.screen
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/AppProfile.kt
 
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -14,14 +18,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,15 +41,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -62,6 +63,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.dropUnlessResumed
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/AppProfile.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.AppControlAction
 import com.tesla.resukisuultra.domain.model.AppProfile
@@ -91,8 +93,41 @@ import com.tesla.resukisuultra.ui.util.showReplacingSnackbar
 import com.tesla.resukisuultra.ui.viewmodel.AppProfileUiAction
 import com.tesla.resukisuultra.ui.viewmodel.AppProfileUiEvent
 import com.tesla.resukisuultra.ui.viewmodel.AppProfileViewModel
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/AppProfile.kt
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.AppControlAction
+import org.bakasu.bakasu.domain.model.AppProfile
+import org.bakasu.bakasu.domain.model.InstalledApp
+import org.bakasu.bakasu.domain.model.InstalledAppGroup
+import org.bakasu.bakasu.ui.component.PackageIcon
+import org.bakasu.bakasu.ui.component.SwipeableSnackbarHost
+import org.bakasu.bakasu.ui.component.profile.AppProfileConfig
+import org.bakasu.bakasu.ui.component.profile.RootProfileConfig
+import org.bakasu.bakasu.ui.component.profile.TemplateConfig
+import org.bakasu.bakasu.ui.component.settings.AppBackButton
+import org.bakasu.bakasu.ui.component.settings.SegmentedColumn
+import org.bakasu.bakasu.ui.component.settings.SettingsBaseWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsDropdownWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsJumpPageWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsSwitchWidget
+import org.bakasu.bakasu.ui.component.settings.lazySegmentColumn
+import org.bakasu.bakasu.ui.navigation.LocalNavigator
+import org.bakasu.bakasu.ui.navigation.Route
+import org.bakasu.bakasu.ui.theme.CardConfig
+import org.bakasu.bakasu.ui.theme.ThemeConfig
+import org.bakasu.bakasu.ui.theme.blurEffect
+import org.bakasu.bakasu.ui.theme.blurSource
+import org.bakasu.bakasu.ui.theme.renderBackgroundBlur
+import org.bakasu.bakasu.ui.util.ActivityResumeEffect
+import org.bakasu.bakasu.ui.util.LocalSnackbarHost
+import org.bakasu.bakasu.ui.util.adaptiveScaffoldWindowInsets
+import org.bakasu.bakasu.ui.util.showReplacingSnackbar
+import org.bakasu.bakasu.ui.viewmodel.AppProfileUiAction
+import org.bakasu.bakasu.ui.viewmodel.AppProfileUiEvent
+import org.bakasu.bakasu.ui.viewmodel.AppProfileViewModel
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -118,8 +153,9 @@ fun AppProfileScreen(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val appGroup = uiState.appGroup
     val appLabel = appGroup?.mainApp?.label ?: packageName
+    val isSpecial = appGroup?.isWebViewZygote == true
     val failToUpdateAppProfile = stringResource(R.string.failed_to_update_app_profile).format(
-        appLabel
+        appLabel,
     )
     val failToUpdateSepolicy =
         stringResource(R.string.failed_to_update_sepolicy).format(appLabel)
@@ -129,7 +165,7 @@ fun AppProfileScreen(
         viewModel.events.collectLatest { event ->
             when (event) {
                 is AppProfileUiEvent.Error -> snackBarHost.showReplacingSnackbar(
-                    failToUpdateAppProfile
+                    failToUpdateAppProfile,
                 )
 
                 AppProfileUiEvent.SepolicyUpdateFailed ->
@@ -159,27 +195,37 @@ fun AppProfileScreen(
         colorScheme.surfaceContainer
     }
 
-    LaunchedEffect(Unit) {
-        scrollBehavior.state.heightOffset = scrollBehavior.state.heightOffsetLimit
-    }
-    
     Scaffold(
         topBar = {
-            TopBar(
-                title = appGroup.mainApp.label,
-                packageName = packageName,
+            LargeFlexibleTopAppBar(
+                modifier = Modifier.blurEffect(),
+                title = {
+                    Text(
+                        text = appGroup.mainApp.label,
+                    )
+                },
+                subtitle = {
+                    Text(
+                        text = appGroup.mainApp.displayIdentifier,
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = cardColor,
-                    scrolledContainerColor = cardColor
+                    scrolledContainerColor = cardColor,
                 ),
-                onBack = dropUnlessResumed { navigator.pop() },
+                navigationIcon = {
+                    AppBackButton(
+                        onClick = dropUnlessResumed { navigator.pop() },
+                    )
+                },
+                windowInsets = TopAppBarDefaults.windowInsets.add(WindowInsets(left = 12.dp)),
                 scrollBehavior = scrollBehavior,
             )
         },
         snackbarHost = { SwipeableSnackbarHost(hostState = snackBarHost) },
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
     ) { paddingValues ->
         AppProfileInner(
             modifier = Modifier
@@ -187,10 +233,12 @@ fun AppProfileScreen(
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .blurSource(),
             topPadding = paddingValues.calculateTopPadding(),
+            bottomPadding = paddingValues.calculateBottomPadding(),
             appGroup = appGroup,
+            isSpecial = isSpecial,
             appIcon = {
                 PackageIcon(
-                    packageName = appGroup.mainApp.packageName,
+                    packageName = if (isSpecial) "android" else appGroup.mainApp.packageName,
                     contentDescription = appGroup.mainApp.label,
                     modifier = Modifier
                         .padding(4.dp)
@@ -232,7 +280,9 @@ fun AppProfileScreen(
 private fun AppProfileInner(
     modifier: Modifier = Modifier,
     topPadding: Dp,
+    bottomPadding: Dp = 0.dp,
     appGroup: InstalledAppGroup,
+    isSpecial: Boolean = false,
     appIcon: @Composable () -> Unit,
     profile: AppProfile,
     defaultUmountModules: Boolean = profile.umountModules,
@@ -244,8 +294,11 @@ private fun AppProfileInner(
     onProfileChange: (AppProfile) -> Unit,
 ) {
     val cardConfig: CardConfig = koinInject()
-    val isRootGranted = profile.allowSu
+    val themeConfig: ThemeConfig = koinInject()
+    val isRootGranted = !isSpecial && profile.allowSu
     val affectedApplicationsTitle = stringResource(R.string.affected_applications)
+    val currentAppIcon by rememberUpdatedState(appIcon)
+    val iconContent = remember { movableContentOf { currentAppIcon() } }
 
     LazyColumn(modifier = modifier) {
         item {
@@ -253,30 +306,43 @@ private fun AppProfileInner(
         }
 
         item {
-            SettingsDropdownWidget(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                title = appGroup.mainApp.label,
-                description = appGroup.mainApp.packageName,
-                iconPlaceholder = false,
-                leadingContent = {
-                    appIcon()
-                },
-                choice = -1,
-                data = listOf(
-                    stringResource(id = R.string.launch_app),
-                    stringResource(id = R.string.force_stop_app),
-                    stringResource(id = R.string.restart_app)
+            if (isSpecial) {
+                SettingsBaseWidget(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    title = appGroup.mainApp.label,
+                    description = appGroup.mainApp.displayIdentifier,
+                    iconPlaceholder = false,
+                    leadingContent = {
+                        iconContent()
+                    },
                 )
-            ) { choice ->
-                when (choice) {
-                    0 -> onControlApp(AppControlAction.LAUNCH)
-                    1 -> onControlApp(AppControlAction.FORCE_STOP)
-                    2 -> onControlApp(AppControlAction.RESTART)
-                    else -> throw IllegalStateException("Illegal choice: $choice")
+            } else {
+                SettingsDropdownWidget(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    title = appGroup.mainApp.label,
+                    description = appGroup.mainApp.displayIdentifier,
+                    iconPlaceholder = false,
+                    leadingContent = {
+                        iconContent()
+                    },
+                    choice = -1,
+                    data = listOf(
+                        stringResource(id = R.string.launch_app),
+                        stringResource(id = R.string.force_stop_app),
+                        stringResource(id = R.string.restart_app),
+                    ),
+                ) { choice ->
+                    when (choice) {
+                        0 -> onControlApp(AppControlAction.LAUNCH)
+                        1 -> onControlApp(AppControlAction.FORCE_STOP)
+                        2 -> onControlApp(AppControlAction.RESTART)
+                        else -> throw IllegalStateException("Illegal choice: $choice")
+                    }
                 }
             }
         }
 
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/AppProfile.kt
         item {
             Surface(
                 modifier = Modifier
@@ -294,14 +360,35 @@ private fun AppProfileInner(
                     title = stringResource(id = R.string.superuser),
                     checked = isRootGranted,
                     onCheckedChange = { onProfileChange(profile.copy(allowSu = it)) },
+========
+        if (!isSpecial) {
+            item {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.surfaceBright.copy(
+                        alpha = cardConfig.cardAlpha,
+                    ),
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/AppProfile.kt
                 )
+                {
+                    SettingsSwitchWidget(
+                        icon = Icons.TwoTone.Security,
+                        title = stringResource(id = R.string.superuser),
+                        checked = isRootGranted,
+                        onCheckedChange = { onProfileChange(profile.copy(allowSu = it)) },
+                    )
+                }
             }
         }
 
         item {
             Crossfade(
                 targetState = isRootGranted,
-                label = "RootAccess"
+                label = "RootAccess",
             )
             { current ->
                 Column {
@@ -324,10 +411,21 @@ private fun AppProfileInner(
                                 .padding(top = 8.dp)
                                 .clip(ContinuousCornerShape(16.dp))
                                 .renderBackgroundBlur(MaterialTheme.colorScheme.surfaceBright),
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/AppProfile.kt
                             shape = ContinuousCornerShape(16.dp),
                             color = MaterialTheme.colorScheme.surfaceBright.copy(
                                 alpha = cardConfig.cardAlpha
                             ),
+========
+                            shape = RoundedCornerShape(16.dp),
+                            color = if (themeConfig.isEnableBlurExp) {
+                                Color.Transparent
+                            } else {
+                                MaterialTheme.colorScheme.surfaceBright.copy(
+                                    alpha = cardConfig.cardAlpha,
+                                )
+                            },
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/AppProfile.kt
                             contentColor = MaterialTheme.colorScheme.onSurface,
                         ) {
                             ProfileBox(mode, true) {
@@ -336,8 +434,8 @@ private fun AppProfileInner(
                                     onProfileChange(
                                         profile.copy(
                                             rootUseDefault = it == Mode.Default,
-                                            rootTemplate = null
-                                        )
+                                            rootTemplate = null,
+                                        ),
                                     )
                                 }
                                 mode = it
@@ -347,11 +445,11 @@ private fun AppProfileInner(
                         AnimatedVisibility(
                             visible = mode != Mode.Default,
                             enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically()
+                            exit = fadeOut() + shrinkVertically(),
                         ) {
                             Crossfade(
                                 targetState = mode,
-                                label = "ProfileMode"
+                                label = "ProfileMode",
                             ) { currentMode ->
                                 when (currentMode) {
                                     Mode.Template -> {
@@ -360,7 +458,7 @@ private fun AppProfileInner(
                                                 TemplateConfig(
                                                     profile = profile,
                                                     onViewTemplate = onViewTemplate,
-                                                    onProfileChange = onProfileChange
+                                                    onProfileChange = onProfileChange,
                                                 )
                                             }
 
@@ -371,7 +469,7 @@ private fun AppProfileInner(
                                                     description = stringResource(R.string.settings_profile_template_summary),
                                                     onClick = {
                                                         onManageTemplate()
-                                                    }
+                                                    },
                                                 )
                                             }
                                         }
@@ -382,7 +480,7 @@ private fun AppProfileInner(
                                             profile = profile,
                                             sepolicyValid = sepolicyValid,
                                             onValidateSepolicy = onValidateSepolicy,
-                                            onProfileChange = onProfileChange
+                                            onProfileChange = onProfileChange,
                                         )
                                     }
 
@@ -400,10 +498,21 @@ private fun AppProfileInner(
                                 .padding(top = 8.dp)
                                 .clip(ContinuousCornerShape(16.dp))
                                 .renderBackgroundBlur(MaterialTheme.colorScheme.surfaceBright),
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/AppProfile.kt
                             shape = ContinuousCornerShape(16.dp),
                             color = MaterialTheme.colorScheme.surfaceBright.copy(
                                 alpha = cardConfig.cardAlpha
                             ),
+========
+                            shape = RoundedCornerShape(16.dp),
+                            color = if (themeConfig.isEnableBlurExp) {
+                                Color.Transparent
+                            } else {
+                                MaterialTheme.colorScheme.surfaceBright.copy(
+                                    alpha = cardConfig.cardAlpha,
+                                )
+                            },
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/AppProfile.kt
                             contentColor = MaterialTheme.colorScheme.onSurface,
                         ) {
                             ProfileBox(mode, false) {
@@ -414,7 +523,7 @@ private fun AppProfileInner(
                         AnimatedVisibility(
                             visible = mode == Mode.Custom,
                             enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically()
+                            exit = fadeOut() + shrinkVertically(),
                         ) {
                             Surface(
                                 modifier = Modifier
@@ -423,7 +532,7 @@ private fun AppProfileInner(
                                     .padding(top = 8.dp),
                                 shape = ContinuousCornerShape(16.dp),
                                 color = MaterialTheme.colorScheme.surfaceBright.copy(
-                                    alpha = cardConfig.cardAlpha
+                                    alpha = cardConfig.cardAlpha,
                                 ),
                                 contentColor = MaterialTheme.colorScheme.onSurface,
                             ) {
@@ -431,7 +540,7 @@ private fun AppProfileInner(
                                     enabled = mode == Mode.Custom,
                                     profile = profile,
                                     defaultUmountModules = defaultUmountModules,
-                                    onProfileChange = onProfileChange
+                                    onProfileChange = onProfileChange,
                                 )
                             }
                         }
@@ -466,49 +575,23 @@ private fun AppProfileInner(
         }
 
         item {
-            Spacer(modifier = Modifier.height(6.dp + 48.dp + 6.dp /* SnackBar height */))
+            Spacer(
+                modifier = Modifier.height(
+                    bottomPadding + 6.dp + 48.dp + 6.dp, /* SnackBar height */
+                ),
+            )
         }
     }
 }
 
 private enum class Mode(@param:StringRes private val res: Int) {
-    Default(R.string.profile_default), Template(R.string.profile_template), Custom(R.string.profile_custom);
+    Default(R.string.profile_default),
+    Template(R.string.profile_template),
+    Custom(R.string.profile_custom),
+    ;
 
     val text: String
         @Composable get() = stringResource(res)
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun TopBar(
-    title: String,
-    packageName: String,
-    onBack: () -> Unit,
-    colors: TopAppBarColors,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-) {
-    LargeFlexibleTopAppBar(
-        modifier = Modifier.blurEffect(
-        ),
-        title = {
-            Text(
-                text = title,
-            )
-        },
-        subtitle = {
-            Text(
-                text = packageName
-            )
-        },
-        colors = colors,
-        navigationIcon = {
-            AppBackButton(
-                onClick = onBack
-            )
-        },
-        windowInsets = TopAppBarDefaults.windowInsets.add(WindowInsets(left = 12.dp)),
-        scrollBehavior = scrollBehavior,
-    )
 }
 
 @Composable
@@ -520,16 +603,18 @@ private fun ProfileBox(
     Column {
         SettingsBaseWidget(
             icon = Icons.TwoTone.AccountCircle,
+            iconColor = MaterialTheme.colorScheme.onSurface,
             title = stringResource(R.string.profile),
             description = mode.text,
             isOnBackground = false,
-            containerAlpha = 0f
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onSurface,
         )
 
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
         )
         {
             FilterChip(
@@ -538,7 +623,7 @@ private fun ProfileBox(
                 label = {
                     Text(
                         text = stringResource(R.string.profile_default),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 },
                 shape = MaterialTheme.shapes.medium,
@@ -551,7 +636,7 @@ private fun ProfileBox(
                     label = {
                         Text(
                             text = stringResource(R.string.profile_template),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     },
                     shape = MaterialTheme.shapes.medium,
@@ -564,7 +649,7 @@ private fun ProfileBox(
                 label = {
                     Text(
                         text = stringResource(R.string.profile_custom),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 },
                 shape = MaterialTheme.shapes.medium,
@@ -580,7 +665,7 @@ private fun AppProfilePreview() {
     var profile by remember { mutableStateOf(AppProfile("")) }
 
     Surface(
-        color = if (cardConfig.isCustomBackgroundEnabled) Color.Transparent else MaterialTheme.colorScheme.surfaceBright
+        color = if (cardConfig.isCustomBackgroundEnabled) Color.Transparent else MaterialTheme.colorScheme.surfaceBright,
     ) {
         AppProfileInner(
             appGroup = InstalledAppGroup(

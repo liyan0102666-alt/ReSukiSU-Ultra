@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/util/HyperlinkText.kt
 package com.tesla.resukisuultra.ui.util
+========
+package org.bakasu.bakasu.ui.util
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/util/HyperlinkText.kt
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.material3.MaterialTheme
@@ -18,7 +22,7 @@ import java.util.regex.Pattern
 @Composable
 fun LinkifyText(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val uriHandler = LocalUriHandler.current
     val layoutResult = remember {
@@ -31,16 +35,16 @@ fun LinkifyText(
             addStyle(
                 style = SpanStyle(
                     color = MaterialTheme.colorScheme.primary,
-                    textDecoration = TextDecoration.Underline
+                    textDecoration = TextDecoration.Underline,
                 ),
                 start = it.start,
-                end = it.end
+                end = it.end,
             )
             addStringAnnotation(
                 tag = "URL",
                 annotation = it.url,
                 start = it.start,
-                end = it.end
+                end = it.end,
             )
         }
     }
@@ -59,21 +63,21 @@ fun LinkifyText(
                 }
             }
         },
-        onTextLayout = { layoutResult.value = it }
+        onTextLayout = { layoutResult.value = it },
     )
 }
 
 private val urlPattern: Pattern = Pattern.compile(
-    "(?:^|\\W)((ht|f)tp(s?)://|www\\.)"
-            + "(([\\w\\-]+\\.)+([\\w\\-.~]+/?)*"
-            + "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]*$~@!:/{};']*)",
-    Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL
+    "(?:^|\\W)((ht|f)tp(s?)://|www\\.)" +
+        "(([\\w\\-]+\\.)+([\\w\\-.~]+/?)*" +
+        "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]*$~@!:/{};']*)",
+    Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL,
 )
 
 private data class LinkInfo(
     val url: String,
     val start: Int,
-    val end: Int
+    val end: Int,
 )
 
 @Suppress("HttpUrlsUsage")

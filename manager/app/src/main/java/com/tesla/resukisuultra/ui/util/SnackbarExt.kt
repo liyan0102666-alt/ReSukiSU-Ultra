@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/util/SnackbarExt.kt
 package com.tesla.resukisuultra.ui.util
+========
+package org.bakasu.bakasu.ui.util
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/util/SnackbarExt.kt
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState

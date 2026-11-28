@@ -1,5 +1,9 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/component/SuSFSConfigComponents.kt
 package com.tesla.resukisuultra.ui.screen.susfs.component
 import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
+========
+package org.bakasu.bakasu.ui.screen.susfs.component
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/component/SuSFSConfigComponents.kt
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,12 +29,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/component/SuSFSConfigComponents.kt
 import com.tesla.resukisuultra.ui.component.settings.SettingsJumpPageWidget
 import com.tesla.resukisuultra.ui.component.settings.lazySegmentColumn
 import com.tesla.resukisuultra.ui.theme.ThemeConfig
 import com.tesla.resukisuultra.ui.theme.renderBackgroundBlur
+========
+import org.bakasu.bakasu.ui.component.settings.SettingsJumpPageWidget
+import org.bakasu.bakasu.ui.component.settings.lazySegmentColumn
+import org.bakasu.bakasu.ui.theme.ThemeConfig
+import org.bakasu.bakasu.ui.theme.renderBackgroundBlur
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/component/SuSFSConfigComponents.kt
 import org.koin.compose.koinInject
-
 
 private const val ADD_ENTRY_KEY = "susfs_add_entry"
 private const val EMPTY_STATE_KEY = "susfs_empty_state"

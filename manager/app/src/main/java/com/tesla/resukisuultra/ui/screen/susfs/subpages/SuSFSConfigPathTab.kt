@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/subpages/SuSFSConfigPathTab.kt
 package com.tesla.resukisuultra.ui.screen.susfs.subpages
+========
+package org.bakasu.bakasu.ui.screen.susfs.subpages
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/subpages/SuSFSConfigPathTab.kt
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/susfs/subpages/SuSFSConfigPathTab.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.SusPathItem
 import com.tesla.resukisuultra.ui.component.settings.SettingsJumpPageWidget
@@ -38,7 +43,26 @@ import com.tesla.resukisuultra.ui.viewmodel.SuSFSUiAction
 import com.tesla.resukisuultra.ui.viewmodel.SuSFSViewModel
 import com.tesla.resukisuultra.ui.viewmodel.awaitSuSFSBoolean
 import com.tesla.resukisuultra.ui.viewmodel.awaitSuSFSConfig
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/susfs/subpages/SuSFSConfigPathTab.kt
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.SusPathItem
+import org.bakasu.bakasu.ui.component.settings.SettingsJumpPageWidget
+import org.bakasu.bakasu.ui.component.settings.SettingsTextFieldWidget
+import org.bakasu.bakasu.ui.screen.susfs.RegisterSuSFSRefresh
+import org.bakasu.bakasu.ui.screen.susfs.SuSFSRefreshRegistrar
+import org.bakasu.bakasu.ui.screen.susfs.component.EntryDetailDialog
+import org.bakasu.bakasu.ui.screen.susfs.component.ManualAddDialog
+import org.bakasu.bakasu.ui.screen.susfs.component.SuSFSDescriptionCard
+import org.bakasu.bakasu.ui.screen.susfs.component.susfsEntryList
+import org.bakasu.bakasu.ui.screen.susfs.component.toImportedEntryLines
+import org.bakasu.bakasu.ui.util.LocalSnackbarHost
+import org.bakasu.bakasu.ui.util.showReplacingSnackbar
+import org.bakasu.bakasu.ui.viewmodel.SuSFSUiAction
+import org.bakasu.bakasu.ui.viewmodel.SuSFSViewModel
+import org.bakasu.bakasu.ui.viewmodel.awaitSuSFSBoolean
+import org.bakasu.bakasu.ui.viewmodel.awaitSuSFSConfig
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -185,12 +209,12 @@ fun SusPathTab(
                     enabled = !isLoading,
                     lineLimits = TextFieldLineLimits.MultiLine(
                         minHeightInLines = 4,
-                        maxHeightInLines = 8
+                        maxHeightInLines = 8,
                     ),
-                    renderBackgroundBlur = false
+                    renderBackgroundBlur = false,
                 )
             }
-        }
+        },
     )
 
     detailItem?.let { item ->
@@ -199,7 +223,7 @@ fun SusPathTab(
             title = detailTitle,
             fields = listOf(
                 pathLabel to item.path,
-                isLoopLabel to if (item.is_loop) isLoopLabel else isNotLoopLabel
+                isLoopLabel to if (item.is_loop) isLoopLabel else isNotLoopLabel,
             ),
             onDismiss = { detailItem = null },
             onDelete = {

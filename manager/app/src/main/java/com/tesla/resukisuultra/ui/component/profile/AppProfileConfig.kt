@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/profile/AppProfileConfig.kt
 package com.tesla.resukisuultra.ui.component.profile
+========
+package org.bakasu.bakasu.ui.component.profile
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/profile/AppProfileConfig.kt
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.FolderDelete
@@ -9,9 +13,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/component/profile/AppProfileConfig.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.domain.model.AppProfile
 import com.tesla.resukisuultra.ui.component.settings.SettingsSwitchWidget
+========
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.domain.model.AppProfile
+import org.bakasu.bakasu.ui.component.settings.SettingsSwitchWidget
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/component/profile/AppProfileConfig.kt
 
 @Composable
 fun AppProfileConfig(
@@ -34,10 +44,10 @@ fun AppProfileConfig(
             onProfileChange(
                 profile.copy(
                     umountModules = it,
-                    nonRootUseDefault = false
-                )
+                    nonRootUseDefault = false,
+                ),
             )
-        }
+        },
     )
 }
 

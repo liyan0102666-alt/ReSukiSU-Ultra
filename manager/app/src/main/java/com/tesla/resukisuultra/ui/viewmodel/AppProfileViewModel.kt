@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/viewmodel/AppProfileViewModel.kt
 package com.tesla.resukisuultra.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,12 @@ import com.tesla.resukisuultra.domain.usecase.GetSuperUserAppGroupUseCase
 import com.tesla.resukisuultra.domain.usecase.SetAppProfileUseCase
 import com.tesla.resukisuultra.domain.usecase.SetAppSepolicyUseCase
 import com.tesla.resukisuultra.domain.usecase.ValidateSepolicyUseCase
+========
+package org.bakasu.bakasu.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/viewmodel/AppProfileViewModel.kt
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +31,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.bakasu.bakasu.domain.model.AppControlAction
+import org.bakasu.bakasu.domain.model.AppProfile
+import org.bakasu.bakasu.domain.model.InstalledAppGroup
+import org.bakasu.bakasu.domain.model.WEBVIEW_ZYGOTE_UID
+import org.bakasu.bakasu.domain.usecase.ControlAppUseCase
+import org.bakasu.bakasu.domain.usecase.GetAppProfileUseCase
+import org.bakasu.bakasu.domain.usecase.GetAppSepolicyUseCase
+import org.bakasu.bakasu.domain.usecase.GetDefaultUmountModulesUseCase
+import org.bakasu.bakasu.domain.usecase.GetSuperUserAppGroupUseCase
+import org.bakasu.bakasu.domain.usecase.SetAppProfileUseCase
+import org.bakasu.bakasu.domain.usecase.SetAppSepolicyUseCase
+import org.bakasu.bakasu.domain.usecase.ValidateSepolicyUseCase
 
 data class AppProfileUiState(
     val appGroup: InstalledAppGroup? = null,
@@ -76,10 +95,13 @@ class AppProfileViewModel(
                 mutableState.update { it.copy(isLoading = true) }
                 runCatching {
                     val profile = getProfile(packageName, uid)
-                    val loadedProfile = if (profile.allowSu) {
+                    val isSpecial = uid == WEBVIEW_ZYGOTE_UID
+                    val loadedProfile = if (isSpecial) {
+                        profile.copy(allowSu = false)
+                    } else if (profile.allowSu) {
                         profile.copy(
                             rules = runCatching { getSepolicy(packageName) }
-                                .getOrDefault(profile.rules)
+                                .getOrDefault(profile.rules),
                         )
                     } else {
                         profile
@@ -105,29 +127,37 @@ class AppProfileViewModel(
 
             is AppProfileUiAction.Save -> {
                 val previous = mutableState.value.profile
-                mutableState.update { it.copy(profile = action.profile) }
+                val isSpecial = uid == WEBVIEW_ZYGOTE_UID
+                val profileToSave = if (isSpecial) {
+                    action.profile.copy(allowSu = false)
+                } else {
+                    action.profile
+                }
+                mutableState.update { it.copy(profile = profileToSave) }
                 viewModelScope.launch {
                     saveMutex.withLock {
-                        val sepolicyKey = action.profile.rootTemplate ?: action.profile.name
-                        if (action.profile.allowSu && !action.profile.rootUseDefault &&
-                            action.profile.rules.isNotEmpty() &&
-                            !setSepolicy(sepolicyKey, action.profile.rules)
-                        ) {
-                            rollbackIfCurrent(action.profile, previous)
-                            mutableEvents.emit(AppProfileUiEvent.SepolicyUpdateFailed)
-                            return@withLock
+                        if (!isSpecial) {
+                            val sepolicyKey = profileToSave.rootTemplate ?: profileToSave.name
+                            if (profileToSave.allowSu && !profileToSave.rootUseDefault &&
+                                profileToSave.rules.isNotEmpty() &&
+                                !setSepolicy(sepolicyKey, profileToSave.rules)
+                            ) {
+                                rollbackIfCurrent(profileToSave, previous)
+                                mutableEvents.emit(AppProfileUiEvent.SepolicyUpdateFailed)
+                                return@withLock
+                            }
                         }
-                        runCatching { setProfile(action.profile) }
+                        runCatching { setProfile(profileToSave) }
                             .onSuccess { saved ->
                                 if (saved) {
                                     mutableEvents.tryEmit(AppProfileUiEvent.Saved)
                                 } else {
-                                    rollbackIfCurrent(action.profile, previous)
+                                    rollbackIfCurrent(profileToSave, previous)
                                     mutableEvents.tryEmit(AppProfileUiEvent.Error())
                                 }
                             }
                             .onFailure {
-                                rollbackIfCurrent(action.profile, previous)
+                                rollbackIfCurrent(profileToSave, previous)
                                 mutableEvents.tryEmit(AppProfileUiEvent.Error(it))
                             }
                     }

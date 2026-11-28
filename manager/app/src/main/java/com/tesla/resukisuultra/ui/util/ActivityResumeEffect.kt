@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/util/ActivityResumeEffect.kt
 package com.tesla.resukisuultra.ui.util
+========
+package org.bakasu.bakasu.ui.util
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/util/ActivityResumeEffect.kt
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

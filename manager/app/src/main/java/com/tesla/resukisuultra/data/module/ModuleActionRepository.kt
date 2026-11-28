@@ -1,18 +1,26 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/data/module/ModuleActionRepository.kt
 package com.tesla.resukisuultra.data.module
 
 import android.os.Environment
 import com.tesla.resukisuultra.data.shell.KsuCliRepository
 import com.tesla.resukisuultra.domain.model.ModuleActionUpdate
+========
+package org.bakasu.bakasu.data.module
+
+import android.os.Environment
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/data/module/ModuleActionRepository.kt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import org.bakasu.bakasu.data.shell.KsuCliRepository
+import org.bakasu.bakasu.domain.model.ModuleActionUpdate
 
 class ModuleActionRepository(
     private val ksuCliRepository: KsuCliRepository,
@@ -37,7 +45,7 @@ class ModuleActionRepository(
             val date = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault()).format(Date())
             val file = File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                "KernelSU_module_action_log_${date}.log",
+                "KernelSU_module_action_log_$date.log",
             )
             file.writeText(content)
             file.absolutePath

@@ -14,6 +14,18 @@
 sys_call_ptr_t *ksu_syscall_table = NULL;
 int ksu_dispatcher_nr = -1;
 
+long ksu_call_syscall(int nr, const struct pt_regs *regs)
+{
+#ifdef CONFIG_COMPAT
+    if (unlikely(in_compat_syscall())) {
+        pr_err("compat but hooked! Please report this as a issue");
+        return -EOPNOTSUPP;
+    }
+#endif
+
+    return ksu_syscall_table[nr](regs);
+}
+
 #ifndef __NR_syscalls
 #define __NR_syscalls (__NR_syscall_max + 1)
 #endif
@@ -215,10 +227,15 @@ static long my_x64_sys_call(const struct pt_regs *regs, unsigned int nr)
     return ksu_syscall_table[nr](regs);
 }
 
-// avd 13-5.15 missing this commit:
+// Kernels without x64_sys_call may also miss this commit (both landed in 6.9
+// and were backported to GKI branches later), e.g. avd 13-5.15 and
+// avd 14-6.1.23, so the syscall nr rewritten by the sys_enter tracepoint is
+// never re-read:
 // https://github.com/torvalds/linux/commit/fb13b11d53875e28e7fbf0c26b288e4ea676aa9f
-// we need to patch the whole do_syscall_64
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 16, 0)
+// Patch the whole do_syscall_64 instead when x64_sys_call is not available.
+// Limited to < 6.7: since 6.7 do_syscall_64 returns bool (SYSRET vs IRET),
+// which this replacement does not implement.
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 7, 0)
 static void *do_syscall_64_patch_addr;
 static char do_syscall_64_orig_insn[14];
 
@@ -244,7 +261,9 @@ static __always_inline bool my_do_syscall_x64(struct pt_regs *regs, int nr)
 static void __nocfi my_do_syscall_64(struct pt_regs *regs, int nr)
 {
     nr = syscall_enter_from_user_mode_fn(regs, nr);
-    nr = syscall_get_nr(current, regs);
+    // Pick up the tracepoint's nr rewrite unless the syscall is skipped (-1, e.g. seccomp)
+    if (nr != -1)
+        nr = syscall_get_nr(current, regs);
 
     // AVD doesn't have x32 support after A13, we can ignore do_syscall_x32
 
@@ -306,13 +325,17 @@ void __init __nocfi ksu_syscall_hook_init(void)
 
 #ifdef CONFIG_KSU_X86_PATCH_SYSCALL_DISPATCHER
     patch_abs_jump("x64_sys_call", &x64_sys_call_patch_addr, my_x64_sys_call, x64_sys_call_patch_orig_insn);
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 16, 0)
-    syscall_enter_from_user_mode_fn = find_kernel_symbol_exact("syscall_enter_from_user_mode");
-    syscall_exit_to_user_mode_fn = find_kernel_symbol_exact("syscall_exit_to_user_mode");
-    pr_info("syscall_enter_from_user_mode: 0x%lx, syscall_exit_to_user_mode: 0x%lx\n",
-            (unsigned long)syscall_enter_from_user_mode_fn, (unsigned long)syscall_exit_to_user_mode_fn);
-    if (syscall_enter_from_user_mode_fn && syscall_exit_to_user_mode_fn) {
-        patch_abs_jump("do_syscall_64", &do_syscall_64_patch_addr, my_do_syscall_64, do_syscall_64_orig_insn);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 7, 0) && !defined(CONFIG_X86_X32_ABI)
+    // Before 5.16 always patch do_syscall_64 as well: such a kernel may have
+    // x64_sys_call backported without fb13b11d.
+    if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 16, 0) || !x64_sys_call_patch_addr) {
+        syscall_enter_from_user_mode_fn = find_kernel_symbol_exact("syscall_enter_from_user_mode");
+        syscall_exit_to_user_mode_fn = find_kernel_symbol_exact("syscall_exit_to_user_mode");
+        pr_info("syscall_enter_from_user_mode: 0x%lx, syscall_exit_to_user_mode: 0x%lx\n",
+                (unsigned long)syscall_enter_from_user_mode_fn, (unsigned long)syscall_exit_to_user_mode_fn);
+        if (syscall_enter_from_user_mode_fn && syscall_exit_to_user_mode_fn) {
+            patch_abs_jump("do_syscall_64", &do_syscall_64_patch_addr, my_do_syscall_64, do_syscall_64_orig_insn);
+        }
     }
 #endif
 #endif
@@ -342,7 +365,7 @@ void __exit ksu_syscall_hook_exit(void)
         }
     }
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 16, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 7, 0) && !defined(CONFIG_X86_X32_ABI)
     if (do_syscall_64_patch_addr) {
         ret = ksu_patch_text((void *)do_syscall_64_patch_addr, do_syscall_64_orig_insn, sizeof(do_syscall_64_orig_insn),
                              KSU_PATCH_TEXT_FLUSH_ICACHE);
@@ -381,5 +404,49 @@ clear_state:
 
     pr_info("all syscall hooks restored\n");
 }
+
+// stub here
+// because i think no usecase
+// (no device with x64 kernel and x32 userspace)
+#ifdef CONFIG_COMPAT
+// --- Dispatcher-based hook API (register/unregister) ---
+// Register a handler into the dispatcher's routing table for syscall @nr.
+// When a marked process invokes syscall @nr, the sys_enter tracepoint redirects
+// it to the unified dispatcher, which looks up @fn by @nr and calls it.
+// Does NOT modify the syscall table itself — the dispatcher slot is shared.
+// Returns 0 on success, -EEXIST if already registered, -EINVAL if nr invalid.
+int ksu_register_compat_syscall_hook(int nr, ksu_syscall_hook_fn fn)
+{
+    return -EOPNOTSUPP;
+}
+
+// Remove a handler from the dispatcher's routing table for syscall @nr.
+// The syscall table is not touched — only the dispatcher stops routing @nr.
+void ksu_unregister_compat_syscall_hook(int nr)
+{
+    // do nothing
+}
+
+// Check if a handler is registered in the dispatcher for syscall @nr.
+bool ksu_has_compat_syscall_hook(int nr)
+{
+    return false;
+}
+
+// --- Direct syscall table patching API (hook/unhook) ---
+// Directly overwrite syscall_table[@nr] with @fn using fixmap + stop_machine.
+// Saves the original handler to *@old (if non-NULL) and records the entry
+// for restoration at module exit. Use this for boot-time hooks that replace
+// a real syscall entry (e.g. ksud hooking __NR_execve/__NR_read/__NR_fstat).
+void ksu_compat_syscall_table_hook(int nr, syscall_fn_t fn, syscall_fn_t *old)
+{
+    // do nothing
+}
+
+void ksu_compat_syscall_table_unhook(int nr)
+{
+    // do nothing
+}
+#endif
 
 #endif /* __x86_64__ */

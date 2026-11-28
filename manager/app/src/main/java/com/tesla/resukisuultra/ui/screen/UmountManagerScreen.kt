@@ -1,5 +1,9 @@
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/UmountManagerScreen.kt
 package com.tesla.resukisuultra.ui.screen
 import com.tesla.resukisuultra.ui.theme.ContinuousCornerShape
+========
+package org.bakasu.bakasu.ui.screen
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/UmountManagerScreen.kt
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,11 +53,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+<<<<<<<< HEAD:manager/app/src/main/java/com/tesla/resukisuultra/ui/screen/UmountManagerScreen.kt
 import com.tesla.resukisuultra.R
 import com.tesla.resukisuultra.ui.component.ConfirmResult
 import com.tesla.resukisuultra.ui.component.SwipeableSnackbarHost
@@ -73,8 +77,30 @@ import com.tesla.resukisuultra.ui.util.showReplacingSnackbar
 import com.tesla.resukisuultra.ui.viewmodel.UmountManagerScreenViewModel
 import com.tesla.resukisuultra.ui.viewmodel.UmountManagerUiAction
 import com.tesla.resukisuultra.ui.viewmodel.UmountManagerUiEvent
+========
+>>>>>>>> resukisu/main:manager/app/src/main/java/org/bakasu/bakasu/ui/screen/UmountManagerScreen.kt
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.bakasu.bakasu.R
+import org.bakasu.bakasu.ui.component.ConfirmResult
+import org.bakasu.bakasu.ui.component.SwipeableSnackbarHost
+import org.bakasu.bakasu.ui.component.WarningCard
+import org.bakasu.bakasu.ui.component.rememberConfirmDialog
+import org.bakasu.bakasu.ui.component.settings.AppBackButton
+import org.bakasu.bakasu.ui.component.settings.SettingsBaseWidget
+import org.bakasu.bakasu.ui.component.settings.lazySegmentColumn
+import org.bakasu.bakasu.ui.navigation.LocalNavigator
+import org.bakasu.bakasu.ui.theme.CardConfig
+import org.bakasu.bakasu.ui.theme.ThemeConfig
+import org.bakasu.bakasu.ui.theme.blurEffect
+import org.bakasu.bakasu.ui.theme.blurSource
+import org.bakasu.bakasu.ui.util.ActivityResumeEffect
+import org.bakasu.bakasu.ui.util.LocalSnackbarHost
+import org.bakasu.bakasu.ui.util.adaptiveScaffoldWindowInsets
+import org.bakasu.bakasu.ui.util.showReplacingSnackbar
+import org.bakasu.bakasu.ui.viewmodel.UmountManagerScreenViewModel
+import org.bakasu.bakasu.ui.viewmodel.UmountManagerUiAction
+import org.bakasu.bakasu.ui.viewmodel.UmountManagerUiEvent
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -87,7 +113,6 @@ fun UmountManagerScreen() {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val snackBarHost = LocalSnackbarHost.current
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val confirmDialog = rememberConfirmDialog()
 
@@ -105,7 +130,7 @@ fun UmountManagerScreen() {
         viewModel.events.collectLatest { event ->
             when (event) {
                 is UmountManagerUiEvent.Message ->
-                    snackBarHost.showReplacingSnackbar(context.getString(event.stringResource))
+                    snackBarHost.showReplacingSnackbar(event.message)
             }
         }
     }
@@ -115,6 +140,7 @@ fun UmountManagerScreen() {
     }
 
     Scaffold(
+        contentWindowInsets = adaptiveScaffoldWindowInsets(),
         topBar = {
             LargeFlexibleTopAppBar(
                 modifier = Modifier
@@ -125,28 +151,30 @@ fun UmountManagerScreen() {
                     AppBackButton(
                         onClick = {
                             navigator.pop()
-                        }
+                        },
                     )
                 },
                 windowInsets = TopAppBarDefaults.windowInsets.add(WindowInsets(left = 12.dp)),
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor =
-                        if (themeConfig.isEnableBlur)
+                        if (themeConfig.isEnableBlur) {
                             Color.Transparent
-                        else
-                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
+                        } else {
+                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                        },
                     scrolledContainerColor =
-                        if (themeConfig.isEnableBlur)
+                        if (themeConfig.isEnableBlur) {
                             Color.Transparent
-                        else
-                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha),
-                )
+                        } else {
+                            MaterialTheme.colorScheme.surfaceContainer.copy(cardConfig.cardAlpha)
+                        },
+                ),
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showAddDialog = true }
+                onClick = { showAddDialog = true },
             ) {
                 Icon(Icons.TwoTone.Add, contentDescription = null)
             }
@@ -164,8 +192,7 @@ fun UmountManagerScreen() {
             ) {
                 LoadingIndicator()
             }
-        }
-        else {
+        } else {
             PullToRefreshBox(
                 state = pullToRefreshState,
                 isRefreshing = uiState.isRefreshing,
@@ -183,7 +210,7 @@ fun UmountManagerScreen() {
                 },
                 modifier = Modifier
                     .fillMaxSize()
-                    .blurSource()
+                    .blurSource(),
             ) {
                 LazyColumn(
                     modifier = Modifier
@@ -193,8 +220,8 @@ fun UmountManagerScreen() {
                         top = paddingValues.calculateTopPadding() + 5.dp,
                         start = 0.dp,
                         end = 0.dp,
-                        bottom = paddingValues.calculateBottomPadding() + 72.dp + 5.dp + 5.dp // FAB
-                    )
+                        bottom = paddingValues.calculateBottomPadding() + 72.dp + 5.dp + 5.dp, // FAB
+                    ),
                 ) {
                     item {
                         WarningCard(
@@ -220,7 +247,8 @@ fun UmountManagerScreen() {
 
                     lazySegmentColumn(
                         uiState.umountPaths,
-                        key = { _, it -> it.path }) { _, entry ->
+                        key = { _, it -> it.path },
+                    ) { _, entry ->
                         SettingsBaseWidget(
                             icon = Icons.TwoTone.Folder,
                             title = entry.path,
@@ -230,43 +258,44 @@ fun UmountManagerScreen() {
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(top = 5.dp)
+                                        .padding(top = 5.dp),
                                 ) {
                                     LabelText(
                                         label = if (entry.persistent) {
                                             stringResource(R.string.persistent)
                                         } else {
                                             stringResource(R.string.temporary)
-                                        }
+                                        },
                                     )
                                     LabelText(
                                         label = entry.flags.toUmountFlagName(),
                                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
                                     )
                                 }
-                            }
+                            },
                         ) {
                             val confirmDeleteSummary = stringResource(
                                 R.string.confirm_delete_umount_path,
-                                entry.path
+                                entry.path,
                             )
                             IconButton(
                                 onClick = {
                                     scope.launch {
                                         val confirmResult = confirmDialog.awaitConfirm(
                                             title = confirmDelete,
-                                            content = confirmDeleteSummary
+                                            content = confirmDeleteSummary,
                                         )
-                                        if (confirmResult != ConfirmResult.Confirmed)
+                                        if (confirmResult != ConfirmResult.Confirmed) {
                                             return@launch
+                                        }
                                         viewModel.dispatch(UmountManagerUiAction.Remove(entry))
                                     }
-                                }
+                                },
                             ) {
                                 Icon(
                                     imageVector = Icons.TwoTone.Delete,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.error
+                                    tint = MaterialTheme.colorScheme.error,
                                 )
                             }
                         }
@@ -286,7 +315,7 @@ fun UmountManagerScreen() {
                     }
 
                     viewModel.dispatch(UmountManagerUiAction.Add(path, flags))
-                }
+                },
             )
         }
     }
@@ -306,7 +335,7 @@ private fun Int.toUmountFlagName(): String = when (this) {
 @Composable
 fun AddUmountPathDialog(
     onDismiss: () -> Unit,
-    onConfirm: (String, Int) -> Unit
+    onConfirm: (String, Int) -> Unit,
 ) {
     var path by remember { mutableStateOf("") }
     var flags by remember { mutableStateOf("0") }
@@ -321,7 +350,7 @@ fun AddUmountPathDialog(
                     onValueChange = { path = it },
                     label = { Text(stringResource(R.string.mount_path)) },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -333,7 +362,7 @@ fun AddUmountPathDialog(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    supportingText = { Text(stringResource(R.string.umount_flags_hint)) }
+                    supportingText = { Text(stringResource(R.string.umount_flags_hint)) },
                 )
             }
         },
@@ -343,7 +372,7 @@ fun AddUmountPathDialog(
                     val flagsInt = flags.toIntOrNull() ?: 0
                     onConfirm(path, flagsInt)
                 },
-                enabled = path.isNotBlank()
+                enabled = path.isNotBlank(),
             ) {
                 Text(stringResource(android.R.string.ok))
             }
@@ -352,6 +381,6 @@ fun AddUmountPathDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(android.R.string.cancel))
             }
-        }
+        },
     )
 }
